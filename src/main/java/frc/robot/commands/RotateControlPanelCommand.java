@@ -21,7 +21,7 @@ import frc.robot.subsystems.ControlPanelSubsystem;
 public class RotateControlPanelCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-    private final ControlPanelSubsystem m_controlPanelSubSystem;
+    private final ControlPanelSubsystem m_controlPanelSubsystem;
     private final I2C.Port m_i2cPort = I2C.Port.kMXP;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(m_i2cPort);
     private final ColorMatch m_colorMatcher = new ColorMatch();
@@ -37,7 +37,7 @@ public class RotateControlPanelCommand extends CommandBase {
     // The + 1 is because that is when we have achieved the minimum number of
     // rotations
 
-    private boolean m_rotationComplete;
+    private boolean m_isRotationComplete;
     private int m_rotationsOfStartColor;
     private boolean m_hasChangedColor;
     private String m_colorString = "Unknown";
@@ -47,11 +47,11 @@ public class RotateControlPanelCommand extends CommandBase {
 
     public RotateControlPanelCommand(ControlPanelSubsystem controlPanel) {
 
-        m_controlPanelSubSystem = controlPanel;
-        m_wheelTalonSRX = m_controlPanelSubSystem.getTalonSRX();
+        m_controlPanelSubsystem = controlPanel;
+        m_wheelTalonSRX = m_controlPanelSubsystem.getTalonSRX();
         
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(m_controlPanelSubSystem);
+        addRequirements(m_controlPanelSubsystem);
     }
 
     // Called when the command is initially scheduled.
@@ -80,7 +80,7 @@ public class RotateControlPanelCommand extends CommandBase {
             m_startColor = "UnknownStartColor";
         }
 
-        m_rotationComplete = false;
+        m_isRotationComplete = false;
         m_hasChangedColor = false;
 
         System.out.println("Start Motor");
@@ -121,7 +121,7 @@ public class RotateControlPanelCommand extends CommandBase {
 
         if (m_rotationsOfStartColor == m_numOfRotationsToStop) // If we have reached the required amount of rotations,
         { // stop the motor and change rotationComplete to true;
-            m_rotationComplete = true;
+            m_isRotationComplete = true;
             System.out.println("Stop Motor");
         }
 
@@ -135,7 +135,7 @@ public class RotateControlPanelCommand extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_rotationComplete;
+        return m_isRotationComplete;
     }
 
     // Called once the command ends or is interrupted.
