@@ -28,6 +28,7 @@ public class RobotContainer {
   // Robot Subsystems
   //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
+  private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
 
   // Robot Commands
   //private final static SampleCommand m_sampleCommand = new SampleCommand(/*m_subSystem*/);
@@ -48,6 +49,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     OI.bindButton(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
+    OI.bindButton(OI::getXboxYButton).whenPressed(getStartAcquisitionMotorCommand());
   }
 
   public static OI getOI()
@@ -78,6 +80,10 @@ public class RobotContainer {
     return new RumbleCommand(m_controlPanelSubsystem);
   }
 
+    public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
+      return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
+    }
+
   // Subsystem Getters
   // public static DrivebaseSubsystem getDrivebaseSubsystem() {
   //   return m_drivebaseSubsystem;
@@ -85,5 +91,9 @@ public class RobotContainer {
 
   public static ControlPanelSubsystem getControlPanel() {
     return m_controlPanelSubsystem;
+  }
+
+  public static AcquisitionSubsystem getAcquisitionSubsystem(){
+    return m_acquisitionSubsystem;
   }
 }
