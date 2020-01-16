@@ -1,8 +1,11 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.button.Button;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -40,7 +43,7 @@ public class OI {
 
     public OI() {
 
-        m_xboxController = new XboxController(0);
+        m_xboxController = new XboxController(1);
     }
 
     public static boolean getXboxAButton() {
@@ -142,5 +145,10 @@ public class OI {
 
     public static void setXboxRumbleStop() {
         OI.setXboxRumbleSpeed(0);
+    }
+
+    public static Button bindButton(BooleanSupplier btn)
+    {
+        return new Button(btn) {};
     }
 }
