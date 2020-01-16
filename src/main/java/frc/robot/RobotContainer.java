@@ -26,7 +26,7 @@ public class RobotContainer {
   private final static OI m_oi = new OI();
 
   // Robot Subsystems
-  private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
+  //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
 
   // Robot Commands
@@ -47,6 +47,7 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    OI.bindButton(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
   }
 
   public static OI getOI()
@@ -67,6 +68,10 @@ public class RobotContainer {
   // Command Getters
   public static RotateControlPanelCommand getRotateControlPanelCommand() {
     return new RotateControlPanelCommand(m_controlPanelSubsystem);
+  }
+
+  public static PositionControlPanelCommand getPositionControlPanelCommand() {
+    return new PositionControlPanelCommand(m_controlPanelSubsystem);
    }
 
   public static RumbleCommand getRumbleCommand() {
@@ -74,9 +79,9 @@ public class RobotContainer {
   }
 
   // Subsystem Getters
-  public static DrivebaseSubsystem getDrivebaseSubsystem() {
-    return m_drivebaseSubsystem;
-  }
+  // public static DrivebaseSubsystem getDrivebaseSubsystem() {
+  //   return m_drivebaseSubsystem;
+  // }
 
   public static ControlPanelSubsystem getControlPanel() {
     return m_controlPanelSubsystem;

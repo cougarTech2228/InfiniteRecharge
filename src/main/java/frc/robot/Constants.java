@@ -52,10 +52,12 @@ public final class Constants {
         public static final int PWM_PIN_8 = 8;
         public static final int PWM_PIN_9 = 9;
 
-        public static final int RIGHT_FRONT_MOTOR_CAN_ID = 11;
-        public static final int RIGHT_REAR_MOTOR_CAN_ID = 12;
-        public static final int LEFT_FRONT_MOTOR_CAN_ID = 13;
-        public static final int LEFT_REAR_MOTOR_CAN_ID = 14;
+        public static final int RIGHT_FRONT_MOTOR_CAN_ID = 0; //11
+        public static final int RIGHT_REAR_MOTOR_CAN_ID = 0; //12
+        public static final int LEFT_FRONT_MOTOR_CAN_ID = 0; //13
+        public static final int LEFT_REAR_MOTOR_CAN_ID = 0; //14
+
+        public static final int CONTROL_PANEL_MOTOR_CAN_ID = 4;
 
         public static final int NEO_SPARK_MAX_CAN_ID = 6;
 
@@ -75,4 +77,6 @@ public final class Constants {
         public static final double ARCADE_DRIVE_TURN_DEADBAND = .03;
 
         public static final double XBOX_RUMBLE_TIME = 1.0;
+
+        public static final double WHEEL_MOTOR_VELOCITY = 0.1;
 }
