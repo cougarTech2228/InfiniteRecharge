@@ -50,6 +50,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.bindButton(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
     OI.bindButton(OI::getXboxYButton).whenPressed(getStartAcquisitionMotorCommand());
+    OI.bindButton(OI::getXboxDpadUp).whenPressed(getPositionControlPanelCommand());
   }
 
   public static OI getOI()

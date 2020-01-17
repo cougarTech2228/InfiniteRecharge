@@ -60,7 +60,7 @@ public class PositionControlPanelCommand extends CommandBase {
             //in position
             System.out.println("Stop Motor");
             //m_newWheelTalonSRX.set(0);
-            m_wheelTalonSRX.set(0.1);
+            m_wheelTalonSRX.set(0);
             isPositioned = true;
         }
 
@@ -82,7 +82,8 @@ public class PositionControlPanelCommand extends CommandBase {
 
     public String matchColor(String str) {
         int index = Arrays.asList(colorPositions).indexOf(str);
-        if ((index + 2) > colorPositions.length - 1) { // Since the game field color sensor is 2 colors off,  
+        index += 2;
+        if (index > colorPositions.length - 1) { // Since the game field color sensor is 2 colors off,  
             index -= 4; // the color you need is two off. This makes sure 
                         // traversing the color wheel doesn't go out of bounds        }
         }

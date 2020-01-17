@@ -45,7 +45,7 @@ public class OI {
     public OI() {
         //m_debouncer = new ButtonDebouncer(m_xboxController, 1, .5);
 
-        m_xboxController = new XboxController(1);
+        m_xboxController = new XboxController(0);
     }
 
     public static boolean getXboxAButton() {
