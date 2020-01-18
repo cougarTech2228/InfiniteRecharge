@@ -75,8 +75,8 @@ public class RobotContainer {
     return new RumbleCommand(m_controlPanelSubsystem);
   }
 
-    public static StartAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
-      return new StartAcquisitionMotorCommand(m_acquisitionSubsystem);
+    public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
+      return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
     }
 
   // Subsystem Getters

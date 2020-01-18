@@ -10,6 +10,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.GarminLidarLiteV3;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,6 +24,13 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  private GarminLidarLiteV3 m_Lidar = new GarminLidarLiteV3();
+  public static final int m_Serial = 0x1440;
+  public static final int m_Address = 0x62; // 20
+
+
+  private int m_Dist = 0;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -31,7 +40,22 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_Lidar.turnOnDebug();
+    m_Lidar.setI2CAddressToSerialNumber(m_Address, m_Serial, true);
+    m_Lidar.configure(GarminLidarLiteV3.BALANCED_PERFORMANCE);
+    m_Lidar.turnOffDebug();
+
   }
+
+  /**
+   * This function is called every robot packet, no matter the mode. Use
+   * this for items like diagnostics that you want ran during disabled,
+   * autonomous, teleoperated and test.
+   *
+   * <p>This runs after the mode specific periodic functions, but before
+   * LiveWindow and SmartDashboard integrated updating.
+   */
+  
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -78,7 +102,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    m_Dist = m_Lidar.distance(false);
+    double inches = m_Dist / 2.54;
+    System.out.printf("Centimeters: %s\n", m_Dist);
+    System.out.printf("Inches: %s\n", inches);
   }
+  
 
   @Override
   public void teleopInit() {
