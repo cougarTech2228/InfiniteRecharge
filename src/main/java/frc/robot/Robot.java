@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.GarminLidarLiteV3;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
@@ -106,6 +107,9 @@ public class Robot extends TimedRobot {
     double inches = m_Dist / 2.54;
     System.out.printf("Centimeters: %s\n", m_Dist);
     System.out.printf("Inches: %s\n", inches);
+
+    SmartDashboard.putNumber("Distance to Target (cm)", m_Dist);
+    SmartDashboard.putNumber("Distance to Target (in)", inches);
   }
   
 

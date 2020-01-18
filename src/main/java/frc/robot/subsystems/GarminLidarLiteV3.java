@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj.I2C.Port;
 import java.nio.ByteBuffer;
 import edu.wpi.first.wpilibj.Timer;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 //----------------------------------------------------------------------------
 //Class Declarations
 //----------------------------------------------------------------------------
@@ -97,7 +99,7 @@ public class GarminLidarLiteV3
       //----------------------------------------------------------------------------
       private int mSerialNumber = 0;
       private byte mAddress = DEFAULT_ADDRESS;
-      private boolean mDebug = true;
+      private boolean mDebug = false;
       private ByteBuffer mBuffer = ByteBuffer.allocateDirect(2);
       private int mPort = 0;
 
@@ -292,9 +294,37 @@ public class GarminLidarLiteV3
         {
           return error;
         }
-
         return mBuffer.getShort(0);
       }
+
+      // --------------------------------------------------------------------
+      // Purpose:
+      // Returns the moving average in in.
+      //
+      // Notes:
+      // none
+      // --------------------------------------------------------------------
+      public int MovingAverage() 
+      {
+        double sum;
+        int size;
+            
+        public double next(int val) {
+            sum += val;
+            list.offer(val);
+     
+            if(list.size()<=size){
+                return sum/list.size();
+            }
+     
+            sum -= list.poll();
+     
+            return sum/size;
+        }
+    }
+
+
+
 
       // --------------------------------------------------------------------
       // Purpose:
