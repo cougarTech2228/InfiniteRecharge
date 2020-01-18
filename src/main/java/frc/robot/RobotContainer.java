@@ -48,7 +48,9 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    OI.bindButton(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
     OI.bindButton(OI::getXboxYButton).whenPressed(getStartAcquisitionMotorCommand());
+    OI.bindButton(OI::getXboxDpadUp).whenPressed(getPositionControlPanelCommand());
   }
 
   public static OI getOI()
@@ -69,14 +71,18 @@ public class RobotContainer {
   // Command Getters
   public static RotateControlPanelCommand getRotateControlPanelCommand() {
     return new RotateControlPanelCommand(m_controlPanelSubsystem);
+  }
+
+  public static PositionControlPanelCommand getPositionControlPanelCommand() {
+    return new PositionControlPanelCommand(m_controlPanelSubsystem);
    }
 
   public static RumbleCommand getRumbleCommand() {
     return new RumbleCommand(m_controlPanelSubsystem);
   }
 
-    public static StartAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
-      return new StartAcquisitionMotorCommand(m_acquisitionSubsystem);
+    public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
+      return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
     }
 
   // Subsystem Getters
