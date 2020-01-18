@@ -6,8 +6,8 @@ import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 
 public abstract class TalonMotorBase extends MotorBase {
     
-    public TalonMotorBase(String name, int port) {
-        super(name, port);
+    public TalonMotorBase(int port) {
+        super(port);
         // TODO Auto-generated constructor stub
     }
 
@@ -49,9 +49,9 @@ public abstract class TalonMotorBase extends MotorBase {
     }
 
     @Override
-    public void setBreakMode(BrakeMode brakeMode) {
+    public void setBrakeMode(BrakeMode brakeMode) {
         switch(brakeMode) {
-            case Break:
+            case Brake:
                 talon.setNeutralMode(NeutralMode.Brake);
                 break;
             case Coast:

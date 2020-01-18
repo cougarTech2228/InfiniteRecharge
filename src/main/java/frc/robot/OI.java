@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.Button;
-//import frc.robot.utils.ButtonDebouncer;;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -92,8 +91,16 @@ public class OI {
         return m_xboxController.getTriggerAxis(Hand.kRight);
     }
 
+    public static boolean getXboxRightTriggerPressed() {
+        return m_xboxController.getTriggerAxis(Hand.kRight) > 0.2;
+    }
+
     public static double getXboxLeftTrigger() {
         return m_xboxController.getTriggerAxis(Hand.kLeft);
+    }
+
+    public static boolean getXboxLeftTriggerPressed() {
+        return m_xboxController.getTriggerAxis(Hand.kLeft) > 0.2;
     }
 
     public static double getXboxRightJoystickX() {
@@ -147,9 +154,5 @@ public class OI {
 
     public static void setXboxRumbleStop() {
         OI.setXboxRumbleSpeed(0);
-    }
-    
-    public static Button bindButton(BooleanSupplier btn) {
-        return new Button(btn) {};
     }
 }

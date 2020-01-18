@@ -53,7 +53,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
     public ControlPanelSubsystem() {
         System.out.println("controlpanelsubsystem");
 
-        m_wheelTalonSRX = new TalonSRXMotor("wheelTalon", Constants.CONTROL_PANEL_MOTOR_CAN_ID);
+        m_wheelTalonSRX = new TalonSRXMotor(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
         m_newWheelTalonSRX = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
 
         m_colorMatcher.addColorMatch(m_kBlueTarget);
