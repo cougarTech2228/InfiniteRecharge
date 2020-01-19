@@ -131,7 +131,7 @@ public class ToggleButton {
                     if(state == CommandState.Precedented && !commands.get(currentIndex).isFinished()) {
                         return;
                     }
-                    if(state == CommandState.Interruptible) {
+                    if(state == CommandState.Interruptible && commands.get(currentIndex) != null) {
                         commands.get(currentIndex).cancel();
                     }
                 }

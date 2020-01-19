@@ -36,6 +36,7 @@ public class BallDumpSubsystem extends SubsystemBase {
     public Command cmdSetPosition(DumperState state) {
         return new MethodCommand(() -> {
             dumper.set(state.value);
+            System.out.println(state);
         });
     }
 }

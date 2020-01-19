@@ -165,7 +165,6 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 
 		new ToggleButton()
-		.setStartCommand(new InstantCommand(() -> System.out.println("Enabled!")))
 		.addCommand(
 			new SequentialCommandGroup(
 				new MethodCommand(this::arcadeInit),
@@ -213,7 +212,7 @@ public void testPeriodic() {
 }
 	@Override
 	public void testInit(){
-		GainsBinder b = new GainsBinder("Attempt 2", _acquisitionMotor, new Gains(0,0,0,0,0,0));
+		//GainsBinder b = new GainsBinder("Attempt 2", _acquisitionMotor, new Gains(0,0,0,0,0,0));
 		/* Factory Default all hardware to prevent unexpected behaviour */
 		_leftMaster.configFactoryDefault();
 		_rightMaster.configFactoryDefault();
@@ -322,7 +321,7 @@ public void testPeriodic() {
 		System.out.println("This is arcade drive");
 	}
 	public void arcadeDrive() {
-		double forward = OI.getXboxLeftJoystickY();
+		double forward = -OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
 		forward = Deadband(forward);
 		turn = Deadband(turn) * 0.5;

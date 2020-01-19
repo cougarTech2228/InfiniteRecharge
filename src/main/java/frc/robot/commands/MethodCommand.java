@@ -23,7 +23,7 @@ public class MethodCommand extends CommandBase {
     public MethodCommand(Runnable method) {
         this.method = method;
         this.isFinished = false;
-        this.endCondition = () -> false;
+        this.endCondition = () -> true;
     }
     /**
      * This constructor should be used when the user wants to run a single method every loop iteration with no end condition.
