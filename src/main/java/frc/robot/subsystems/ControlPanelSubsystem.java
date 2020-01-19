@@ -31,13 +31,13 @@ import java.util.logging.Logger;
  */
 public class ControlPanelSubsystem extends SubsystemBase {
 
-    private TalonSRXMotor m_wheelTalonSRX;
-    private WPI_TalonSRX m_newWheelTalonSRX;
+    private WPI_TalonSRX m_wheelTalonSRX;
     private final static DigitalInput m_digitalInterrupt = new DigitalInput(Constants.DIGITAL_IO_0);
     private boolean hasFiredRotate;
     private boolean hasFiredPosition;
 
     private String gameData;
+    private final int m_rumbleTime = 1;
 
     private final I2C.Port m_i2cPort = I2C.Port.kOnboard;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(m_i2cPort);
@@ -53,8 +53,8 @@ public class ControlPanelSubsystem extends SubsystemBase {
     public ControlPanelSubsystem() {
         System.out.println("controlpanelsubsystem");
 
-        m_wheelTalonSRX = new TalonSRXMotor(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
-        m_newWheelTalonSRX = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
+        m_wheelTalonSRX = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
+        //m_newWheelTalonSRX = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
 
         m_colorMatcher.addColorMatch(m_kBlueTarget);
         m_colorMatcher.addColorMatch(m_kGreenTarget);
@@ -78,7 +78,10 @@ public class ControlPanelSubsystem extends SubsystemBase {
                     m_digitalInterrupt.disableInterrupts();
                     System.out.println("interruptFired");
                     m_logger.info("ControlPanel Digital Interrupt fired");
-                    CommandScheduler.getInstance().schedule(RobotContainer.getRotateControlPanelCommand());
+                    CommandScheduler.getInstance()
+                        .schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime)
+                        .andThen(RobotContainer.getRotateControlPanelCommand())
+                        .andThen(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime)));
                 }
             }
         });
@@ -88,7 +91,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
         // Enable digital interrupt pin
         m_digitalInterrupt.enableInterrupts();
     }
-
+    
     @Override
     public void periodic() {
         // Put code here to be run every loop
@@ -105,12 +108,8 @@ public class ControlPanelSubsystem extends SubsystemBase {
         relatchInterrupt();
     }
 
-    public TalonSRXMotor getTalonSRX() {
+    public WPI_TalonSRX getTalonSRX() {
         return m_wheelTalonSRX;
-    }
-
-    public WPI_TalonSRX getNewTalonSRX() {
-        return m_newWheelTalonSRX;
     }
 
     public void relatchInterrupt() {

@@ -28,6 +28,7 @@ import frc.robot.util.CommandToggler.CommandState;
 public class RobotContainer {
 
   private final static OI m_oi = new OI();
+  private static boolean fireEntireDrum = false;
 
   // Robot Subsystems
   //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
@@ -120,9 +121,25 @@ public class RobotContainer {
     return new RumbleCommand(m_controlPanelSubsystem);
   }
 
-    public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
-      return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
-    }
+  public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
+    return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
+  }
+
+  public static RunMotorCommand getRunMotorCommand() {
+    return new RunMotorCommand();
+  }
+  
+  // public static RotateDrumOneSectionCommand getRotateDrumOneSectionCommand() {
+  //   return new RotateDrumOneSectionCommand(m_storageSubsystem);
+  // }
+
+  // public static ShootEntireDrumCommand getShootEntireDrumCommand() {
+  //   return new ShootEntireDrumCommand(m_shooterSubsystem);
+  // }
+
+  // public static ShootSingleCellCommand getShootSingleCellCommand() {
+  //   return new ShootSingleCellCommand(m_shooterSubsystem);
+  // }
 
   // Subsystem Getters
   // public static DrivebaseSubsystem getDrivebaseSubsystem() {
@@ -136,4 +153,14 @@ public class RobotContainer {
   public static AcquisitionSubsystem getAcquisitionSubsystem(){
     return m_acquisitionSubsystem;
   }
+
+  // public static StorageSubsystem getStorageSubsystem(){
+  //   return m_storageSubsystem;
+  // }
+
+  // public static ShooterSubsystem getShooterSubystem(){
+  //   return m_shooterSubsystem;
+  // }
+
+  
 }

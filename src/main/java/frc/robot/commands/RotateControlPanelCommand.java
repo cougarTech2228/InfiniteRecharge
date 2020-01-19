@@ -2,8 +2,10 @@ package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 //import frc.robot.motors.TalonSRXMotor;
 import frc.robot.subsystems.ControlPanelSubsystem;
@@ -35,8 +37,7 @@ public class RotateControlPanelCommand extends CommandBase {
     public RotateControlPanelCommand(ControlPanelSubsystem controlPanel) {
 
         m_controlPanelSubsystem = controlPanel;
-        //m_wheelTalonSRX = m_controlPanelSubsystem.getTalonSRX();
-        m_wheelTalonSRX = m_controlPanelSubsystem.getNewTalonSRX();
+        m_wheelTalonSRX = m_controlPanelSubsystem.getTalonSRX();
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(m_controlPanelSubsystem);
     }
@@ -54,10 +55,10 @@ public class RotateControlPanelCommand extends CommandBase {
 
         System.out.println("Start Motor");
         //m_wheelTalonSRX.setVelocity(Constants.WHEEL_MOTOR_VELOCITY);
-        m_wheelTalonSRX.set(0.1);
+        m_wheelTalonSRX.set(0.25);
 
         //rumble controller
-        CommandScheduler.getInstance().schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime));
+        //CommandScheduler.getInstance().schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -78,19 +79,24 @@ public class RotateControlPanelCommand extends CommandBase {
         m_hasChangedColor = false;
     }
 
+    if(m_rotationsOfStartColor == m_numOfRotationsToStop - 1) // slow wheel down on last rotation
+    {
+        m_wheelTalonSRX.set(0.2);
+    }
+
     if(m_rotationsOfStartColor == m_numOfRotationsToStop) // If we have reached the required amount of rotations,
-    {                                                 // stop the motor and change rotationComplete to true;
+    {          
+        m_wheelTalonSRX.set(0);                                       // stop the motor and change rotationComplete to true;
         m_rotationComplete = true;
             System.out.println("Stop Motor");
-        m_wheelTalonSRX.set(0);
         //m_wheelTalonSRX.set(0);
     }   
 
     //-------------------------------------SmartDashboardWrites--------------------------------------
-    // SmartDashboard.putString("startColor", m_startColor);
-    // SmartDashboard.putString("colorString", m_colorString);
-    // SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
-    // SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
+    SmartDashboard.putString("startColor", m_startColor);
+    SmartDashboard.putString("colorString", m_colorString);
+    SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
+    SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
     }
 
     // Returns true when the command should end.
@@ -102,6 +108,7 @@ public class RotateControlPanelCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        CommandScheduler.getInstance().schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime));
+        //CommandScheduler.getInstance().schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime));
+        //CommandScheduler.getInstance().schedule(new WaitCommand(0.1).andThen(() -> m_wheelTalonSRX.set(0)));
     }
 }

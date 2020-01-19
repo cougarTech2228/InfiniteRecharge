@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.OI;
@@ -67,6 +68,18 @@ public class StorageSubsystem extends SubsystemBase {
             bopper.set(false);
         }*/
 
+        // Put code here to be run every loop
+
+        //SmartDashboard.putBooleanArray("drumArray", drumArray);
+        // SmartDashboard.putBoolean("isFull", isFull);
+        // SmartDashboard.putBoolean("isIndexerNotBlocked", isIndexerNotBlocked);
+        // SmartDashboard.putBoolean("isCheckerNotBlocked", isCheckerNotBlocked);
+        // SmartDashboard.putBoolean("drumarray[0]", drumArray[0]);
+        // SmartDashboard.putBoolean("drumarray[1]", drumArray[1]);
+        // SmartDashboard.putBoolean("drumarray[2]", drumArray[2]);
+        // SmartDashboard.putBoolean("drumarray[3]", drumArray[3]);
+        // SmartDashboard.putBoolean("drumarray[4]", drumArray[4]);
+        // SmartDashboard.putNumber("index", drumArrayIndex);
 
         if (m_inputIndexChecker.get()) {
             //System.out.println("ON!");

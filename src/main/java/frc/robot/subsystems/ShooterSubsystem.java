@@ -64,4 +64,34 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command cmdEnableShooter() {
         return new MethodCommand(() -> shooterMotor.set(ControlMode.PercentOutput, -1.0), true).runOnEnd(() -> shooterMotor.set(ControlMode.PercentOutput, 0));
     }
+    
+    // public boolean[] getDrumArray()
+    // {
+    //     return drumArray;
+    // }
+
+    // public boolean isShooterSlotOccupied()
+    // {
+    //     return !m_inputBallShooterChecker.get();
+    // }
+
+    public void raiseLifter()
+    {
+        System.out.println("raise lifter");
+    }
+
+    public void lowerLifter()
+    {
+        System.out.println("lower lifter");
+    }
+    
+    public void startFlywheel()
+    {
+        System.out.println("start flywheel");
+    }
+
+    public void stopFlywheel()
+    {
+        System.out.println("stop flywheel");
+    }
 }
