@@ -108,14 +108,12 @@ public class Robot extends TimedRobot {
   
     if (OI.getXboxAButton()) {
       m_talon.set(ControlMode.PercentOutput, 0.1);
-    }
-    if(!OI.getXboxAButton()){
+    } else {
       m_talon.set(ControlMode.PercentOutput, 0.0);
     }
     if (OI.getXboxXButton()) {
       m_venom.set(0.1);
-    }
-    if(!OI.getXboxXButton()){
+    } else {
       m_venom.set(0.0);
     }
   }
