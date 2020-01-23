@@ -16,6 +16,8 @@ import frc.robot.OI;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.playingwithfusion.CANVenom;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -28,6 +30,7 @@ public class Robot extends TimedRobot {
   private TalonFX m_talon = new TalonFX(11);
   private CANVenom m_venom = new CANVenom(15);
   private final static OI m_oi = new OI();
+  private CANSparkMax m_neo = new CANSparkMax(6, MotorType.kBrushless);
 
   private RobotContainer m_robotContainer;
 
@@ -115,6 +118,11 @@ public class Robot extends TimedRobot {
       m_venom.set(0.1);
     } else {
       m_venom.set(0.0);
+    }
+    if (OI.getXboxYButton()) {
+      m_neo.set(0.1);
+    } else {
+      m_neo.set(0.0);
     }
   }
 
