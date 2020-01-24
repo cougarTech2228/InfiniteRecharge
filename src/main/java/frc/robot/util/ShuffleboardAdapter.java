@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -7,6 +9,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -23,22 +26,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder.BooleanConsumer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.commands.MethodCommand;
 
 public class ShuffleboardAdapter {
-    private ShuffleboardTab subsystemTab;
+    private final ShuffleboardTab subsystemTab;
     private ShuffleboardContainer activeContainer;
     private Dictionary<String, SimpleWidget> widgets;
     private String activeWidget;
     private List<Runnable> updaters;
+    private List<Double> prevValues;
 
     private boolean isUpdating;
 
     public ShuffleboardAdapter(String subsystem) {
         subsystemTab = Shuffleboard.getTab(subsystem);
         activeContainer = subsystemTab;
+
         updaters = new ArrayList<Runnable>();
+        prevValues = new ArrayList<Double>();
         
         widgets = new Hashtable<String, SimpleWidget>();
         isUpdating = true;
@@ -52,8 +56,12 @@ public class ShuffleboardAdapter {
         isUpdating = update;
         return this;
     }
-    public ShuffleboardAdapter addBox(String name) {
-        activeContainer = subsystemTab.getLayout(name, BuiltInLayouts.kList);
+    public ShuffleboardAdapter inBox(String name) {
+        activeContainer = activeContainer.getLayout(name, BuiltInLayouts.kList);
+        return this;
+    }
+    public ShuffleboardAdapter inTab() {
+        activeContainer = subsystemTab;
         return this;
     }
     public ShuffleboardAdapter addBoolean(String name, boolean defaultValue, BooleanConsumer receiver) {
@@ -66,16 +74,62 @@ public class ShuffleboardAdapter {
         updaters.add(() -> v.setBoolean(updater.getAsBoolean()));
         return this;
     }
-    public ShuffleboardAdapter addDouble(String name, double defaultValue, DoubleConsumer receiver) {
-        var v = activeContainer.add(name, defaultValue);//.withWidget(BuiltInWidgets.kTextView);
+    public ShuffleboardAdapter addString(String name, String defaultValue, Consumer<String> receiver) {
+        var v = activeContainer.add(name, defaultValue);
         widgets.put(name, v);
         activeWidget = name;
+        updaters.add(() -> receiver.accept(v.getEntry().getString(defaultValue)));
+        return this;
+    }
+    public ShuffleboardAdapter addString(String name, String defaultValue, Supplier<String> updater) {
+        var v = activeContainer.add(name, defaultValue);
+        widgets.put(name, v);
+        activeWidget = name;
+        updaters.add(() -> v.getEntry().setString(updater.get()));
+        return this;
+    }
+    public ShuffleboardAdapter addDoubleSlider(String name, double defaultValue, DoubleConsumer receiver, double min, double max) {
+        addDouble(name, defaultValue, receiver)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", min, "max", max));
+        return this;
+    }
+    public ShuffleboardAdapter addDoubleSlider(String name, double defaultValue, DoubleConsumer receiver, double min, double max, double incrementerBy) {
+        addDouble(name, defaultValue, receiver)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", min, "max", max, "block increment", incrementerBy));
+        System.out.println(activeWidget);
+        return this;
+    }
+    public ShuffleboardAdapter addDoubleText(String name, double defaultValue, DoubleConsumer receiver) {
+        addDouble(name, defaultValue, receiver).withWidget(BuiltInWidgets.kTextView);
+        return this;
+    }
+    public ShuffleboardAdapter addDoubleText(String name, double defaultValue, DoubleConsumer receiver, double min, double max) {
+        addDouble(name, defaultValue, receiver, min, max).withWidget(BuiltInWidgets.kTextView);
+        return this;
+    }
+    public ShuffleboardAdapter addDouble(String name, double defaultValue, DoubleConsumer receiver, double min, double max) {
+        var v = activeContainer.add(name, defaultValue);
+        widgets.put(name, v);
+        activeWidget = name;
+        int index = prevValues.size();
+        prevValues.add(defaultValue);
+
         updaters.add(() -> {
             double d = v.getEntry().getDouble(Double.POSITIVE_INFINITY);
-            if(d != Double.POSITIVE_INFINITY) {
-                receiver.accept(v.getEntry().getDouble(defaultValue));
+            if(d != Double.POSITIVE_INFINITY && d >= min && d <= max) {
+                receiver.accept(d);
+                prevValues.set(index, d);
+            }
+            else {
+                v.getEntry().setDouble(prevValues.get(index));
             }
         });
+        return this;
+    }
+    public ShuffleboardAdapter addDouble(String name, double defaultValue, DoubleConsumer receiver) {
+        addDouble(name, defaultValue, receiver, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         return this;
     }
     public ShuffleboardAdapter addDouble(String name, double defaultValue, DoubleSupplier updater) {

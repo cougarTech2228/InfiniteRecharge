@@ -1,9 +1,5 @@
 package frc.robot.motors;
 
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-
 public abstract class MotorBase {
     protected int port;
     protected double maxRPM;

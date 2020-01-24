@@ -46,7 +46,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         // You need to register the subsystem to get it's periodic
         // method to be called by the Scheduler
-        CommandScheduler.getInstance().registerSubsystem(this);
+        register();
 
         m_visionDataTableInst = NetworkTableInstance.getDefault();
         m_visionDataTable = m_visionDataTableInst.getTable(VISION_DATA_TABLE_KEY);

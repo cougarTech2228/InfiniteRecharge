@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 /**
  * A class dedicated to make it easy to make buttons toggle between or through multiple commands
  */
-public class ToggleButton {
+public class CommandToggler {
 
     private int nextIndex;
     private boolean cycle;
@@ -23,7 +23,7 @@ public class ToggleButton {
     private CommandState defaultCmdState = CommandState.Normal;
 
     /**
-     * CommandStates define how the commands should be run in the ToggleButton's command list
+     * CommandStates define how the commands should be run in the CommandToggler's command list
      */
     public enum CommandState {
         /**
@@ -41,9 +41,9 @@ public class ToggleButton {
         Precedented
     }
     /**
-     * Creates a new default ToggleButton instance
+     * Creates a new default CommandToggler instance
      */
-    public ToggleButton() {
+    public CommandToggler() {
         this.commands = new ArrayList<Command>();
         this.commandStates = new ArrayList<CommandState>();
         nextIndex = 0;
@@ -51,10 +51,10 @@ public class ToggleButton {
         cycle = false;
     }
     /**
-     * Creates a new ToggleButton that toggles between the commands passed in
+     * Creates a new CommandToggler that toggles between the commands passed in
      * @param commands
      */
-    public ToggleButton(Command... commands) {
+    public CommandToggler(Command... commands) {
         this.commands = Arrays.asList(commands);
         this.commandStates = new ArrayList<CommandState>();
         setDefaultState(CommandState.Normal);
@@ -67,7 +67,7 @@ public class ToggleButton {
      * @param command
      * @param state
      */
-    public ToggleButton addCommand(Command command, CommandState state) {
+    public CommandToggler addCommand(Command command, CommandState state) {
         commands.add(command);
         commandStates.add(state);
         return this;
@@ -76,7 +76,7 @@ public class ToggleButton {
      * Adds the specified command onto the toggling list with the default CommandState
      * @param command
      */
-    public ToggleButton addCommand(Command command) {
+    public CommandToggler addCommand(Command command) {
         return addCommand(command, defaultCmdState);
     }
     /**
@@ -84,7 +84,7 @@ public class ToggleButton {
      * @param state
      * @return
      */
-    public ToggleButton setDefaultState(CommandState state) {
+    public CommandToggler setDefaultState(CommandState state) {
         commandStates = new ArrayList<CommandState>();
         for(Command c : commands) {
             commandStates.add(state);
@@ -93,36 +93,36 @@ public class ToggleButton {
     }
     /**
      * Sets whether to cycle through the command list, if true, once the last command has been started,
-     * the next time the set ToggleButton is pressed, it will loop to the beginning of the command list and run the first command
+     * the next time the set CommandToggler is pressed, it will loop to the beginning of the command list and run the first command
      * (The exact opposite happens for the ToggleDownButton if one is assigned)
      * @param on
      * @return
      */
-    public ToggleButton setCycle(boolean on) {
+    public CommandToggler setCycle(boolean on) {
         cycle = on;
         return this;
     }
     /**
-     * Sets a command to be run when the ToggleButton is initialized
+     * Sets a command to be run when the CommandToggler is initialized
      * @param command
      */
-    public ToggleButton setStartCommand(Command command) {
+    public CommandToggler setStartCommand(Command command) {
         command.schedule();
         return this;
     }
     /**
      * Assigns a button to control toggling upward through the command list
      * @param pressed = a reference to the method testing the button press
-     * Ex: .setToggleButton(OI::getXboxLeftBumper)
+     * Ex: .setCommandToggler(OI::getXboxLeftBumper)
      */
-    public ToggleButton setToggleButton(BooleanSupplier pressed) {
+    public CommandToggler setToggleButton(BooleanSupplier pressed) {
         return setToggleButton(new Button(pressed) {});
     }
     /**
      * Assigns a button to control toggling upward through the command list
      * @param button = a Button object
      */
-    public ToggleButton setToggleButton(Button button) {
+    public CommandToggler setToggleButton(Button button) {
         if(upButton == null) {
             upButton = button;
             upButton.whenPressed(() -> {
@@ -151,14 +151,14 @@ public class ToggleButton {
      * @param pressed = a reference to the method testing the button press
      * Ex: .setToggleDownButton(OI::getXboxRightBumper)
      */
-    public ToggleButton setToggleDownButton(BooleanSupplier pressed) {
+    public CommandToggler setToggleDownButton(BooleanSupplier pressed) {
         return setToggleDownButton(new Button(pressed) {});
     }
     /**
      * Assigns a button to control toggling downward through the command list
      * @param button = a Button object
      */
-    public ToggleButton setToggleDownButton(Button button) {
+    public CommandToggler setToggleDownButton(Button button) {
         if(downButton == null) {
             downButton = button;
             downButton.whenPressed(() -> {

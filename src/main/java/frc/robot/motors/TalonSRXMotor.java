@@ -1,5 +1,6 @@
 package frc.robot.motors;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class TalonSRXMotor extends TalonMotorBase {
@@ -8,5 +9,6 @@ public class TalonSRXMotor extends TalonMotorBase {
         super(port);
         talon = new TalonSRX(port);
         talon.configFactoryDefault();
+        talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
     }
 }
