@@ -12,8 +12,12 @@ import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.BallDumpSubsystem.DumperState;
+import frc.robot.util.CommandToggler;
+import frc.robot.util.CommandToggler.CommandState;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -28,7 +32,11 @@ public class RobotContainer {
   // Robot Subsystems
   //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
+  private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
+  private final static BallDumpSubsystem m_dumperSubsystem = new BallDumpSubsystem();
   private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
+  private final static StorageSubsystem m_storageSubsytem = new StorageSubsystem();
+  private final static ShooterSubsystem m_shooterSubsytem = new ShooterSubsystem();
 
   // Robot Commands
   //private final static SampleCommand m_sampleCommand = new SampleCommand(/*m_subSystem*/);
@@ -48,14 +56,45 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.bindButton(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
-    OI.bindButton(OI::getXboxYButton).whenPressed(getStartAcquisitionMotorCommand());
-    OI.bindButton(OI::getXboxDpadUp).whenPressed(getPositionControlPanelCommand());
-  }
+    //Bind driveState Toggler to left bumper
+    new CommandToggler(
+      m_drivebaseSubsystem.cmdUseArcadeDrive(),
+      m_drivebaseSubsystem.cmdUseStraightDrive()
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxLeftBumper)
+    .setCycle(true);
 
-  public static OI getOI()
-  {
-    return m_oi;
+    //Bind raise/lowering the dumper to right bumper
+    /*
+    new CommandToggler(
+      m_dumperSubsystem.cmdSetPosition(DumperState.raised),
+      m_dumperSubsystem.cmdSetPosition(DumperState.lowered)
+    )
+    .setToggleButton(OI::getXboxRightBumper)
+    .setCycle(true);
+    */
+    //Bind enabling/disabling the aquirer closed loop to the right trigger
+    new CommandToggler(
+      m_acquisitionSubsystem.cmdSetClosedLoop(),
+      null
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxRightTriggerPressed)
+    .setCycle(true);
+
+    new Button(OI::getXboxRightBumper).whenPressed(m_storageSubsytem.cmdBop());
+    new Button(OI::getXboxYButton).whenHeld(m_storageSubsytem.cmdRunDrum());
+    
+    new CommandToggler(
+      m_shooterSubsytem.cmdEnableShooter(),
+      null
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxBButton)
+    .setCycle(true);
+
+    new Button(OI::getXboxAButton).whenPressed(m_storageSubsytem.cmdRotateDrumOnce());
   }
 
   /**

@@ -4,8 +4,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 public class FalconMotor extends TalonMotorBase {
 
-    public FalconMotor(String name, int port) {
-        super(name, port);
+    public FalconMotor(int port) {
+        super(port);
         talon = new TalonFX(port);
         talon.configFactoryDefault();
     }

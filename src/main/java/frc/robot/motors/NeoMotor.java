@@ -13,8 +13,8 @@ public class NeoMotor extends MotorBase {
     private CANEncoder neoEnc;
     private CANPIDController neoPID;
 
-    public NeoMotor(String name, int port) {
-        super(name, port);
+    public NeoMotor(int port) {
+        super(port);
         neo = new CANSparkMax(port, MotorType.kBrushless);
         neoEnc = neo.getEncoder();
         neoPID = neo.getPIDController();
@@ -63,9 +63,9 @@ public class NeoMotor extends MotorBase {
     }
 
     @Override
-    public void setBreakMode(BrakeMode brakeMode) {
+    public void setBrakeMode(BrakeMode brakeMode) {
         switch(brakeMode) {
-            case Break:
+            case Brake:
                 neo.setIdleMode(IdleMode.kBrake);
                 break;
             case Coast:

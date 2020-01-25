@@ -8,8 +8,8 @@ public class VenomMotor extends MotorBase {
     
     private CANVenom venom;
 
-    public VenomMotor(String name, int port) {
-        super(name, port);
+    public VenomMotor(int port) {
+        super(port);
         venom = new CANVenom(port);
     }
     /**
@@ -44,9 +44,9 @@ public class VenomMotor extends MotorBase {
     }
 
     @Override
-    public void setBreakMode(BrakeMode brakeMode) {
+    public void setBrakeMode(BrakeMode brakeMode) {
         switch(brakeMode) {
-            case Break:
+            case Brake:
                 venom.setBrakeCoastMode(BrakeCoastMode.Brake);
                 break;
             case Coast:

@@ -1,32 +1,66 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.Constants;
-import frc.robot.OI;
+import frc.robot.commands.MethodCommand;
+import frc.robot.motors.TalonSRXMotor;
+import frc.robot.util.ShuffleboardAdapter;
 
 public class AcquisitionSubsystem extends SubsystemBase {
-    private WPI_TalonSRX m_acquisitionMotor;
-    private boolean m_isAcquiring;
+    private TalonSRXMotor acquisitionMotor;
+    private double acquisitionMaxSpeed = 0.5;
+    private int r, g, b, a;
+    private int state = 0;
+    private Timer timer;
+
     public AcquisitionSubsystem() {
-        m_acquisitionMotor = new WPI_TalonSRX(Constants.ACQUISITION_MOTOR_CAN_ID);
-        m_isAcquiring = false;
-        // You need to register the subsystem to get it's periodic
-        // method to be called by the Scheduler
-        CommandScheduler.getInstance().registerSubsystem(this);
+        register();
 
+        System.out.println("dumper init");
+        acquisitionMotor = new TalonSRXMotor(15);
+        timer = new Timer();
+        /*
+        new ShuffleboardAdapter("Acquirer")
+            .inBox("Test2")
+                .addColorBox("Color", () -> new Color8Bit(r, g, b))
+
+                .addDoubleSlider("R", 0, value -> r = (int)value, 0, 255, 1)
+                .addDoubleSlider("G", 0, value -> g = (int)value, 0, 255, 1)
+                .addDoubleSlider("B", 0, value -> b = (int)value, 0, 255, 1);*/
     }
-
     @Override
     public void periodic() {
-        // Put code here to be run every loop
-        if(OI.getXboxYButton())
-        {
-            
-        }
-    }
         
+    }
+    
+    public Command cmdSetAquisitionSpeed(double speed) {
+        return new MethodCommand(() -> {
+            acquisitionMotor.set(acquisitionMaxSpeed * speed);
+        });
+    }
+    public Command cmdSetClosedLoop() {
+        return new SequentialCommandGroup(
+            new MethodCommand(() -> acquisitionMotor.set(0.5)),
+            new MethodCommand(() -> 
+            {
+                if(acquisitionMotor.getCurrent() > 2 && timer.get() == 0) {
+                    timer.start();
+                    acquisitionMotor.set(0.6);
+                }
+                else if(timer.get() > 0.2) {
+                    timer.stop();
+                    timer.reset();
+                    acquisitionMotor.set(0.5);
+                }
+                System.out.println(acquisitionMotor.getCurrent());
+                return false;
+            }).runOnEnd(
+                () -> acquisitionMotor.set(0)
+            )
+        );
+    }
 }
