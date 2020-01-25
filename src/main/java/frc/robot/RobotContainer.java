@@ -32,6 +32,7 @@ public class RobotContainer {
   // Robot Subsystems
   //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
+  private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static BallDumpSubsystem m_dumperSubsystem = new BallDumpSubsystem();
   private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
   private final static StorageSubsystem m_storageSubsytem = new StorageSubsystem();
@@ -78,7 +79,7 @@ public class RobotContainer {
       m_acquisitionSubsystem.cmdSetClosedLoop(),
       null
     )
-    .setDefaultState(CommwandState.Interruptible)
+    .setDefaultState(CommandState.Interruptible)
     .setToggleButton(OI::getXboxRightTriggerPressed)
     .setCycle(true);
 
