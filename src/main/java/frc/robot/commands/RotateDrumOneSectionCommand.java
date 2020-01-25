@@ -2,38 +2,34 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StorageSubsystem;
-import frc.robot.OI;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.RobotContainer;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.motors.*;
 import frc.robot.Constants;
-import edu.wpi.first.wpilibj.InterruptHandlerFunction;
 
 /**
- * Rumble Controller
- * Needs a .withTimeout(time) when scheduled or it will vibrate infinitely
+ * RotateDrumOneSectionCommand
+ * 
  */
 public class RotateDrumOneSectionCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private TalonSRXMotor m_drumMotor;
     private StorageSubsystem m_storageSubsystem;
-    private boolean isDoneSpinning;
+    private boolean m_isDoneSpinning;
     
-
-    public RotateDrumOneSectionCommand(StorageSubsystem storageSubsystem) {
-        // Use addRequirements() here to declare subsystem dependencies.
+    public RotateDrumOneSectionCommand(StorageSubsystem storageSubsystem) {  
         m_storageSubsystem = storageSubsystem;
         m_drumMotor = new TalonSRXMotor("drumMotor", Constants.DRUM_MOTOR_CAN_ID);
+
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(m_storageSubsystem);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_drumMotor.set(0.2);
-        isDoneSpinning = false;
+        m_drumMotor.set(Constants.DRUM_MOTOR_VELOCITY);
+        m_isDoneSpinning = false;
+        System.out.println("start motor");
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -42,14 +38,15 @@ public class RotateDrumOneSectionCommand extends CommandBase {
         if(!m_storageSubsystem.getIndexCheckerIsNotBlocked())
         {
             m_drumMotor.set(0);
-            isDoneSpinning = true;
+            m_isDoneSpinning = true;
+            System.out.println("stop motor");
         }
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return isDoneSpinning;
+        return m_isDoneSpinning;
     }
 
     // Called once the command ends or is interrupted.

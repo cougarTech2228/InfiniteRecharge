@@ -1,15 +1,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ControlPanelSubsystem;
 import frc.robot.Constants;
 import frc.robot.OI;
 
 import frc.robot.motors.*;
 
 /**
- * Rumble Controller
- * Needs a .withTimeout(time) when scheduled or it will vibrate infinitely
+ * RunMotorCommand
+ * 
  */
 public class RunMotorCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
@@ -37,12 +36,20 @@ public class RunMotorCommand extends CommandBase {
         }
     }
 
+    
+    /** 
+     * @return boolean
+     */
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return isFinished;
     }
 
+    
+    /** 
+     * @param interrupted
+     */
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {

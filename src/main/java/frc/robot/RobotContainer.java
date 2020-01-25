@@ -18,6 +18,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.BallDumpSubsystem.DumperState;
 import frc.robot.util.CommandToggler;
 import frc.robot.util.CommandToggler.CommandState;
+import frc.robot.Constants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -28,7 +29,6 @@ import frc.robot.util.CommandToggler.CommandState;
 public class RobotContainer {
 
   private final static OI m_oi = new OI();
-  private static boolean fireEntireDrum = false;
 
   // Robot Subsystems
   //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();

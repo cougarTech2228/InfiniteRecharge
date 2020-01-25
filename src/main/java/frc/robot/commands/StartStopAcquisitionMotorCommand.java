@@ -2,12 +2,10 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.AcquisitionSubsystem;
-import frc.robot.subsystems.ControlPanelSubsystem;
-import frc.robot.OI;
 
 /**
- * Rumble Controller
- * Needs a .withTimeout(time) when scheduled or it will vibrate infinitely
+ * StartStopAcquisitionMotorCommand
+ * 
  */
 public class StartStopAcquisitionMotorCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })

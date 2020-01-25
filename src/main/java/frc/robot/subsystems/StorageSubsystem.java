@@ -35,7 +35,7 @@ public class StorageSubsystem extends SubsystemBase {
     private boolean isFull;
 
     public StorageSubsystem() {
-        
+        System.out.println("subsystem constructor");
         // You need to register the subsystem to get it's periodic
         // method to be called by the Scheduler
         register();
@@ -70,45 +70,29 @@ public class StorageSubsystem extends SubsystemBase {
 
         // Put code here to be run every loop
 
-        //SmartDashboard.putBooleanArray("drumArray", drumArray);
-        // SmartDashboard.putBoolean("isFull", isFull);
-        // SmartDashboard.putBoolean("isIndexerNotBlocked", isIndexerNotBlocked);
-        // SmartDashboard.putBoolean("isCheckerNotBlocked", isCheckerNotBlocked);
-        // SmartDashboard.putBoolean("drumarray[0]", drumArray[0]);
-        // SmartDashboard.putBoolean("drumarray[1]", drumArray[1]);
-        // SmartDashboard.putBoolean("drumarray[2]", drumArray[2]);
-        // SmartDashboard.putBoolean("drumarray[3]", drumArray[3]);
-        // SmartDashboard.putBoolean("drumarray[4]", drumArray[4]);
-        // SmartDashboard.putNumber("index", drumArrayIndex);
+        SmartDashboard.putBooleanArray("m_drumArray", m_drumArray);
+        SmartDashboard.putBoolean("m_isFull", m_isFull);
+        SmartDashboard.putBoolean("isIndexCheckerNotBlocked", m_inputIndexChecker.get());
+        SmartDashboard.putBoolean("isBallCheckerNotBlocked", m_inputBallChecker.get());
+        SmartDashboard.putBoolean("m_drumArray[0]", m_drumArray[0]);
+        SmartDashboard.putBoolean("m_drumArray[1]", m_drumArray[1]);
+        SmartDashboard.putBoolean("m_drumArray[2]", m_drumArray[2]);
+        SmartDashboard.putBoolean("m_drumArray[3]", m_drumArray[3]);
+        SmartDashboard.putBoolean("m_drumArray[4]", m_drumArray[4]);
+        SmartDashboard.putNumber("index", m_drumArrayIndex);
 
-        if (m_inputIndexChecker.get()) {
-            //System.out.println("ON!");
-            isIndexerNotBlocked = true;
-        } else {
-            //System.out.println("off...");
-            isIndexerNotBlocked = false;
-        }
-
-        if (m_inputBallChecker.get()) {
-            //System.out.println("ON!");
-            isCheckerNotBlocked = true;
-        } else {
-            //System.out.println("off...");
-            isCheckerNotBlocked = false;
-        }
-
-        if (OI.getXboxLeftBumper()) // temporary, remove in the end
+        if (OI.getXboxYButton()) // TODO just for testing
         {
-            for(int i = 0; i < drumArray.length; i++)
+            for(int i = 0; i < m_drumArray.length; i++)
             {
-                drumArray[i] = false;
+                m_drumArray[i] = false;
             }
-            isFull = false;
+            m_isFull = false;
         }
 
-        if (!isFull) // if the drum is full, dont try to check if it needs to rotate again
+        if (!m_isFull) // if the drum is full, dont try to check if it needs to rotate again
         {
-            if(!m_inputBallChecker.get() && !hasBeenTripped) // something tripped the laser sensor and it hasn't done it before
+            if(!m_inputBallChecker.get() && !m_hasBeenTripped) // something tripped the laser sensor and it hasn't done it before
             {
                 hasBeenTripped = true;
                 drumArray[drumArrayIndex] = true;
@@ -159,16 +143,16 @@ public class StorageSubsystem extends SubsystemBase {
     }
     public boolean[] getDrumArray()
     {
-        return drumArray;
+        return m_drumArray;
     }
 
     public void finishIndex()
     {
-        drumArrayIndex++;
-        if (drumArrayIndex == drumArray.length) {
-            drumArrayIndex = 0;
+        m_drumArrayIndex++;
+        if (m_drumArrayIndex == m_drumArray.length) {
+            m_drumArrayIndex = 0;
         }
-        hasBeenTripped = false;
+        m_hasBeenTripped = false;
     }
     
     public boolean getIndexCheckerIsNotBlocked()
@@ -178,17 +162,17 @@ public class StorageSubsystem extends SubsystemBase {
     
     public void isDrumFull()
     {
-        for (boolean slot : drumArray)
+        for (boolean slot : m_drumArray)
         {
             if (!slot) {
                 return;
             }
         }
-        isFull = true;
+        m_isFull = true;
     }
 
     public void setDrumArray(int index, boolean value)
     {
-        drumArray[index] = value;
+        m_drumArray[index] = value;
     }
 }

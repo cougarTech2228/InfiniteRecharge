@@ -4,15 +4,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.RobotContainer;
-//import frc.robot.motors.TalonSRXMotor;
 import frc.robot.subsystems.ControlPanelSubsystem;
-
+import frc.robot.Constants;
 
 /**
- *
+ * RotateControlPanelCommand
+ * 
  */
 public class RotateControlPanelCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
@@ -20,24 +17,24 @@ public class RotateControlPanelCommand extends CommandBase {
     private final ControlPanelSubsystem m_controlPanelSubsystem;
 
     private final int m_rotations = 3; // Setting this variable to 5 will not work correctly as of now
-    private final int m_numOfRotationsToStop = (m_rotations * 2) + 1; 
-    // The (rotations * 2) because there are two of the same color on the wheel. 
-    // The + 1 is because that is when we have achieved the minimum number of rotations
+    private final int m_numOfRotationsToStop = (m_rotations * 2) + 2;
+    // The (rotations * 2) because there are two of the same color on the wheel.
+    // The + 1 is because that is when we have achieved the minimum number of
+    // rotations
 
     private boolean m_rotationComplete;
     private int m_rotationsOfStartColor;
     private boolean m_hasChangedColor;
-    private final int m_rumbleTime = 1; // seconds
     private String m_colorString = "Unknown";
-    private String m_startColor = "UnknownStartColor";
+    private final String m_redColor = "Red";
+    private boolean hasFoundRed = false;
 
-    //private TalonSRXMotor m_wheelTalonSRX;
     private WPI_TalonSRX m_wheelTalonSRX;
 
     public RotateControlPanelCommand(ControlPanelSubsystem controlPanel) {
-
         m_controlPanelSubsystem = controlPanel;
         m_wheelTalonSRX = m_controlPanelSubsystem.getTalonSRX();
+
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(m_controlPanelSubsystem);
     }
@@ -47,56 +44,64 @@ public class RotateControlPanelCommand extends CommandBase {
     public void initialize() {
         m_rotationsOfStartColor = 0;
 
-        //---------------------------------GetStartColor---------------------------------------
-        m_startColor = m_controlPanelSubsystem.getCurrentColor();
+        // ---------------------------------GetStartColor---------------------------------------
 
         m_rotationComplete = false;
         m_hasChangedColor = false;
 
         System.out.println("Start Motor");
-        //m_wheelTalonSRX.setVelocity(Constants.WHEEL_MOTOR_VELOCITY);
-        m_wheelTalonSRX.set(0.25);
-
-        //rumble controller
-        //CommandScheduler.getInstance().schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime));
+        m_wheelTalonSRX.set(Constants.CONTROL_PANEL_MOTOR_VELOCITY_FAST);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
 
-    //-------------------------------------GetCurrentColor---------------------------------------    
-    m_colorString = m_controlPanelSubsystem.getCurrentColor();
+        // -------------------------------------GetCurrentColor---------------------------------------
+        m_colorString = m_controlPanelSubsystem.getCurrentColor();
 
-    //----------------------------------IncrementRotations----------------------------------------
-    if(!m_colorString.equals(m_startColor))
-    {
-        m_hasChangedColor = true; // the color is different and sensor has moved
-    }
-    else if(m_colorString.equals(m_startColor) && m_hasChangedColor) // If the current color string equals the the start color and it has changed color, 
-    {                                                          // increment rotationsOfStartColor
-        m_rotationsOfStartColor++;
-        m_hasChangedColor = false;
-    }
+        // -------------------------------------FindRed-----------------------------------------------
+        if (!hasFoundRed) 
+        {
+            if(m_colorString.equals(m_redColor)) 
+            {
+                hasFoundRed = true;
+                m_wheelTalonSRX.set(Constants.CONTROL_PANEL_MOTOR_VELOCITY_FAST);
+                System.out.println("red found");
+            }
+        } 
+        else 
+        {
+            // ----------------------------------IncrementRotations----------------------------------------
+            if (!m_colorString.equals(m_redColor)) 
+            {
+                m_hasChangedColor = true; // the color is different and sensor has moved
+            } 
+            else if ((m_colorString.equals(m_redColor) && (m_hasChangedColor))
+                    && m_controlPanelSubsystem.getConfidence() > 0.97) // If the current color is red, has changed color, and has a high confident rating.
+            {                                                          
+                m_rotationsOfStartColor++; // increment rotationsOfStartColor
+                m_hasChangedColor = false;
+            }
 
-    if(m_rotationsOfStartColor == m_numOfRotationsToStop - 1) // slow wheel down on last rotation
-    {
-        m_wheelTalonSRX.set(0.2);
-    }
+            if ((m_rotationsOfStartColor) == (m_numOfRotationsToStop - 1)) // slow wheel down on last rotation
+            {
+                m_wheelTalonSRX.set(Constants.CONTROL_PANEL_MOTOR_VELOCITY_SLOW);
+            }
 
-    if(m_rotationsOfStartColor == m_numOfRotationsToStop) // If we have reached the required amount of rotations,
-    {          
-        m_wheelTalonSRX.set(0);                                       // stop the motor and change rotationComplete to true;
-        m_rotationComplete = true;
-            System.out.println("Stop Motor");
-        //m_wheelTalonSRX.set(0);
-    }   
+            if (m_rotationsOfStartColor == m_numOfRotationsToStop) // If we have reached the required amount of rotations,
+            {
+                m_wheelTalonSRX.set(0); // stop the motor and change rotationComplete to true;
+                m_rotationComplete = true;
+                System.out.println("Stop Motor");
+            }
+        }
 
-    //-------------------------------------SmartDashboardWrites--------------------------------------
-    SmartDashboard.putString("startColor", m_startColor);
-    SmartDashboard.putString("colorString", m_colorString);
-    SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
-    SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
+        // -------------------------------------SmartDashboardWrites--------------------------------------
+        // SmartDashboard.putString("startColor", m_redColor);
+        // SmartDashboard.putString("colorString", m_colorString);
+        // SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
+        // SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
     }
 
     // Returns true when the command should end.
@@ -108,7 +113,6 @@ public class RotateControlPanelCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        //CommandScheduler.getInstance().schedule(RobotContainer.getRumbleCommand().withTimeout(m_rumbleTime));
-        //CommandScheduler.getInstance().schedule(new WaitCommand(0.1).andThen(() -> m_wheelTalonSRX.set(0)));
+
     }
 }
