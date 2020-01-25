@@ -60,9 +60,9 @@ public class ShootCommand extends CommandBase {
             } 
             else 
             {
-                CommandScheduler.getInstance() // Other wise move the drum one section
-                        .schedule(RobotContainer.getRotateDrumOneSectionCommand()
-                        .andThen(new WaitCommand(1)));
+                // CommandScheduler.getInstance() // Other wise move the drum one section
+                //         .schedule(RobotContainer.getRotateDrumOneSectionCommand()
+                //         .andThen(new WaitCommand(1)));
                 
                 if(m_shootMode == Constants.SHOOT_MODE_ALL_CELLS)
                 {

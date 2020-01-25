@@ -18,7 +18,7 @@ public class RunMotorCommand extends CommandBase {
 
     public RunMotorCommand() {
         // Use addRequirements() here to declare subsystem dependencies.
-        m_neoMotor = new NeoMotor("neoMotor", Constants.CONTROL_PANEL_MOTOR_CAN_ID);
+        m_neoMotor = new NeoMotor(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
     }
 
     // Called when the command is initially scheduled.

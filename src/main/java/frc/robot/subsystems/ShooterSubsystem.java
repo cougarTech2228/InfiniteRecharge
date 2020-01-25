@@ -54,21 +54,21 @@ public class ShooterSubsystem extends SubsystemBase {
         new ShuffleboardAdapter("Shooter")
             .addDoubleText("target velocity", 0, value -> {
                 shooterMotor.set(ControlMode.Velocity, value);
-                System.out.println("Set it to: " + value);
+                //System.out.println("Set it to: " + value);
             });
         // You need to register the subsystem to get it's periodic
         // method to be called by the Scheduler
 
         m_inputBallShooterChecker = new DigitalInput(Constants.DIGITAL_IO_3);
         //m_storageSubsystem = storageSubsystem;
-        m_drumArray = m_storageSubsystem.getDrumArray();
+        //m_drumArray = m_storageSubsystem.getDrumArray();
         //m_lifterSolenoid = new Solenoid(Constants.PCM_CAN_ID, Constants.PCM_PORT_1);
     }
 
-    }
+    
     @Override
     public void periodic() {
-        System.out.println(shooterMotor.getSelectedSensorPosition());
+        //System.out.println(shooterMotor.getSelectedSensorPosition());
         /*
         if(OI.getXboxBButton()) {
             shooterMotor.set(-1.0);
@@ -81,20 +81,16 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command cmdEnableShooter() {
         return new MethodCommand(() -> shooterMotor.set(ControlMode.PercentOutput, -1.0), true).runOnEnd(() -> shooterMotor.set(ControlMode.PercentOutput, 0));
     }
+    
     public boolean[] getDrumArray()
     {
         return m_drumArray;
     }
-    
-    // public boolean[] getDrumArray()
-    // {
-    //     return drumArray;
-    // }
 
-    // public boolean isShooterSlotOccupied()
-    // {
-    //     return !m_inputBallShooterChecker.get();
-    // }
+    public boolean isShooterSlotOccupied()
+    {
+        return !m_inputBallShooterChecker.get();
+    }
 
     public void raiseLifter()
     {

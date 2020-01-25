@@ -86,6 +86,10 @@ public class RobotContainer {
 
     new Button(OI::getXboxRightBumper).whenPressed(m_storageSubsytem.cmdBop());
     new Button(OI::getXboxYButton).whenHeld(m_storageSubsytem.cmdRunDrum());
+    new Button(OI::getXboxDpadLeft).whenHeld(m_controlPanelSubsystem.cmdPositionControlPanel());
+    new Button(OI::getXboxDpadRight).whenHeld(m_controlPanelSubsystem.cmdRotateControlPanel());
+    new Button(OI::getXboxAButton).whenHeld(m_controlPanelSubsystem.cmdRelatchInterrupt());
+    new Button(OI::getXboxLeftBumper).whenHeld(m_storageSubsytem.cmdResetDrum());
     
     new CommandToggler(
       m_shooterSubsytem.cmdEnableShooter(),
@@ -109,13 +113,6 @@ public class RobotContainer {
   }
 
   // Command Getters
-  public static RotateControlPanelCommand getRotateControlPanelCommand() {
-    return new RotateControlPanelCommand(m_controlPanelSubsystem);
-  }
-
-  public static PositionControlPanelCommand getPositionControlPanelCommand() {
-    return new PositionControlPanelCommand(m_controlPanelSubsystem);
-   }
 
   public static RumbleCommand getRumbleCommand() {
     return new RumbleCommand(m_controlPanelSubsystem);

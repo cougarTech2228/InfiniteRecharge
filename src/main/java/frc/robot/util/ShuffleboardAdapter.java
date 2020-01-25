@@ -98,7 +98,7 @@ public class ShuffleboardAdapter {
         addDouble(name, defaultValue, receiver)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", min, "max", max, "block increment", incrementerBy));
-        System.out.println(activeWidget);
+        //System.out.println(activeWidget);
         return this;
     }
     public ShuffleboardAdapter addDoubleText(String name, double defaultValue, DoubleConsumer receiver) {

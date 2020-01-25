@@ -26,13 +26,13 @@ public class StorageSubsystem extends SubsystemBase {
     private DigitalInput m_inputIndexChecker;
     private TalonSRXMotor m_drumMotor;
     private Spark m_drumSparkMotor;
-    private boolean[] drumArray = {false, false, false, false, false}; // false if unoccupied, true if occupied
-    private boolean hasBeenTripped = false;
-    private int drumArrayIndex = 0;
-    private Solenoid bopper;
-    private boolean isIndexerNotBlocked = true;
-    private boolean isCheckerNotBlocked = true;
-    private boolean isFull;
+    private boolean[] m_drumArray = {false, false, false, false, false}; // false if unoccupied, true if occupied
+    private boolean m_hasBeenTripped = false;
+    private int m_drumArrayIndex = 0;
+    private Solenoid m_bopper;
+    private boolean m_isIndexerNotBlocked = true;
+    private boolean m_isCheckerNotBlocked = true;
+    private boolean m_isFull;
 
     public StorageSubsystem() {
         System.out.println("subsystem constructor");
@@ -44,8 +44,8 @@ public class StorageSubsystem extends SubsystemBase {
         //m_drumMotor = new TalonSRXMotor(-1s);
         m_drumSparkMotor = new Spark(Constants.DRUM_SPARK_PWM_ID);
 
-        bopper = new Solenoid(0);
-        isFull = false;
+        m_bopper = new Solenoid(0);
+        m_isFull = false;
 
         //new ShuffleboardAdapter("")
     }
@@ -81,26 +81,30 @@ public class StorageSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("m_drumArray[4]", m_drumArray[4]);
         SmartDashboard.putNumber("index", m_drumArrayIndex);
 
-        if (OI.getXboxYButton()) // TODO just for testing
-        {
-            for(int i = 0; i < m_drumArray.length; i++)
-            {
-                m_drumArray[i] = false;
-            }
-            m_isFull = false;
-        }
-
         if (!m_isFull) // if the drum is full, dont try to check if it needs to rotate again
         {
             if(!m_inputBallChecker.get() && !m_hasBeenTripped) // something tripped the laser sensor and it hasn't done it before
             {
-                hasBeenTripped = true;
-                drumArray[drumArrayIndex] = true;
+                m_hasBeenTripped = true;
+                m_drumArray[m_drumArrayIndex] = true;
                 cmdRotateDrum().schedule();
             }
         }
 
     }
+
+    public Command cmdResetDrum() {
+            return new MethodCommand(() -> {
+                System.out.println("reset drum");
+                for(int i = 0; i < m_drumArray.length; i++)
+                {
+                    m_drumArray[i] = false;
+                }
+                m_isFull = false;
+            }
+        );
+    }
+
     public Command cmdRotateDrumOnce() {
         return new SequentialCommandGroup(
             new MethodCommand(() -> m_drumMotor.set(0.2)),
@@ -136,9 +140,9 @@ public class StorageSubsystem extends SubsystemBase {
     }
     public Command cmdBop() {
         return new SequentialCommandGroup(
-            new MethodCommand(() -> bopper.set(true)),
+            new MethodCommand(() -> m_bopper.set(true)),
             new WaitCommand(0.1),
-            new MethodCommand(() -> bopper.set(false))
+            new MethodCommand(() -> m_bopper.set(false))
         );
     }
     public boolean[] getDrumArray()

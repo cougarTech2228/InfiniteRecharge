@@ -18,7 +18,7 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     
     public RotateDrumOneSectionCommand(StorageSubsystem storageSubsystem) {  
         m_storageSubsystem = storageSubsystem;
-        m_drumMotor = new TalonSRXMotor("drumMotor", Constants.DRUM_MOTOR_CAN_ID);
+        m_drumMotor = new TalonSRXMotor(Constants.DRUM_MOTOR_CAN_ID);
 
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(m_storageSubsystem);

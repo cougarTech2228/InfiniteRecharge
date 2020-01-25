@@ -45,6 +45,15 @@ public class MethodCommand extends CommandBase {
         this.isFinished = false;
     }
     /**
+     * This makes the command run a given command when it ends
+     * @param command = the command to be run when the first command ends
+     */
+    public MethodCommand runOnEnd(Command command) {
+        this.endMethod = () -> command.schedule();
+        return this;
+    }
+
+    /**
      * This makes the command run a given method when it ends
      * @param method = the method to be run when the command ends
      */
