@@ -18,6 +18,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.BallDumpSubsystem.DumperState;
 import frc.robot.util.CommandToggler;
 import frc.robot.util.CommandToggler.CommandState;
+import frc.robot.Constants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -85,6 +86,10 @@ public class RobotContainer {
 
     new Button(OI::getXboxRightBumper).whenPressed(m_storageSubsytem.cmdBop());
     new Button(OI::getXboxYButton).whenHeld(m_storageSubsytem.cmdRunDrum());
+    new Button(OI::getXboxDpadLeft).whenHeld(m_controlPanelSubsystem.cmdPositionControlPanel());
+    new Button(OI::getXboxDpadRight).whenHeld(m_controlPanelSubsystem.cmdRotateControlPanel());
+    new Button(OI::getXboxAButton).whenHeld(m_controlPanelSubsystem.cmdRelatchInterrupt());
+    new Button(OI::getXboxLeftBumper).whenHeld(m_storageSubsytem.cmdResetDrum());
     
     new CommandToggler(
       m_shooterSubsytem.cmdEnableShooter(),
@@ -108,21 +113,30 @@ public class RobotContainer {
   }
 
   // Command Getters
-  public static RotateControlPanelCommand getRotateControlPanelCommand() {
-    return new RotateControlPanelCommand(m_controlPanelSubsystem);
-  }
-
-  public static PositionControlPanelCommand getPositionControlPanelCommand() {
-    return new PositionControlPanelCommand(m_controlPanelSubsystem);
-   }
 
   public static RumbleCommand getRumbleCommand() {
     return new RumbleCommand(m_controlPanelSubsystem);
   }
 
-    public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
-      return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
-    }
+  public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
+    return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
+  }
+
+  public static RunMotorCommand getRunMotorCommand() {
+    return new RunMotorCommand();
+  }
+  
+  // public static RotateDrumOneSectionCommand getRotateDrumOneSectionCommand() {
+  //   return new RotateDrumOneSectionCommand(m_storageSubsystem);
+  // }
+
+  // public static ShootEntireDrumCommand getShootEntireDrumCommand() {
+  //   return new ShootEntireDrumCommand(m_shooterSubsystem);
+  // }
+
+  // public static ShootSingleCellCommand getShootSingleCellCommand() {
+  //   return new ShootSingleCellCommand(m_shooterSubsystem);
+  // }
 
   // Subsystem Getters
   // public static DrivebaseSubsystem getDrivebaseSubsystem() {
@@ -136,4 +150,14 @@ public class RobotContainer {
   public static AcquisitionSubsystem getAcquisitionSubsystem(){
     return m_acquisitionSubsystem;
   }
+
+  // public static StorageSubsystem getStorageSubsystem(){
+  //   return m_storageSubsystem;
+  // }
+
+  // public static ShooterSubsystem getShooterSubystem(){
+  //   return m_shooterSubsystem;
+  // }
+
+  
 }

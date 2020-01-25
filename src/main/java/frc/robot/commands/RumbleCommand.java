@@ -3,22 +3,25 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ControlPanelSubsystem;
 import frc.robot.OI;
+import frc.robot.Constants;
 
 /**
- * Rumble Controller
- * Needs a .withTimeout(time) when scheduled or it will vibrate infinitely
+ * RumbleCommand
+ * 
  */
 public class RumbleCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     public RumbleCommand(ControlPanelSubsystem controlPanel) {
+
         // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(controlPanel);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        OI.setXboxRumbleSpeed(1.0);
+        OI.setXboxRumbleSpeed(Constants.XBOX_RUMBLE_TIME);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

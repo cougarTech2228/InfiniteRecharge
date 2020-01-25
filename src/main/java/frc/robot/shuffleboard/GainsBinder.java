@@ -55,7 +55,7 @@ public class GainsBinder {
                     if(!newGains.isEqualTo(gains.get(i / 6))) {
                         gains.set(i / 6, newGains);
                         motor.setPID(i / 6, newGains);
-                        System.out.println(this);
+                        //System.out.println(this);
                     }
                 }
                 System.out.println("running");
