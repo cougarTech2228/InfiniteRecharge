@@ -31,13 +31,12 @@ public class RobotContainer {
   private final static OI m_oi = new OI();
 
   // Robot Subsystems
-  //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
-  private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
+   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
   private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static BallDumpSubsystem m_dumperSubsystem = new BallDumpSubsystem();
   private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
-  private final static StorageSubsystem m_storageSubsytem = new StorageSubsystem();
-  private final static ShooterSubsystem m_shooterSubsytem = new ShooterSubsystem();
+  private final static StorageSubsystem m_storageSubsystem = new StorageSubsystem();
+  private final static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(m_storageSubsystem);
 
   // Robot Commands
   //private final static SampleCommand m_sampleCommand = new SampleCommand(/*m_subSystem*/);
@@ -57,49 +56,63 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    //Bind driveState Toggler to left bumper
-    new CommandToggler(
-      m_drivebaseSubsystem.cmdUseArcadeDrive(),
-      m_drivebaseSubsystem.cmdUseStraightDrive()
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxLeftBumper)
-    .setCycle(true);
+    // stuff tucker wants
+    // LB - shoot motor (toggle)
+    // LT - shoot once
+    // RB - Acquirer motor (toggle)
+    // RT -Shoot entire drum
+    // X - Rotation
+    // Y - Position
+    // dpad for climb
 
-    //Bind raise/lowering the dumper to right bumper
-    /*
-    new CommandToggler(
-      m_dumperSubsystem.cmdSetPosition(DumperState.raised),
-      m_dumperSubsystem.cmdSetPosition(DumperState.lowered)
-    )
-    .setToggleButton(OI::getXboxRightBumper)
-    .setCycle(true);
-    */
-    //Bind enabling/disabling the aquirer closed loop to the right trigger
+    // new Button(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
+    // new Button(OI::getXboxYButton).whenPressed(getPositionControlPanelCommand());
+
     new CommandToggler(
       m_acquisitionSubsystem.cmdSetClosedLoop(),
       null
     )
     .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxRightTriggerPressed)
+    .setToggleButton(OI::getXboxRightBumper)
     .setCycle(true);
 
-    new Button(OI::getXboxRightBumper).whenPressed(m_storageSubsytem.cmdBop());
-    new Button(OI::getXboxYButton).whenHeld(m_storageSubsytem.cmdRunDrum());
-    new Button(OI::getXboxDpadLeft).whenHeld(m_controlPanelSubsystem.cmdPositionControlPanel());
-    new Button(OI::getXboxDpadRight).whenHeld(m_controlPanelSubsystem.cmdRotateControlPanel());
-    new Button(OI::getXboxAButton).whenHeld(m_controlPanelSubsystem.cmdRelatchInterrupt());
-    new Button(OI::getXboxLeftBumper).whenHeld(m_storageSubsytem.cmdResetDrum());
+    // new CommandToggler( // TODO test this
+    //   new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
+    //   new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem)
+    // )
+    // .setDefaultState(CommandState.Interruptible)
+    // .setToggleButton(OI::getXboxLeftBumper)
+    // .setCycle(true);
     
+    //new Button(OI::getXboxLeftTrigger).whenPressed(shootonce());
+    //new Button(OI::getXboxRightTrigger).whenPressed(shootentire());
+
+    //------------------
+
+    new Button(OI::getXboxLeftBumper).whenPressed(() -> m_storageSubsystem.resetDrum());
+
+    new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_shooterSubsystem.tryToShoot());
+
+    new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_storageSubsystem.stopDrumMotor());
+
+    new Button(OI::getXboxAButton).whenPressed(() -> m_storageSubsystem.startDrumMotor());
+
+    new Button(OI::getXboxBButton).whenPressed(getRotateDrumOneSectionCommand());
+
+    new Button(OI::getXboxXButton).whenPressed(() -> m_shooterSubsystem.startShooterMotor());
+    new Button(OI::getXboxYButton).whenPressed(() -> m_shooterSubsystem.stopShooterMotor());
+
+    
+
     new CommandToggler(
-      m_shooterSubsytem.cmdEnableShooter(),
-      null
+      m_drivebaseSubsystem.cmdUseArcadeDrive(),
+      m_drivebaseSubsystem.cmdUseStraightDrive()
     )
     .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxBButton)
+    .setToggleButton(OI::getXboxRightJoystickPress)
     .setCycle(true);
 
-    new Button(OI::getXboxAButton).whenPressed(m_storageSubsytem.cmdRotateDrumOnce());
+
   }
 
   /**
@@ -115,49 +128,46 @@ public class RobotContainer {
   // Command Getters
 
   public static RumbleCommand getRumbleCommand() {
-    return new RumbleCommand(m_controlPanelSubsystem);
+    return new RumbleCommand();
   }
 
-  public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
-    return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
-  }
-
-  public static RunMotorCommand getRunMotorCommand() {
-    return new RunMotorCommand();
+  public static BopperCommand getBopperCommand() {
+    return new BopperCommand(m_shooterSubsystem);
   }
   
-  // public static RotateDrumOneSectionCommand getRotateDrumOneSectionCommand() {
-  //   return new RotateDrumOneSectionCommand(m_storageSubsystem);
-  // }
+  public static RotateDrumOneSectionCommand getRotateDrumOneSectionCommand() {
+    return new RotateDrumOneSectionCommand(m_storageSubsystem, m_shooterSubsystem);
+  }
 
-  // public static ShootEntireDrumCommand getShootEntireDrumCommand() {
-  //   return new ShootEntireDrumCommand(m_shooterSubsystem);
-  // }
+  public static PositionControlPanelCommand getPositionControlPanelCommand() {
+    return new PositionControlPanelCommand(m_controlPanelSubsystem);
+  }
 
-  // public static ShootSingleCellCommand getShootSingleCellCommand() {
-  //   return new ShootSingleCellCommand(m_shooterSubsystem);
-  // }
+  public static RotateControlPanelCommand getRotateControlPanelCommand() {
+    return new RotateControlPanelCommand(m_controlPanelSubsystem);
+  }
 
   // Subsystem Getters
-  // public static DrivebaseSubsystem getDrivebaseSubsystem() {
-  //   return m_drivebaseSubsystem;
-  // }
 
-  public static ControlPanelSubsystem getControlPanel() {
-    return m_controlPanelSubsystem;
+  public static DrivebaseSubsystem getDrivebaseSubsystem() {
+    return m_drivebaseSubsystem;
   }
+
+   public static ControlPanelSubsystem getControlPanel() {
+     return m_controlPanelSubsystem;
+   }
 
   public static AcquisitionSubsystem getAcquisitionSubsystem(){
     return m_acquisitionSubsystem;
   }
 
-  // public static StorageSubsystem getStorageSubsystem(){
-  //   return m_storageSubsystem;
-  // }
+  public static StorageSubsystem getStorageSubsystem(){
+     return m_storageSubsystem;
+  }
 
-  // public static ShooterSubsystem getShooterSubystem(){
-  //   return m_shooterSubsystem;
-  // }
+   public static ShooterSubsystem getShooterSubystem(){
+     return m_shooterSubsystem;
+   }
 
   
 }

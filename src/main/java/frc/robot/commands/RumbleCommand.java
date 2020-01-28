@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ControlPanelSubsystem;
 import frc.robot.OI;
 import frc.robot.Constants;
 
@@ -12,10 +11,10 @@ import frc.robot.Constants;
 public class RumbleCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-    public RumbleCommand(ControlPanelSubsystem controlPanel) {
+    public RumbleCommand() {
 
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(controlPanel);
+        //addRequirements();
     }
 
     // Called when the command is initially scheduled.

@@ -2,89 +2,64 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
-import frc.robot.OI;
-import frc.robot.commands.MethodCommand;
+import frc.robot.RobotContainer;
 import frc.robot.motors.Gains;
-import frc.robot.motors.TalonSRXMotor;
 import frc.robot.shuffleboard.GainsBinder;
 import frc.robot.util.ShuffleboardAdapter;
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ShooterSubsystem extends SubsystemBase {
-    TalonSRX shooterMotor;
+
+    TalonSRX m_shooterMotor;
     private DigitalInput m_inputBallShooterChecker;
+    private Solenoid m_bopper;
     private StorageSubsystem m_storageSubsystem;
-    private boolean[] m_drumArray;
-    private Solenoid m_lifterSolenoid;
-    public ShooterSubsystem() {
-        register();
-        shooterMotor = new TalonSRX(Constants.SHOOTER_CAN_ID);
+    private boolean m_isShooting;
+    //private ShootOnceCommand m_shootOnceCommandReference;
 
-        shooterMotor.configFactoryDefault();
-        shooterMotor.configSelectedFeedbackSensor(
-            FeedbackDevice.QuadEncoder,
-            Constants.PID_PRIMARY,
-            Constants.kTimeoutMs
-        );
-    
-
-
-        shooterMotor.config_kP(0, 0.01, Constants.kTimeoutMs);
-		shooterMotor.config_kI(0, 0, Constants.kTimeoutMs);
-		shooterMotor.config_kD(0, 0, Constants.kTimeoutMs);
-		shooterMotor.config_kF(0, 0, Constants.kTimeoutMs);
-		shooterMotor.config_IntegralZone(0, 0, Constants.kTimeoutMs);
-		shooterMotor.configClosedLoopPeakOutput(0, 1.0, Constants.kTimeoutMs);
-        shooterMotor.configAllowableClosedloopError(0, 0, Constants.kTimeoutMs);
-        
-        shooterMotor.configClosedLoopPeriod(0, 1, Constants.kTimeoutMs);
-
-        shooterMotor.configPeakOutputForward(+1.0, Constants.kTimeoutMs);
-		shooterMotor.configPeakOutputReverse(-1.0, Constants.kTimeoutMs);
-        //GainsBinder g = new GainsBinder("Shooter Motor", shooterMotor, new Gains(0.01, 0, 0, 0, 0, 1.0));
-        /*shooterMotor.setPID(0, new Gains(0.01, 0, 0, 0, 0, 1.0));
-        */
-        new ShuffleboardAdapter("Shooter")
-            .addDoubleText("target velocity", 0, value -> {
-                shooterMotor.set(ControlMode.Velocity, value);
-                //System.out.println("Set it to: " + value);
-            });
+    public ShooterSubsystem(StorageSubsystem storageSubsystem) {
         // You need to register the subsystem to get it's periodic
         // method to be called by the Scheduler
+        register();
 
+        m_storageSubsystem = storageSubsystem;
+
+        m_shooterMotor = new TalonSRX(Constants.SHOOTER_CAN_ID);
+        m_bopper = new Solenoid(Constants.PCM_PORT_0);
         m_inputBallShooterChecker = new DigitalInput(Constants.DIGITAL_IO_3);
-        //m_storageSubsystem = storageSubsystem;
-        //m_drumArray = m_storageSubsystem.getDrumArray();
-        //m_lifterSolenoid = new Solenoid(Constants.PCM_CAN_ID, Constants.PCM_PORT_1);
+        m_isShooting = false;
+
+        new ShuffleboardAdapter("Shooter")
+            .addDoubleText("target velocity", 0, value -> {
+                //m_shooterMotor.set(ControlMode.Velocity, value);
+                //System.out.println("Set it to: " + value);
+            });
     }
 
-    
     @Override
     public void periodic() {
-        //System.out.println(shooterMotor.getSelectedSensorPosition());
-        /*
-        if(OI.getXboxBButton()) {
-            shooterMotor.set(-1.0);
-        }
-        else {
-            shooterMotor.set(0);
-        }*/
+        SmartDashboard.putBoolean("shooterChecker", m_inputBallShooterChecker.get());
     }
 
-    public Command cmdEnableShooter() {
-        return new MethodCommand(() -> shooterMotor.set(ControlMode.PercentOutput, -1.0), true).runOnEnd(() -> shooterMotor.set(ControlMode.PercentOutput, 0));
+    // Put methods for controlling this subsystem
+    // here. Call these from Commands.
+
+    public void startShooterMotor() {
+        m_storageSubsystem.setIsShooting(true);
+        m_shooterMotor.set(ControlMode.PercentOutput, -1.0);
     }
-    
-    public boolean[] getDrumArray()
-    {
-        return m_drumArray;
+
+    public void stopShooterMotor() {
+        m_storageSubsystem.setIsShooting(false);
+        m_shooterMotor.set(ControlMode.PercentOutput, 0);
     }
 
     public boolean isShooterSlotOccupied()
@@ -92,25 +67,60 @@ public class ShooterSubsystem extends SubsystemBase {
         return !m_inputBallShooterChecker.get();
     }
 
-    public void raiseLifter()
+    public void raiseBopper()
     {
-        System.out.println("raise lifter");
-        m_lifterSolenoid.set(true);
+        m_bopper.set(true);
     }
 
-    public void lowerLifter()
+    public void lowerBopper()
     {
-        System.out.println("lower lifter");
-        m_lifterSolenoid.set(false);
-    }
-    
-    public void startFlywheel()
-    {
-        System.out.println("start flywheel");
+        m_bopper.set(false);
     }
 
-    public void stopFlywheel()
+    public void initShooterMotor()
     {
-        System.out.println("stop flywheel");
+        m_shooterMotor.configFactoryDefault();
+        m_shooterMotor.configSelectedFeedbackSensor(
+            FeedbackDevice.QuadEncoder,
+            Constants.PID_PRIMARY,
+            Constants.kTimeoutMs
+        );
+        m_shooterMotor.config_kP(0, 0.01, Constants.kTimeoutMs);
+		m_shooterMotor.config_kI(0, 0, Constants.kTimeoutMs);
+		m_shooterMotor.config_kD(0, 0, Constants.kTimeoutMs);
+		m_shooterMotor.config_kF(0, 0, Constants.kTimeoutMs);
+		m_shooterMotor.config_IntegralZone(0, 0, Constants.kTimeoutMs);
+		m_shooterMotor.configClosedLoopPeakOutput(0, 1.0, Constants.kTimeoutMs);
+        m_shooterMotor.configAllowableClosedloopError(0, 0, Constants.kTimeoutMs);
+        
+        m_shooterMotor.configClosedLoopPeriod(0, 1, Constants.kTimeoutMs);
+
+        m_shooterMotor.configPeakOutputForward(+1.0, Constants.kTimeoutMs);
+		m_shooterMotor.configPeakOutputReverse(-1.0, Constants.kTimeoutMs);
+        //GainsBinder g = new GainsBinder("Shooter Motor", m_shooterMotor, new Gains(0.01, 0, 0, 0, 0, 1.0));
+        /*shooterMotor.setPID(0, new Gains(0.01, 0, 0, 0, 0, 1.0));
+        */
+    }
+
+    public void tryToShoot()
+    {
+        if (isShooterSlotOccupied())
+        {
+            //startShooterMotor();
+
+            System.out.println("Bop and Rotate Drum One Section");
+
+            RobotContainer.getBopperCommand()
+            .andThen(() -> m_storageSubsystem.setDrumArray(m_storageSubsystem.getDrumArrayIndex(), false))
+            .andThen(() -> m_storageSubsystem.isDrumFull())
+            .andThen(RobotContainer.getRotateDrumOneSectionCommand()).schedule();
+            
+        }
+        else
+        {
+            System.out.println("Rotate Drum One Section");
+
+            RobotContainer.getRotateDrumOneSectionCommand().schedule();
+        }
     }
 }
