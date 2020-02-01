@@ -22,15 +22,6 @@ public class NeoMotor extends MotorBase {
     }
 
     @Override
-    public void setPID(int slot, Gains pidGains) {
-        neoPID.setP(pidGains.kP, slot);
-        neoPID.setI(pidGains.kI, slot);
-        neoPID.setD(pidGains.kD, slot);
-        neoPID.setFF(pidGains.kF, slot);
-        neoPID.setIZone(pidGains.iZone, slot);
-    }
-
-    @Override
     public void setVelocity(double vel) {
         neoPID.setReference(vel, ControlType.kVelocity);
     }
@@ -43,7 +34,6 @@ public class NeoMotor extends MotorBase {
     @Override
     public void setInverted(boolean inverted) {
         neo.setInverted(inverted);
-
     }
 
     @Override
@@ -72,7 +62,6 @@ public class NeoMotor extends MotorBase {
                 neo.setIdleMode(IdleMode.kCoast);
                 break;
         }
-
     }
 
     @Override
@@ -121,6 +110,31 @@ public class NeoMotor extends MotorBase {
     @Override
     public double getTemperature() {
         return neo.getMotorTemperature();
+    }
+
+    @Override
+    public void setP(int slot, double kP) {
+        neoPID.setP(kP, slot);
+    }
+
+    @Override
+    public void setI(int slot, double kI) {
+        neoPID.setI(kI, slot);
+    }
+
+    @Override
+    public void setD(int slot, double kD) {
+        neoPID.setD(kD, slot);
+    }
+
+    @Override
+    public void setF(int slot, double kF) {
+        neoPID.setFF(kF, slot);
+    }
+
+    @Override
+    public void setIntegralZone(int slot, double kP) {
+        neoPID.setIZone(kP, slot);
     }
     
 }

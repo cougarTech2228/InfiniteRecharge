@@ -118,7 +118,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
         {
             hasFiredPosition = false;
             hasFiredRotate = false;
-            System.out.println("Reseting interrupt");
+            //System.out.println("Reseting interrupt");
             m_digitalInterrupt.enableInterrupts();
         }
     }

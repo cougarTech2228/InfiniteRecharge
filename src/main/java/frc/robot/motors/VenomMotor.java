@@ -24,6 +24,32 @@ public class VenomMotor extends MotorBase {
     }
 
     @Override
+    public void setP(int slot, double kP) {
+        venom.setKP(kP);
+    }
+
+    @Override
+    public void setI(int slot, double kI) {
+        venom.setKI(kI);
+    }
+
+    @Override
+    public void setD(int slot, double kD) {
+        venom.setKD(kD);
+    }
+
+    @Override
+    public void setF(int slot, double kF) {
+        venom.setKF(kF);
+    }
+    /**
+     * @deprecated
+     * Do not use this method, Venom's do not support integral zone
+     */
+    @Override
+    public void setIntegralZone(int slot, double kIzone) {}
+
+    @Override
     public void setVelocity(double vel) {
         venom.setCommand(ControlMode.SpeedControl, vel);
     }

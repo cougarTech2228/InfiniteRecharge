@@ -164,6 +164,6 @@ public final class Constants {
 	public final static int kSlot_Velocit = SLOT_2;
 	public final static int kSlot_MotProf = SLOT_3;
 
-	public static final int SHOOTER_CAN_ID = 15;
-	public static final int DRUM_SPARK_PWM_ID = 1;
+	public static final int SHOOTER_CAN_ID = 16;
+	public static final int DRUM_SPARK_PWM_ID = 0;
 }

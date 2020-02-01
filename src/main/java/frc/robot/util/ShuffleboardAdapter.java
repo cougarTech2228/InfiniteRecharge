@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder.BooleanConsumer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.motors.Gains;
+import frc.robot.motors.MotorBase;
 
 public class ShuffleboardAdapter {
     private final ShuffleboardTab subsystemTab;
@@ -62,6 +64,22 @@ public class ShuffleboardAdapter {
     }
     public ShuffleboardAdapter inTab() {
         activeContainer = subsystemTab;
+        return this;
+    }
+    public ShuffleboardAdapter addTestMotor(MotorBase motor, String name) {
+        inBox(name)
+            .addDoubleText("kP", 0, value -> motor.setP(0, value))
+            .addDoubleText("kI", 0, value -> motor.setI(0, value))
+            .addDoubleText("kD", 0, value -> motor.setD(0, value))
+            .addDoubleText("kF", 0, value -> motor.setF(0, value))
+            .addDoubleText("kIZone", 0, value -> motor.setIntegralZone(0, value))
+
+            .addDoubleText("TargetVel", 0, value -> motor.setVelocity(value))
+            //.addDouble("Velocity Error", 0, () -> motor
+            .addDouble("Velocity", 0, () -> motor.getVelocity())
+            .addDouble("Current", 0, () -> motor.getCurrent())
+        .inTab();
+        //.addDoubleText("Percent Power", 0, value -> percentOutput = value);
         return this;
     }
     public ShuffleboardAdapter addBoolean(String name, boolean defaultValue, BooleanConsumer receiver) {

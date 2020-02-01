@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OI;
 import frc.robot.commands.MethodCommand;
+import frc.robot.util.ShuffleboardAdapter;
 /**
  *
  */
@@ -26,7 +27,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
     private TalonSRX m_rightFollower = new TalonSRX(Constants.RIGHT_REAR_MOTOR_CAN_ID);
     private TalonSRX m_leftMaster = new TalonSRX(Constants.LEFT_FRONT_MOTOR_CAN_ID);
     private TalonSRX m_leftFollower = new TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
-
+	private double maxSpeed = 1;
     private DriveState m_driveState = DriveState.Arcade;
     private int m_targetAngle;
 
@@ -86,12 +87,12 @@ public class DrivebaseSubsystem extends SubsystemBase {
 														Constants.kTimeoutMs);														// Configuration Timeout
 		
 		/* Configure output and sensor direction */
-		m_leftMaster.setInverted(false);
+		m_leftMaster.setInverted(true);
 		m_leftMaster.setSensorPhase(true);
-		m_rightMaster.setInverted(true);
+		m_rightMaster.setInverted(false);
 		m_rightMaster.setSensorPhase(true);
 		
-		m_rightFollower.setInverted(true);
+		m_leftFollower.setInverted(true);
 		m_leftFollower.follow(m_leftMaster);
 		m_rightFollower.follow(m_rightMaster);
 		
@@ -137,13 +138,62 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		*/
 		m_rightMaster.configAuxPIDPolarity(false, Constants.kTimeoutMs);
 
-    }
+		new ShuffleboardAdapter("Drive Base")
+			.addDoubleText("Right kP", 0, value -> {m_rightMaster.config_kP(0, value); })
+			.addDoubleText("Right kI", 0, value -> {m_rightMaster.config_kF(0, value); })
+			.addDoubleText("Right kD", 0, value -> {m_rightMaster.config_kI(0, value); })
+			.addDoubleText("Right kF", 0, value -> {m_rightMaster.config_kF(0, value); })
+			.addDoubleText("Right kIZone", 0, value -> {m_rightMaster.config_IntegralZone(0, (int)value); })
+			.addDoubleText("RightTargetVel", 0, value -> rightTargetVelocity = value)
+			.addDouble("Right Velocity Error", 0, () -> m_rightMaster.getClosedLoopError())
+			.addDouble("Right Velocity", 0, () -> m_rightMaster.getSelectedSensorVelocity())
+			.addDouble("Right Current", 0, () -> m_rightMaster.getSupplyCurrent())
+			.addDoubleText("Right Percent Power", 0, value -> rightPercentOutput = value)
+
+			.addDoubleText("Left kP", 0, value -> {m_leftMaster.config_kP(0, value); })
+			.addDoubleText("Left kI", 0, value -> {m_leftMaster.config_kF(0, value); })
+			.addDoubleText("Left kD", 0, value -> {m_leftMaster.config_kI(0, value); })
+			.addDoubleText("Left kF", 0, value -> {m_leftMaster.config_kF(0, value); })
+			.addDoubleText("Left kIZone", 0, value -> {m_leftMaster.config_IntegralZone(0, (int)value); })
+			.addDoubleText("LeftTargetVel", 0, value -> leftTargetVelocity = value)
+			.addDouble("Left Velocity Error", 0, () -> m_leftMaster.getClosedLoopError())
+			.addDouble("Left Velocity", 0, () -> m_leftMaster.getSelectedSensorVelocity())
+			.addDouble("Left Current", 0, () -> m_leftMaster.getSupplyCurrent())
+			.addDoubleText("Left Percent Power", 0, value -> leftPercentOutput = value);
+	}
+	private double rightTargetVelocity = 0;
+	private double leftTargetVelocity = 0;
+	private double rightPercentOutput = 0;
+	private double leftPercentOutput = 0;
 
     @Override
     public void periodic() {
+		/*
+		if(rightPercentOutput != 0) {
+			m_rightMaster.set(ControlMode.PercentOutput, rightPercentOutput);
+			System.out.println("Set speed to: " + rightPercentOutput);
+		}
+		else if(rightTargetVelocity != 0) {
+			m_rightMaster.set(ControlMode.Velocity, rightTargetVelocity);
+			System.out.println("Set velocity to: " + rightTargetVelocity);
+		}
+		else {
+			m_rightMaster.set(ControlMode.PercentOutput, 0);
+		}
 
+		if(leftPercentOutput != 0) {
+			m_leftMaster.set(ControlMode.PercentOutput, leftPercentOutput);
+		}
+		else if(leftTargetVelocity != 0) {
+			m_leftMaster.set(ControlMode.Velocity, leftTargetVelocity);
+		}
+		else {
+			m_leftMaster.set(ControlMode.PercentOutput, 0);
+		}*/
     }
-
+	public Command cmdSetMaxSpeed(double percentOfMax) {
+		return new MethodCommand(() -> maxSpeed = percentOfMax);
+	}
     public Command cmdUseArcadeDrive() {
         return new SequentialCommandGroup(
             new MethodCommand(this::arcadeInit),
@@ -164,10 +214,10 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private void arcadeDrive() {
 		double forward = -OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
-		forward = Deadband(forward);
-		turn = Deadband(turn) * 0.5;
-		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
-		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+		forward = Deadband(forward) * maxSpeed;
+		turn = Deadband(turn) * 0.5 * maxSpeed;
+		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
 	}
 	private void straightInit() {
 		System.out.println("This is straight drive with encoders");
@@ -177,8 +227,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private void straightDrive() {
 		double forward = OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
-		forward = Deadband(forward);
-		turn = Deadband(turn);
+		forward = Deadband(forward) * maxSpeed;
+		turn = Deadband(turn) * maxSpeed;
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, m_targetAngle);
 		m_leftMaster.follow(m_rightMaster, FollowerType.AuxOutput1);
 	}

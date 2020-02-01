@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.BallDumpSubsystem.DumperState;
 import frc.robot.util.CommandToggler;
 import frc.robot.util.CommandToggler.CommandState;
 
@@ -33,9 +33,9 @@ public class RobotContainer {
   //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
   private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
-  private final static BallDumpSubsystem m_dumperSubsystem = new BallDumpSubsystem();
+  private final static DumperSubsystem m_dumperSubsystem = new DumperSubsystem();
   private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
-  private final static StorageSubsystem m_storageSubsytem = new StorageSubsystem();
+  private final static DrumSubsystem m_storageSubsystem = new DrumSubsystem();
   private final static ShooterSubsystem m_shooterSubsytem = new ShooterSubsystem();
 
   // Robot Commands
@@ -62,9 +62,13 @@ public class RobotContainer {
       m_drivebaseSubsystem.cmdUseStraightDrive()
     )
     .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxLeftBumper)
-    .setCycle(true);
+    .setToggleButton(OI::getXboxLeftJoystickPress)
+    .setCycle(true)
+    .startOnEnable();
 
+    new Button(OI::getXboxRightJoystickPress)
+      .whenPressed(m_drivebaseSubsystem.cmdSetMaxSpeed(0.3))
+      .whenReleased(m_drivebaseSubsystem.cmdSetMaxSpeed(1));
     //Bind raise/lowering the dumper to right bumper
     /*
     new CommandToggler(
@@ -80,21 +84,22 @@ public class RobotContainer {
       null
     )
     .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxRightTriggerPressed)
+    .setToggleButton(OI::getXboxXButton)
     .setCycle(true);
 
-    new Button(OI::getXboxRightBumper).whenPressed(m_storageSubsytem.cmdBop());
-    new Button(OI::getXboxYButton).whenHeld(m_storageSubsytem.cmdRunDrum());
+    new Button(() -> OI.getXboxYButton()).whenPressed(m_storageSubsystem.cmdShootAll());
+
+    new Button(OI::getXboxRightTriggerPressed).whenHeld(m_storageSubsystem.cmdShoot());
     
     new CommandToggler(
       m_shooterSubsytem.cmdEnableShooter(),
       null
     )
     .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxBButton)
+    .setToggleButton(OI::getXboxRightBumper)
     .setCycle(true);
 
-    new Button(OI::getXboxAButton).whenPressed(m_storageSubsytem.cmdRotateDrumOnce());
+    //new Button(OI::getXboxAButton).whenPressed(m_storageSubsytem.cmdRotateDrumOnce());
   }
 
   /**

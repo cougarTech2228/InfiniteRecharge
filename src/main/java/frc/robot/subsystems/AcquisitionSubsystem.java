@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.OI;
 import frc.robot.commands.MethodCommand;
 import frc.robot.motors.TalonSRXMotor;
 import frc.robot.util.ShuffleboardAdapter;
@@ -34,7 +34,7 @@ public class AcquisitionSubsystem extends SubsystemBase {
     }
     @Override
     public void periodic() {
-        
+
     }
     
     public Command cmdSetAquisitionSpeed(double speed) {
@@ -44,17 +44,17 @@ public class AcquisitionSubsystem extends SubsystemBase {
     }
     public Command cmdSetClosedLoop() {
         return new SequentialCommandGroup(
-            new MethodCommand(() -> acquisitionMotor.set(0.5)),
+            new MethodCommand(() -> acquisitionMotor.set(-0.75)),
             new MethodCommand(() -> 
             {
                 if(acquisitionMotor.getCurrent() > 2 && timer.get() == 0) {
                     timer.start();
-                    acquisitionMotor.set(0.6);
+                    acquisitionMotor.set(-0.75);
                 }
                 else if(timer.get() > 0.2) {
                     timer.stop();
                     timer.reset();
-                    acquisitionMotor.set(0.5);
+                    acquisitionMotor.set(-0.75);
                 }
                 System.out.println(acquisitionMotor.getCurrent());
                 return false;

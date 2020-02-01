@@ -22,6 +22,30 @@ public abstract class TalonMotorBase extends MotorBase {
         talon.config_IntegralZone(slot, pidGains.iZone);
         talon.configClosedLoopPeakOutput(slot, pidGains.peakOutput);
     }
+    
+    @Override
+    public void setP(int slot, double kP) {
+        talon.config_kP(slot, kP);
+    }
+
+    @Override
+    public void setI(int slot, double kI) {
+        talon.config_kI(slot, kI);
+    }
+
+    @Override
+    public void setD(int slot, double kD) {
+        talon.config_kD(slot, kD);
+    }
+
+    @Override
+    public void setF(int slot, double kF) {
+        talon.config_kF(slot, kF);
+    }
+    @Override
+    public void setIntegralZone(int slot, double kIzone) {
+        talon.config_IntegralZone(slot, (int)kIzone);
+    }
 
     @Override
     public void setVelocity(double vel) {

@@ -1,5 +1,9 @@
 package frc.robot.motors;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.controller.PIDController;
+
 public abstract class MotorBase {
     protected int port;
     protected double maxRPM;
@@ -21,7 +25,18 @@ public abstract class MotorBase {
     }
 
     public abstract void setOutputRange(double min, double max);
-    public abstract void setPID(int slot, Gains pidGains);
+    public void setPID(int slot, Gains pidGains) {
+        setP(slot, pidGains.kP);
+        setI(slot, pidGains.kI);
+        setD(slot, pidGains.kD);
+        setF(slot, pidGains.kF);
+        setIntegralZone(slot, pidGains.iZone);
+    }
+    public abstract void setP(int slot, double kP);
+    public abstract void setI(int slot, double kI);
+    public abstract void setD(int slot, double kD);
+    public abstract void setF(int slot, double kF);
+    public abstract void setIntegralZone(int slot, double kP);
     public abstract void setVelocity(double vel);
     public abstract void setPosition(double pos);
     public abstract void setInverted(boolean inverted);

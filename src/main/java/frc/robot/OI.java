@@ -83,7 +83,7 @@ public class OI {
         return m_xboxController.getStickButton(Hand.kLeft);
     }
 
-    public boolean getXboxRightJoystickPress() {
+    public static boolean getXboxRightJoystickPress() {
         return m_xboxController.getStickButton(Hand.kRight);
     }
 

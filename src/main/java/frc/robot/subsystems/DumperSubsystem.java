@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.MethodCommand;
 
-public class BallDumpSubsystem extends SubsystemBase {
+public class DumperSubsystem extends SubsystemBase {
     private Solenoid dumper;
     private Compressor compressor;
 
@@ -18,7 +18,7 @@ public class BallDumpSubsystem extends SubsystemBase {
         }
     }
 
-    public BallDumpSubsystem() {
+    public DumperSubsystem() {
         register();
         //dumper = new Solenoid(0);
         compressor = new Compressor();

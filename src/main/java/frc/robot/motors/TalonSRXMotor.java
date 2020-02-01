@@ -11,4 +11,8 @@ public class TalonSRXMotor extends TalonMotorBase {
         talon.configFactoryDefault();
         talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
     }
+    public TalonSRXMotor(TalonSRX motor) {
+        super(motor.getBaseID());
+        talon = motor;
+    }
 }
