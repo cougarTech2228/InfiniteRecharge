@@ -83,9 +83,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Command cmdEnableShooter() {
         return new MethodCommand(() ->
-            shooterMotor.set(ControlMode.PercentOutput, -1),
-            true
-            ).runOnEnd(() -> shooterMotor.set(ControlMode.PercentOutput, 0)
+            shooterMotor.set(ControlMode.PercentOutput, -1)
+        )
+        .loop()
+        .runOnEnd(() -> shooterMotor.set(ControlMode.PercentOutput, 0)
         );
     }
 }
