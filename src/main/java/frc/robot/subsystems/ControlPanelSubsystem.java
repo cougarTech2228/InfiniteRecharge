@@ -96,7 +96,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
         // Put code here to be run every loop
         // Put methods for controlling this subsystem
         // here. Call these from Commands.
-        SmartDashboard.putString("Current color", getCurrentColor());
+        //SmartDashboard.putString("Current color", getCurrentColor());
     }
 
     // Put methods for controlling this subsystem
@@ -106,6 +106,10 @@ public class ControlPanelSubsystem extends SubsystemBase {
         m_hasFiredRotate = false;
         System.out.println("Resetting interrupt");
         m_digitalInterrupt.enableInterrupts();
+    }
+
+    public void setHasFiredRotate(boolean hasFiredRotate) {
+        m_hasFiredRotate = false;
     }
 
     /** 

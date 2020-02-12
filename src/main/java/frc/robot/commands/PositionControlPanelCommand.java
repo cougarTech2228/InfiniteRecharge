@@ -54,9 +54,9 @@ public class PositionControlPanelCommand extends CommandBase {
                 m_isFinished = true; // end method command and stop here
             }
             
-            SmartDashboard.putString("startColor", m_controlPanelSubsystem.matchColor(m_startColor));
-            SmartDashboard.putString("colorString", m_colorStringPosition);
-            SmartDashboard.putNumber("onColorIncrementer", m_isOnColorIncrementer);
+            // SmartDashboard.putString("startColor", m_controlPanelSubsystem.matchColor(m_startColor));
+            // SmartDashboard.putString("colorString", m_colorStringPosition);
+            // SmartDashboard.putNumber("onColorIncrementer", m_isOnColorIncrementer);
       }
   
       // Returns true when the command should end.

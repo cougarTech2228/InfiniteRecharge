@@ -101,7 +101,10 @@ public final class Constants {
 	public static final int SHOOTER_CAN_ID = 16;
 	public static final int DRUM_SPARK_PWM_ID = 0;
 
-	//public static final int 
+	public static final int LOOPS_TO_WAIT = 5;
+	public static double SHOOTER_MOTOR_SPEED = 90000.0;
+	public static final int MIN_SHOOTING_DISTANCE = 61;
+	public static final int MAX_SHOOTING_DISTANCE = 0;
 	
 	/**
 	 * Number of joystick buttons to poll. 10 means buttons[1,9] are polled, which

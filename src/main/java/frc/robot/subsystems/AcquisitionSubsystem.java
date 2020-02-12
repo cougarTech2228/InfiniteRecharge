@@ -36,6 +36,10 @@ public class AcquisitionSubsystem extends SubsystemBase {
     public void periodic() {
         
     }
+
+    public void setAcquirerSpeed(double speed) {
+        acquisitionMotor.set(acquisitionMaxSpeed * speed);
+    }
     
     public Command cmdSetAquisitionSpeed(double speed) {
         return new MethodCommand(() -> {
@@ -56,7 +60,7 @@ public class AcquisitionSubsystem extends SubsystemBase {
                     timer.reset();
                     acquisitionMotor.set(-0.5);
                 }
-                System.out.println(acquisitionMotor.getCurrent());
+                //System.out.println(acquisitionMotor.getCurrent());
                 return false;
             }).runOnEnd(
                 () -> acquisitionMotor.set(0)

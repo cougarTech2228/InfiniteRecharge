@@ -2,7 +2,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -58,27 +57,27 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Put code here to be run every loop
-        if ((getDistanceFromTarget() < MAXIMUM_TARGET_DISTANCE)
-                && (getDistanceFromTarget() > MINIMUM_TARGET_DISTANCE)) {
-            if (getCameraState() == TARGET_STATE_LOCKED) {
-                m_inRange = true;
+        // if ((getDistanceFromTarget() < MAXIMUM_TARGET_DISTANCE)
+        //         && (getDistanceFromTarget() > MINIMUM_TARGET_DISTANCE)) {
+        //     if (getCameraState() == TARGET_STATE_LOCKED) {
+        //         m_inRange = true;
 
-                double horizontalOffset = getHorizOffsetFromCenter();
+        //         double horizontalOffset = getHorizOffsetFromCenter();
                 
-                System.out.println("horizontalOffset: " + horizontalOffset);
-            } else {
-                m_inRange = false;
+        //         System.out.println("horizontalOffset: " + horizontalOffset);
+        //     } else {
+        //         m_inRange = false;
 
-            }
-        } else {
-            m_inRange = false;
+        //     }
+        // } else {
+        //     m_inRange = false;
 
-        }
+        // }
 
-        SmartDashboard.putBoolean("In Range", m_inRange);
-        SmartDashboard.putNumber("Target State", m_targStateNTE.getDouble(DEFAULT_TABLE_ENTRY_VALUE));
-        SmartDashboard.putNumber("Distance to Target (in)", m_distTargInNTE.getDouble(DEFAULT_TABLE_ENTRY_VALUE));
-        SmartDashboard.putNumber("Horiz. Offset in (in)", m_horzOffInNTE.getDouble(DEFAULT_TABLE_ENTRY_VALUE));
+        // SmartDashboard.putBoolean("In Range", m_inRange);
+        // SmartDashboard.putNumber("Target State", m_targStateNTE.getDouble(DEFAULT_TABLE_ENTRY_VALUE));
+        // SmartDashboard.putNumber("Distance to Target (in)", m_distTargInNTE.getDouble(DEFAULT_TABLE_ENTRY_VALUE));
+        // SmartDashboard.putNumber("Horiz. Offset in (in)", m_horzOffInNTE.getDouble(DEFAULT_TABLE_ENTRY_VALUE));
     }
 
     // Put methods for controlling this subsystem

@@ -91,9 +91,9 @@ public class RotateControlPanelCommand extends CommandBase {
 
         // -------------------------------------SmartDashboardWrites--------------------------------------
         //SmartDashboard.putString("startColor", m_redColor);
-        SmartDashboard.putString("colorString", m_colorStringRotate);
-        SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
-        SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
+        // SmartDashboard.putString("colorString", m_colorStringRotate);
+        // SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
+        // SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
       }
   
       // Returns true when the command should end.
