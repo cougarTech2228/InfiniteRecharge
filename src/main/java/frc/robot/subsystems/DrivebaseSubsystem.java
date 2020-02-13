@@ -18,14 +18,15 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OI;
 import frc.robot.commands.MethodCommand;
 /**
- *
+ * drive robot
  */
 public class DrivebaseSubsystem extends SubsystemBase {
 
     private TalonSRX m_rightMaster = new TalonSRX(Constants.RIGHT_FRONT_MOTOR_CAN_ID);
     private TalonSRX m_rightFollower = new TalonSRX(Constants.RIGHT_REAR_MOTOR_CAN_ID);
     private TalonSRX m_leftMaster = new TalonSRX(Constants.LEFT_FRONT_MOTOR_CAN_ID);
-    private TalonSRX m_leftFollower = new TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
+	private TalonSRX m_leftFollower = new TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
+	private boolean m_isTeleOp;
 
     private DriveState m_driveState = DriveState.Arcade;
     private int m_targetAngle;
@@ -137,12 +138,19 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		*/
 		m_rightMaster.configAuxPIDPolarity(false, Constants.kTimeoutMs);
 
+		m_isTeleOp = false;
     }
 
     @Override
     public void periodic() {
-
-    }
+		if(m_isTeleOp) {
+			arcadeDrive();
+		}
+	}
+	
+	public void setIsTeleop(boolean isTeleOp) {
+		m_isTeleOp = isTeleOp;
+	}
 
     public Command cmdUseArcadeDrive() {
         return new SequentialCommandGroup(
@@ -161,14 +169,24 @@ public class DrivebaseSubsystem extends SubsystemBase {
     private void arcadeInit() {
 		System.out.println("This is arcade drive");
 	}
+	
 	private void arcadeDrive() {
-		double forward = -OI.getXboxLeftJoystickY();
+		double forward = OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
 		forward = Deadband(forward);
 		turn = Deadband(turn) * 0.5;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
 	}
+
+	public void setArcadeDrive(double forward, double turn) {
+		forward = Deadband(forward);
+		turn = Deadband(turn) * 0.5;
+		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
+		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+	}
+
+
 	private void straightInit() {
 		System.out.println("This is straight drive with encoders");
 		m_rightMaster.selectProfileSlot(Constants.kSlot_Turning, Constants.PID_TURN);

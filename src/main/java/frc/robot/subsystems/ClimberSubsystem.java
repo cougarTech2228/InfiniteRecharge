@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.Constants;
 
 public class ClimberSubsystem extends SubsystemBase {
 
@@ -20,5 +19,8 @@ public class ClimberSubsystem extends SubsystemBase {
         // Put code here to be run every loop
         
     }
+
+    // Put methods for controlling this subsystem
+    // here. Call these from Commands.
 
 }

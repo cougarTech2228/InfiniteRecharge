@@ -2,59 +2,67 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StorageSubsystem;
-import frc.robot.motors.*;
 import frc.robot.Constants;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /**
  * RotateDrumOneSectionCommand
  * 
+ * Rotates the drum until a flag is triggered depending on if the robot is shooting or acquiring/storing
  */
 public class RotateDrumOneSectionCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-    private TalonSRXMotor m_drumMotor;
     private StorageSubsystem m_storageSubsystem;
-    private boolean m_isDoneSpinning;
-    
-    public RotateDrumOneSectionCommand(StorageSubsystem storageSubsystem) {  
+    private ShooterSubsystem m_shooterSubsystem;
+    private int m_commandExecutionCount;
+
+    public RotateDrumOneSectionCommand(StorageSubsystem storageSubsystem, ShooterSubsystem shooterSubsystem) {
         m_storageSubsystem = storageSubsystem;
-        m_drumMotor = new TalonSRXMotor(Constants.DRUM_MOTOR_CAN_ID);
+        m_shooterSubsystem = shooterSubsystem;
 
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(m_storageSubsystem);
+        //addRequirements(m_storageSubsystem);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_drumMotor.set(Constants.DRUM_MOTOR_VELOCITY);
-        m_isDoneSpinning = false;
-        System.out.println("start motor");
+        System.out.println("rotate drum one section");
+        m_commandExecutionCount = 0;
+        m_storageSubsystem.startDrumMotor();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(!m_storageSubsystem.getIndexCheckerIsNotBlocked())
-        {
-            m_drumMotor.set(0);
-            m_isDoneSpinning = true;
-            System.out.println("stop motor");
-        }
+        m_commandExecutionCount++; // Count is necessary because the drum starts on the flag being blocked,
+                                   // so the drum needs to rotate for a second or two before it checks for flags
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_isDoneSpinning;
+        if(m_commandExecutionCount > Constants.LOOPS_TO_WAIT) {
+            if(m_shooterSubsystem.getIsShooting()) {
+                return m_shooterSubsystem.isIndexShooterCheckerBlocked();
+            }
+            else
+            {
+                return m_storageSubsystem.isIndexAcquireCheckerBlocked();
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        // m_storageSubsystem.finishIndex();
-        // System.out.println("Waiting 2 seconds for motor to finish moving");
-        // CommandScheduler.getInstance().schedule(new WaitCommand(2));
-        // System.out.println("finished waiting");
+        m_storageSubsystem.stopDrumMotor();
+        m_storageSubsystem.finishIndex();
+        m_storageSubsystem.isDrumFull();
     }
 }

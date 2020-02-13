@@ -1,11 +1,8 @@
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.button.Button;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -40,10 +37,8 @@ public class OI {
     // button.whenReleased(new ExampleCommand());
 
     private static XboxController m_xboxController;
-    //private static ButtonDebouncer m_debouncer;
+   
     public OI() {
-        //m_debouncer = new ButtonDebouncer(m_xboxController, 1, .5);
-
         m_xboxController = new XboxController(0);
     }
 
@@ -83,7 +78,7 @@ public class OI {
         return m_xboxController.getStickButton(Hand.kLeft);
     }
 
-    public boolean getXboxRightJoystickPress() {
+    public static boolean getXboxRightJoystickPress() {
         return m_xboxController.getStickButton(Hand.kRight);
     }
 

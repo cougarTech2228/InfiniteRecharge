@@ -61,7 +61,7 @@ public final class Constants {
 	public static final int RIGHT_REAR_MOTOR_CAN_ID = 12;
 	public static final int LEFT_FRONT_MOTOR_CAN_ID = 13;
 	public static final int LEFT_REAR_MOTOR_CAN_ID = 14;
-	public static final int ACQUISITION_MOTOR_CAN_ID = 3;
+	public static final int ACQUISITION_MOTOR_CAN_ID = 15;
 
 	public static final int NEO_SPARK_MAX_CAN_ID = 6;
 
@@ -89,12 +89,23 @@ public final class Constants {
 	public static final double CONTROL_PANEL_MOTOR_VELOCITY_FAST = 0.27;
 	public static final double CONTROL_PANEL_MOTOR_VELOCITY_SLOW = 0.2;
 
-	public static final double DRUM_MOTOR_VELOCITY = 0.25;
+	public static final double DRUM_MOTOR_VELOCITY = 0.4;
 
 	public static final int SHOOT_MODE_SINGLE_CELL = 0;
 	public static final int SHOOT_MODE_ALL_CELLS = 1;
 
 	public static final int DRUM_MOTOR_CAN_ID = 2;
+
+	public static final int SHOOTER_SLOT = 2;
+
+	public static final int SHOOTER_CAN_ID = 16;
+	public static final int DRUM_SPARK_PWM_ID = 0;
+
+	public static final int LOOPS_TO_WAIT = 5;
+	public static double SHOOTER_MOTOR_SPEED = 110000.0;
+	public static final int MIN_SHOOTING_DISTANCE = 61;
+	public static final int MAX_SHOOTING_DISTANCE = 0;
+	
 	/**
 	 * Number of joystick buttons to poll. 10 means buttons[1,9] are polled, which
 	 * is actually 9 buttons.
@@ -188,6 +199,4 @@ public final class Constants {
 	public final static int kSlot_Velocit = SLOT_2;
 	public final static int kSlot_MotProf = SLOT_3;
 
-	public static final int SHOOTER_CAN_ID = 15;
-	public static final int DRUM_SPARK_PWM_ID = 1;
 }
