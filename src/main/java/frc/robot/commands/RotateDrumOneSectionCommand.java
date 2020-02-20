@@ -29,6 +29,7 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     @Override
     public void initialize() {
         System.out.println("rotate drum one section");
+        m_storageSubsystem.getBallArray().rotate();
         m_commandExecutionCount = 0;
         m_storageSubsystem.startDrumMotor();
     }
@@ -45,11 +46,11 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     public boolean isFinished() {
         if(m_commandExecutionCount > Constants.LOOPS_TO_WAIT) {
             if(m_shooterSubsystem.getIsShooting()) {
-                return m_shooterSubsystem.isIndexShooterCheckerBlocked();
+                return m_shooterSubsystem.isShooterFlagTripped();
             }
             else
             {
-                return m_storageSubsystem.isIndexAcquireCheckerBlocked();
+                return m_storageSubsystem.isAcquireFlagTripped();
             }
         }
         else

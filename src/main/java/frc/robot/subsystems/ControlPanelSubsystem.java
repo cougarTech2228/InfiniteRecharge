@@ -6,7 +6,6 @@ import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.InterruptHandlerFunction;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -29,7 +28,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
 
     // ------------------Subsystem------------------------
     private WPI_TalonSRX m_wheelMotor;
-    private final static DigitalInput m_digitalInterrupt = new DigitalInput(Constants.DIGITAL_IO_0);
+    private final static DigitalInput m_digitalInterrupt = new DigitalInput(Constants.CONTROL_PANEL_INTERRUPT_DIO);
     private boolean m_hasFiredRotate;
 
     private String m_gameData;

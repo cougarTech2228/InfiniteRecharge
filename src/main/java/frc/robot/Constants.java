@@ -7,6 +7,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.motors.Gains;
 
 /**
@@ -21,27 +24,28 @@ import frc.robot.motors.Gains;
  */
 public final class Constants {
 
-	public static final int DIGITAL_IO_0 = 0;
-	public static final int DIGITAL_IO_1 = 1;
-	public static final int DIGITAL_IO_2 = 2;
-	public static final int DIGITAL_IO_3 = 3;
-	public static final int DIGITAL_IO_4 = 4;
+	public static final int CONTROL_PANEL_INTERRUPT_DIO = 0;
+	public static final int ACQUIRE_FLAG_DIO = 1;
+	public static final int ACQUIRE_SLOT_DIO = 2;
+	public static final int SHOOTER_SLOT_DIO = 3;
+	public static final int SHOOTER_FLAG_DIO = 4;
 	public static final int DIGITAL_IO_5 = 5;
 	public static final int DIGITAL_IO_6 = 6;
 	public static final int DIGITAL_IO_7 = 7;
 	public static final int DIGITAL_IO_8 = 8;
+	public static final int DIGITAL_IO_9 = 9;
 
 	public static final int ANALOG_INPUT_0 = 0;
 	public static final int ANALOG_INPUT_1 = 1;
 	public static final int ANALOG_INPUT_2 = 2;
 	public static final int ANALOG_INPUT_3 = 3;
 
-	public static final int PCM_PORT_0 = 0;
-	public static final int PCM_PORT_1 = 1;
-	public static final int PCM_PORT_2 = 2;
-	public static final int PCM_PORT_3 = 3;
-	public static final int PCM_PORT_4 = 4;
-	public static final int PCM_PORT_5 = 5;
+	public static final int BOPPER_PCM_PORT = 0;
+	public static final int CLIMBER_BRAKE_PIN_PCM_PORT = 1;
+	public static final int CLIMBER_DEPLOY_PCM_PORT = 2;
+	public static final int CLIMBER_TRAVERSE_BRAKE_PCM_PORT = 3;
+	public static final int ACQUIRER_DEPLOY_PCM_PORT = 4;
+	public static final int CONTROL_PANEL_DEPLOY_PCM_PORT = 5;
 	public static final int PCM_PORT_6 = 6;
 	public static final int PCM_PORT_7 = 7;
 
@@ -56,14 +60,14 @@ public final class Constants {
 	public static final int PWM_PIN_8 = 8;
 	public static final int PWM_PIN_9 = 9;
 
-	public static final int CONTROL_PANEL_MOTOR_CAN_ID = 4;
+	public static final int CONTROL_PANEL_MOTOR_CAN_ID = 31;
 	public static final int RIGHT_FRONT_MOTOR_CAN_ID = 11;
 	public static final int RIGHT_REAR_MOTOR_CAN_ID = 12;
 	public static final int LEFT_FRONT_MOTOR_CAN_ID = 13;
 	public static final int LEFT_REAR_MOTOR_CAN_ID = 14;
-	public static final int ACQUISITION_MOTOR_CAN_ID = 15;
+	public static final int ACQUISITION_MOTOR_CAN_ID = 21;
 
-	public static final int NEO_SPARK_MAX_CAN_ID = 6;
+	public static final int CLIMBING_NEO_SPARK_MAX_CAN_ID = 42;
 
 	public static final int PIGEON_IMU_CAN_ID = 61;
 	public static final int CANIFIER_CAN_ID = 62;
@@ -89,22 +93,24 @@ public final class Constants {
 	public static final double CONTROL_PANEL_MOTOR_VELOCITY_FAST = 0.27;
 	public static final double CONTROL_PANEL_MOTOR_VELOCITY_SLOW = 0.2;
 
-	public static final double DRUM_MOTOR_VELOCITY = 0.4;
+	public static final double DRUM_MOTOR_VELOCITY = 0.45;
 
 	public static final int SHOOT_MODE_SINGLE_CELL = 0;
 	public static final int SHOOT_MODE_ALL_CELLS = 1;
 
-	public static final int DRUM_MOTOR_CAN_ID = 2;
-
 	public static final int SHOOTER_SLOT = 2;
 
-	public static final int SHOOTER_CAN_ID = 16;
+	public static final int SHOOTER_CAN_ID = 41;
 	public static final int DRUM_SPARK_PWM_ID = 0;
 
 	public static final int LOOPS_TO_WAIT = 5;
-	public static double SHOOTER_MOTOR_SPEED = 110000.0;
+	public static final double SHOOTER_MOTOR_SPEED = 120000.0;
 	public static final int MIN_SHOOTING_DISTANCE = 61;
 	public static final int MAX_SHOOTING_DISTANCE = 0;
+
+	public static final double autoTurnSpeed = 0.6;
+	public static final double timeBetweenShots = 0.5;
+	public static final double bopperWaitTime = 0.1;
 	
 	/**
 	 * Number of joystick buttons to poll. 10 means buttons[1,9] are polled, which
@@ -198,5 +204,41 @@ public final class Constants {
 	public final static int kSlot_Turning = SLOT_1;
 	public final static int kSlot_Velocit = SLOT_2;
 	public final static int kSlot_MotProf = SLOT_3;
+
+    // Stuff needed for Auto Ramsete-based Trajectories
+
+	// Need to set this to TRUE for Ramsete Commands but it
+	// seems to give the negated value not the correct ones
+	// when we're trying to manually create autonomous paths
+	public final static boolean kGyroReversed = true;
+
+	public static final int EDGES_PER_ROTATION = 512;
+    public static final double WHEEL_DIAMETER_INCHES = 4d; // TODO change to 8 on competition bot
+    public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
+    public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
+
+    public static final double TRACK_WIDTH_METERS = 0.647;
+    public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
+			TRACK_WIDTH_METERS);
+
+	// Baseline values for a RAMSETE follower in units of meters and seconds
+	public static final double RAMSETE_B = 2;
+	public static final double RAMSETE_ZETA = 0.7;
+
+	// Voltage needed to overcome the motorâ€™s static friction. kS 
+	public static final double kS = 1.55;
+
+	// Voltage needed to hold (or "cruise") at a given constant velocity. kV
+	public static final double kV = 2.73;
+
+	// Voltage needed to induce a given acceleration in the motor shaft. kA 
+	public static final double kA = 0.184;
+
+	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
+	
+	public static final double kMaxSpeedMetersPerSecond = 1.50;
+	public static final double kMaxAccelerationMetersPerSecondSquared = 1.50;
+
+	public static final double DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE = 10.0;
 
 }

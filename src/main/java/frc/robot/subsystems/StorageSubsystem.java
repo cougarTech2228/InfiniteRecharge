@@ -3,14 +3,17 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.util.BallArray;
 
 public class StorageSubsystem extends SubsystemBase {
 
-    private DigitalInput m_inputBallChecker;
-    private DigitalInput m_inputIndexAcquireChecker;
+    private DigitalInput m_inputAcquireSlotChecker;
+    private DigitalInput m_inputAcquireFlagChecker;
     private Spark m_drumSparkMotor;
     private boolean[] m_drumArray = { false, false, false, false, false }; // false if unoccupied, true if occupied
     private boolean m_hasBeenTripped;
@@ -18,51 +21,52 @@ public class StorageSubsystem extends SubsystemBase {
     private boolean m_isFull;
     private boolean m_isShooting;
     private boolean m_isRepopulating;
+    private BallArray m_ballArray = new BallArray();
 
     public StorageSubsystem() {
-        // You need to register the subsystem to get it's periodic
-        // method to be called by the Scheduler
         register();
-        m_inputBallChecker = new DigitalInput(Constants.DIGITAL_IO_2);
-        m_inputIndexAcquireChecker = new DigitalInput(Constants.DIGITAL_IO_1);
 
+        m_inputAcquireSlotChecker = new DigitalInput(Constants.ACQUIRE_SLOT_DIO);
+        m_inputAcquireFlagChecker = new DigitalInput(Constants.ACQUIRE_FLAG_DIO); // 9
         m_drumSparkMotor = new Spark(Constants.DRUM_SPARK_PWM_ID);
+
         m_isFull = false;
         m_isShooting = false;
         m_hasBeenTripped = false;
         m_isRepopulating = false;
+        SendableRegistry.add(m_ballArray, "balls");
+
+        Shuffleboard.getTab("drum")
+        .add(m_ballArray)
+        .withWidget("DrumWidget");
     }
 
     @Override
     public void periodic() {
-        if (!m_isRepopulating) {
 
-            if (!m_isShooting) {
-
-                if (!m_isFull) // if the drum is full, dont try to check if it needs to rotate again
+        if (!m_inputAcquireSlotChecker.get() && !m_hasBeenTripped)  // is there a ball in the acquire position?
+        {
+            if (!m_isFull) // if the drum is full, dont try to check if it needs to rotate again
+            {
+                if (!m_isShooting) 
                 {
-                    if (!m_inputBallChecker.get() && !m_hasBeenTripped)// is there a ball in the acquire position?
+                    if (!m_isRepopulating) 
                     {
                         m_hasBeenTripped = true;
                         System.out.println("Ball occupied at index: " + m_drumArrayIndex);
-                        m_drumArray[m_drumArrayIndex] = true;
+                        //m_drumArray[m_drumArrayIndex] = true;
+                        m_ballArray.acquire();
                         RobotContainer.getRotateDrumOneSectionCommand().schedule();
-                    }
-                }
-            }
+                    } else { /* System.out.println("Ball detected, but robot is repopulating"); */ }
+
+                } else { /* System.out.println("Ball detected, but robot is shooting"); */ }
+
+            } else { /* System.out.println("Ball detected, but robot is full"); */  }
         }
 
-        // Put code here to be run every loop
-        SmartDashboard.putBooleanArray("m_drumArray", m_drumArray);
         SmartDashboard.putBoolean("m_isFull", m_isFull);
-        SmartDashboard.putBoolean("isIndexAcquireCheckerBlocked", !m_inputIndexAcquireChecker.get());
-        SmartDashboard.putBoolean("isAcquireSlotOccupied", !m_inputBallChecker.get());
-        SmartDashboard.putBoolean("m_drumArray[0]", m_drumArray[0]);
-        SmartDashboard.putBoolean("m_drumArray[1]", m_drumArray[1]);
-        SmartDashboard.putBoolean("m_drumArray[2]", m_drumArray[2]);
-        SmartDashboard.putBoolean("m_drumArray[3]", m_drumArray[3]);
-        SmartDashboard.putBoolean("m_drumArray[4]", m_drumArray[4]);
-        SmartDashboard.putNumber("index", m_drumArrayIndex);
+        SmartDashboard.putBoolean("isAcquireFlagTripped", !m_inputAcquireFlagChecker.get());
+        SmartDashboard.putBoolean("isAcquireSlotOccupied", !m_inputAcquireSlotChecker.get());
     }
 
     /**
@@ -78,7 +82,7 @@ public class StorageSubsystem extends SubsystemBase {
      * @return if the the acquierer slot is occupied
      */
     public boolean isAcquireSlotOccupied() {
-        return !m_inputBallChecker.get();
+        return !m_inputAcquireSlotChecker.get();
     }
 
     /**
@@ -94,12 +98,13 @@ public class StorageSubsystem extends SubsystemBase {
     /**
      * Sets all elements in drumArray to false Sets m_isFull to false
      */
-    public void resetDrum() { // TODO move this to shuffle board
+    public void resetDrum() { 
         System.out.println("reset drum");
-        for (int i = 0; i < m_drumArray.length; i++) {
-            m_drumArray[i] = false;
-        }
-        m_isFull = false;
+        // for (int i = 0; i < m_drumArray.length; i++) {
+        //     m_drumArray[i] = false;
+        // }
+        // m_isFull = false;
+        m_ballArray.data = 0;
     }
 
     /**
@@ -107,14 +112,14 @@ public class StorageSubsystem extends SubsystemBase {
      */
     public void startDrumMotor() {
         System.out.println("start drum motor");
-        m_drumSparkMotor.set(0.45);
+        m_drumSparkMotor.set(Constants.DRUM_MOTOR_VELOCITY);
     }
 
     /**
      * Starts the drum spark motor backwards
      */
     public void startDrumMotorBackwards() {
-        m_drumSparkMotor.set(-0.45);
+        m_drumSparkMotor.set(-Constants.DRUM_MOTOR_VELOCITY);
     }
 
     /**
@@ -134,6 +139,10 @@ public class StorageSubsystem extends SubsystemBase {
         return m_drumArray;
     }
 
+    public BallArray getBallArray() {
+        return m_ballArray;
+    }
+
     /**
      * Gets the current index of the drumArray
      * 
@@ -148,11 +157,11 @@ public class StorageSubsystem extends SubsystemBase {
      * bounds), set it back to 0
      */
     public void finishIndex() {
-        m_drumArrayIndex++;
+        // m_drumArrayIndex++;
 
-        if (m_drumArrayIndex == m_drumArray.length) {
-            m_drumArrayIndex = 0;
-        }
+        // if (m_drumArrayIndex == m_drumArray.length) {
+        //     m_drumArrayIndex = 0;
+        // }
         m_hasBeenTripped = false;
     }
 
@@ -162,8 +171,8 @@ public class StorageSubsystem extends SubsystemBase {
      * 
      * @return If the acquire flag was tripped
      */
-    public boolean isIndexAcquireCheckerBlocked() {
-        return !m_inputIndexAcquireChecker.get();
+    public boolean isAcquireFlagTripped() {
+        return !m_inputAcquireFlagChecker.get(); // remove ! for new sensor (dio9)
     }
 
     /**
@@ -171,13 +180,14 @@ public class StorageSubsystem extends SubsystemBase {
      * to corresponding value
      */
     public void isDrumFull() {
-        for (boolean slot : m_drumArray) {
-            if (!slot) {
-                m_isFull = false;
-                return;
-            }
-        }
-        m_isFull = true;
+        // for (boolean slot : m_drumArray) {
+        //     if (!slot) {
+        //         m_isFull = false;
+        //         return;
+        //     }
+        // }
+        // m_isFull = true;
+        m_isFull = m_ballArray.isFull();
     }
 
     /**
