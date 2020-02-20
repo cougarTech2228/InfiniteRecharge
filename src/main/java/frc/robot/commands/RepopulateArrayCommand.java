@@ -6,20 +6,22 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.StorageSubsystem;
 
 /**
- * ShootEntireDrumCommand
+ * RepopulateArrayCommand
  * 
- * This command shoots the entire drum. It calls tryToShootOnce 5 times.
+ * This command repopulates the drum array with the correct values
+ * Stops in acquire position
  */
 public class RepopulateArrayCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private StorageSubsystem m_storageSubsystem;
+
     public RepopulateArrayCommand(StorageSubsystem storageSubsystem) {
         m_storageSubsystem = storageSubsystem;
-
+        System.out.println("RepopulateArrayCommand");
         addCommands(
             new PrintCommand("Repopulate Array Command")
-            .andThen(() -> m_storageSubsystem.setIsRepopulating(true)) // so the drum doesn't start indexing and stuff
+            .andThen(() -> m_storageSubsystem.setIsRepopulating(true))
             .andThen(() -> m_storageSubsystem.resetDrum())
             .andThen(() -> populateIndex())
             .andThen(RobotContainer.getRotateDrumOneSectionCommand())
@@ -33,16 +35,18 @@ public class RepopulateArrayCommand extends SequentialCommandGroup {
             .andThen(RobotContainer.getRotateDrumOneSectionCommand())
             .andThen(() -> m_storageSubsystem.setIsRepopulating(false))
         );
-
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
     }
-
+    /**
+     * Checks the current slot if there is a ball in there, and sets the drum array accordingly.
+     */
     public void populateIndex() {
         System.out.println("populateIndex");
         if(m_storageSubsystem.isAcquireSlotOccupied()) {
-            int currentDrumIndex = m_storageSubsystem.getDrumArrayIndex();
-            m_storageSubsystem.setDrumArray(currentDrumIndex, true);
+            //int currentDrumIndex = m_storageSubsystem.getDrumArrayIndex();
+            //m_storageSubsystem.setDrumArray(currentDrumIndex, true);
+            m_storageSubsystem.getBallArray().acquire();
         }
     }
 }

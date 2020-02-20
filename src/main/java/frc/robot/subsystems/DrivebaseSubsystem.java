@@ -1,228 +1,381 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-
+import frc.robot.OI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.List;
+
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorTerm;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.OI;
-import frc.robot.commands.MethodCommand;
+import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
+
 /**
- * drive robot
+ * DrivebaseSubsystem
  */
 public class DrivebaseSubsystem extends SubsystemBase {
 
-    private TalonSRX m_rightMaster = new TalonSRX(Constants.RIGHT_FRONT_MOTOR_CAN_ID);
-    private TalonSRX m_rightFollower = new TalonSRX(Constants.RIGHT_REAR_MOTOR_CAN_ID);
-    private TalonSRX m_leftMaster = new TalonSRX(Constants.LEFT_FRONT_MOTOR_CAN_ID);
-	private TalonSRX m_leftFollower = new TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
-	private boolean m_isTeleOp;
+	private WPI_TalonSRX m_rightMaster = new WPI_TalonSRX(Constants.RIGHT_FRONT_MOTOR_CAN_ID);
+	private WPI_TalonSRX m_rightFollower = new WPI_TalonSRX(Constants.RIGHT_REAR_MOTOR_CAN_ID);
+	private WPI_TalonSRX m_leftMaster = new WPI_TalonSRX(Constants.LEFT_FRONT_MOTOR_CAN_ID);
+	private WPI_TalonSRX m_leftFollower = new WPI_TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
 
-    private DriveState m_driveState = DriveState.Arcade;
-    private int m_targetAngle;
+	private DifferentialDrive m_differentialDrive;
+	private boolean m_encodersAreAvailable;
+	private DifferentialDriveOdometry m_odometry;
 
-    public enum DriveState {
-        Arcade, DriveStraight
-    }
+	private Pose2d m_savedPose;
 
-    public DrivebaseSubsystem() {
+	private boolean m_isAutonomous = false;
 
-        // You need to register the subsystem to get it's periodic
-        // method to be called by the Scheduler
-        register();
+	public DrivebaseSubsystem() {
 
-        m_leftMaster.configFactoryDefault();
+		// You need to register the subsystem to get it's periodic
+		// method to be called by the Scheduler
+		register();
+
+		m_leftMaster.configFactoryDefault();
 		m_rightMaster.configFactoryDefault();
 
 		/* Disable all motor controllers */
-		m_rightMaster.set(ControlMode.PercentOutput, 0);
-		m_leftMaster.set(ControlMode.PercentOutput, 0);
-		
+		m_rightMaster.set(ControlMode.Velocity, 0);
+		m_leftMaster.set(ControlMode.Velocity, 0);
+
 		/* Set Neutral Mode */
 		m_leftMaster.setNeutralMode(NeutralMode.Brake);
 		m_rightMaster.setNeutralMode(NeutralMode.Brake);
-		
-		/** Closed loop configuration */
-		
-		/* Configure the drivetrain's left side Feedback Sensor as a Quadrature Encoder */
-		m_leftMaster.configSelectedFeedbackSensor(	FeedbackDevice.QuadEncoder,			// Local Feedback Source
-													Constants.PID_PRIMARY,				// PID Slot for Source [0, 1]
-													Constants.kTimeoutMs);				// Configuration Timeout
 
-		/* Configure the left Talon's Selected Sensor to be a remote sensor for the right Talon */
-		m_rightMaster.configRemoteFeedbackFilter(m_leftMaster.getDeviceID(),					// Device ID of Source
-												RemoteSensorSource.TalonSRX_SelectedSensor,	// Remote Feedback Source
-												Constants.REMOTE_0,							// Source number [0, 1]
-												Constants.kTimeoutMs);						// Configuration Timeout
-		
-		/* Setup difference signal to be used for turn when performing Drive Straight with encoders */
-		m_rightMaster.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.RemoteSensor0, Constants.kTimeoutMs);	// Feedback Device of Remote Talon
-		m_rightMaster.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.QuadEncoder, Constants.kTimeoutMs);		// Quadrature Encoder of current Talon
-		
-		/* Difference term calculated by right Talon configured to be selected sensor of turn PID */
-		m_rightMaster.configSelectedFeedbackSensor(	FeedbackDevice.SensorDifference, 
-													Constants.PID_TURN, 
-													Constants.kTimeoutMs);
-		
+		enableEncoders();
+
+		/*
+		 * Setup difference signal to be used for turn when performing Drive Straight
+		 * with encoders
+		 */
+		// Feedback Device of Remote Talon
+		m_rightMaster.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.RemoteSensor0, Constants.kTimeoutMs);
+
+		// Quadrature Encoder of current Talon
+		m_rightMaster.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.QuadEncoder, Constants.kTimeoutMs);
+
+		/*
+		 * Difference term calculated by right Talon configured to be selected sensor of
+		 * turn PID
+		 */
+		m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, Constants.PID_TURN,
+				Constants.kTimeoutMs);
+
 		/* Scale the Feedback Sensor using a coefficient */
 		/**
-		 * Heading units should be scaled to ~4000 per 360 deg, due to the following limitations...
-		 * - Target param for aux PID1 is 18bits with a range of [-131072,+131072] units.
-		 * - Target for aux PID1 in motion profile is 14bits with a range of [-8192,+8192] units.
-		 *  ... so at 3600 units per 360', that ensures 0.1 degree precision in firmware closed-loop
-		 *  and motion profile trajectory points can range +-2 rotations.
+		 * Heading units should be scaled to ~4000 per 360 deg, due to the following
+		 * limitations... - Target param for aux PID1 is 18bits with a range of
+		 * [-131072,+131072] units. - Target for aux PID1 in motion profile is 14bits
+		 * with a range of [-8192,+8192] units. ... so at 3600 units per 360', that
+		 * ensures 0.1 degree precision in firmware closed-loop and motion profile
+		 * trajectory points can range +-2 rotations.
 		 */
-		m_rightMaster.configSelectedFeedbackCoefficient(	Constants.kTurnTravelUnitsPerRotation / Constants.kEncoderUnitsPerRotation,	// Coefficient
-														Constants.PID_TURN, 														// PID Slot of Source
-														Constants.kTimeoutMs);														// Configuration Timeout
-		
+		m_rightMaster.configSelectedFeedbackCoefficient(
+				Constants.kTurnTravelUnitsPerRotation / Constants.kEncoderUnitsPerRotation, // Coefficient
+				Constants.PID_TURN, // PID Slot of Source
+				Constants.kTimeoutMs); // Configuration Timeout
+
+		/* Set open and closed loop values */
+		m_leftMaster.configOpenloopRamp(0.5);
+		m_leftMaster.configClosedloopRamp(0);
+
+		m_rightMaster.configOpenloopRamp(0.5);
+		m_rightMaster.configClosedloopRamp(0);
+
 		/* Configure output and sensor direction */
-		m_leftMaster.setInverted(false);
-		m_leftMaster.setSensorPhase(true);
-		m_rightMaster.setInverted(true);
-		m_rightMaster.setSensorPhase(true);
-		
-		m_rightFollower.setInverted(true);
+		m_leftMaster.setSensorPhase(false);
+		m_leftMaster.setInverted(true);
+
+		m_leftFollower.setInverted(true);
 		m_leftFollower.follow(m_leftMaster);
+
+		m_rightMaster.setSensorPhase(false);
+		m_rightMaster.setInverted(false);
+
+		m_rightFollower.setInverted(false);
 		m_rightFollower.follow(m_rightMaster);
-		
-		/* Set status frame periods */
-		m_rightMaster.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, Constants.kTimeoutMs);
-		m_rightMaster.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, Constants.kTimeoutMs);
-		m_leftMaster.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, Constants.kTimeoutMs);		//Used remotely by right Talon, speed up
 
-		/* Configure neutral deadband */
-		m_rightMaster.configNeutralDeadband(Constants.kNeutralDeadband, Constants.kTimeoutMs);
-		m_leftMaster.configNeutralDeadband(Constants.kNeutralDeadband, Constants.kTimeoutMs);
+		m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
+		m_differentialDrive.setRightSideInverted(true);
 
-		/* max out the peak output (for all modes).  However you can
-		* limit the output of a given PID object with configClosedLoopPeakOutput().
-		*/
-		m_leftMaster.configPeakOutputForward(+1.0, Constants.kTimeoutMs);
-		m_leftMaster.configPeakOutputReverse(-1.0, Constants.kTimeoutMs);
-		m_rightMaster.configPeakOutputForward(+1.0, Constants.kTimeoutMs);
-		m_rightMaster.configPeakOutputReverse(-1.0, Constants.kTimeoutMs);
+		zeroSensors();
 
-		/* FPID Gains for turn servo */
-		m_rightMaster.config_kP(Constants.kSlot_Turning, Constants.kGains_Turning.kP, Constants.kTimeoutMs);
-		m_rightMaster.config_kI(Constants.kSlot_Turning, Constants.kGains_Turning.kI, Constants.kTimeoutMs);
-		m_rightMaster.config_kD(Constants.kSlot_Turning, Constants.kGains_Turning.kD, Constants.kTimeoutMs);
-		m_rightMaster.config_kF(Constants.kSlot_Turning, Constants.kGains_Turning.kF, Constants.kTimeoutMs);
-		m_rightMaster.config_IntegralZone(Constants.kSlot_Turning, Constants.kGains_Turning.iZone, Constants.kTimeoutMs);
-		m_rightMaster.configClosedLoopPeakOutput(Constants.kSlot_Turning, Constants.kGains_Turning.peakOutput, Constants.kTimeoutMs);
-		m_rightMaster.configAllowableClosedloopError(Constants.kSlot_Turning, 0, Constants.kTimeoutMs);
-			
-		/* 1ms per loop.  PID loop can be slowed down if need be.
-		* For example,
-		* - if sensor updates are too slow
-		* - sensor deltas are very small per update, so derivative error never gets large enough to be useful.
-		* - sensor movement is very slow causing the derivative error to be near zero.
-		*/
-		int closedLoopTimeMs = 1;
-		m_rightMaster.configClosedLoopPeriod(0, closedLoopTimeMs, Constants.kTimeoutMs);
-		m_rightMaster.configClosedLoopPeriod(1, closedLoopTimeMs, Constants.kTimeoutMs);
+		RobotContainer.getNavigationSubsystem().calibrateADXRS450();
+		RobotContainer.getNavigationSubsystem().zeroHeading();
 
-		/* configAuxPIDPolarity(boolean invert, int timeoutMs)
-		* false means talon's local output is PID0 + PID1, and other side Talon is PID0 - PID1
-		* true means talon's local output is PID0 - PID1, and other side Talon is PID0 + PID1
-		*/
-		m_rightMaster.configAuxPIDPolarity(false, Constants.kTimeoutMs);
+		m_odometry = new DifferentialDriveOdometry(
+				Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()));
 
-		m_isTeleOp = false;
-    }
-
-    @Override
-    public void periodic() {
-		if(m_isTeleOp) {
-			arcadeDrive();
-		}
-	}
-	
-	public void setIsTeleop(boolean isTeleOp) {
-		m_isTeleOp = isTeleOp;
+		resetOdometry();
 	}
 
-    public Command cmdUseArcadeDrive() {
-        return new SequentialCommandGroup(
-            new MethodCommand(this::arcadeInit),
-            new MethodCommand(this::arcadeDrive, true)
-        );
-    }
-
-    public Command cmdUseStraightDrive() {
-        return new SequentialCommandGroup(
-            new MethodCommand(this::straightInit),
-            new MethodCommand(this::straightDrive, true)
-        );
-    }
-
-    private void arcadeInit() {
-		System.out.println("This is arcade drive");
-	}
-	
-	private void arcadeDrive() {
-		double forward = OI.getXboxLeftJoystickY();
-		double turn = OI.getXboxRightJoystickX();
-		forward = Deadband(forward);
-		turn = Deadband(turn) * 0.5;
-		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
-		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
-	}
-
-	public void setArcadeDrive(double forward, double turn) {
-		forward = Deadband(forward);
-		turn = Deadband(turn) * 0.5;
-		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
-		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
-	}
-
-
-	private void straightInit() {
-		System.out.println("This is straight drive with encoders");
-		m_rightMaster.selectProfileSlot(Constants.kSlot_Turning, Constants.PID_TURN);
-		m_targetAngle = m_rightMaster.getSelectedSensorPosition(1);
-	}
-	private void straightDrive() {
-		double forward = OI.getXboxLeftJoystickY();
-		double turn = OI.getXboxRightJoystickX();
-		forward = Deadband(forward);
-		turn = Deadband(turn);
-		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, m_targetAngle);
-		m_leftMaster.follow(m_rightMaster, FollowerType.AuxOutput1);
-	}
-	
 	/* Zero all sensors used */
 	private void zeroSensors() {
 		m_leftMaster.getSensorCollection().setQuadraturePosition(0, Constants.kTimeoutMs);
 		m_rightMaster.getSensorCollection().setQuadraturePosition(0, Constants.kTimeoutMs);
 		System.out.println("[Quadrature Encoders] All sensors are zeroed.\n");
 	}
+
+	private void enableEncoders() {
+		m_encodersAreAvailable = m_leftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder,
+				Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK
+				& m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.REMOTE_0,
+						Constants.kTimeoutMs) == ErrorCode.OK;
+		if (!m_encodersAreAvailable) {
+			DriverStation.reportError("Failed to configure Drivetrain encoders!!", false);
+		}
+	}
 	
 	/** Deadband 5 percent, used on the gamepad */
-	double Deadband(double value) {
+	private double deadband(final double value) {
 		/* Upper deadband */
-		if (value >= 0.1) 
+		if (value >= 0.1)
 			return value;
-		
+
 		/* Lower deadband */
 		if (value <= -0.1)
 			return value;
-		
+
 		/* Outside deadband */
 		return 0;
 	}
 
-    // Put methods for controlling this subsystem
-    // here. Call these from Commands.
+	private void arcadeDrive() {
+		m_differentialDrive.feed();
 
+		double forward = -OI.getXboxLeftJoystickY();
+		double turn = -OI.getXboxRightJoystickX();
+		forward = deadband(forward);
+		turn = deadband(turn) * 0.5;
+		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
+		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+	}
+
+	@Override
+	public void periodic() {
+		if (m_isAutonomous) {
+			m_odometry.update(Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()),
+					edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
+		} else {
+			arcadeDrive();
+		}
+	}
+
+	// Put methods for controlling this subsystem
+	// here. Call these from Commands.
+
+	/**
+	 * Controls the left and right side of the drive using Talon SRX closed-loop
+	 * velocity.
+	 * 
+	 * @param leftVelocity  left velocity in meters per second
+	 * @param rightVelocity right velocity in meters per second
+	 */
+	public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
+
+		var leftAccel = (leftVelocity - edgesPerDecisecToMetersPerSec(m_leftMaster.getSelectedSensorVelocity())) / .02;
+		var rightAccel = (rightVelocity - edgesPerDecisecToMetersPerSec(m_rightMaster.getSelectedSensorVelocity()))
+				/ .02;
+		var leftFeedForwardVolts = Constants.FEED_FORWARD.calculate(leftVelocity, leftAccel);
+		var rightFeedForwardVolts = Constants.FEED_FORWARD.calculate(rightVelocity, rightAccel);
+
+		m_leftMaster.set(ControlMode.Velocity, metersPerSecToEdgesPerDecisec(leftVelocity),
+				DemandType.ArbitraryFeedForward, leftFeedForwardVolts / 12);
+		m_rightMaster.set(ControlMode.Velocity, metersPerSecToEdgesPerDecisec(rightVelocity),
+				DemandType.ArbitraryFeedForward, rightFeedForwardVolts / 12);
+		m_differentialDrive.feed();
+	}
+
+	/**
+	 * Sets the drivetrain to zero velocity and rotation.
+	 */
+	public void stop() {
+		tankDriveVelocity(0, 0);
+	}
+
+	/**
+	 * Resets the current pose to 0, 0, 0° and resets the saved pose
+	 */
+	public void resetOdometry() {
+		zeroSensors();
+		m_savedPose = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
+		m_odometry.resetPosition(m_savedPose,
+				Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()));
+	}
+
+	/**
+	 * returns left encoder position
+	 * 
+	 * @return left encoder position
+	 */
+	public int getLeftEncoderPosition() {
+		return m_leftMaster.getSelectedSensorPosition(0);
+	}
+
+	/**
+	 * returns right encoder position
+	 * 
+	 * @return right encoder position
+	 */
+	public int getRightEncoderPosition() {
+		return m_rightMaster.getSelectedSensorPosition(0);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public boolean areEncodersAvailable() {
+		return m_encodersAreAvailable;
+	}
+
+	/**
+	 * Converts from encoder edges to meters.
+	 * 
+	 * @param steps encoder edges to convert
+	 * @return meters
+	 */
+	public static double edgesToMeters(int steps) {
+		return (Constants.WHEEL_CIRCUMFERENCE_METERS / Constants.EDGES_PER_ROTATION) * steps;
+	}
+
+	/**
+	 * Converts from encoder edges per 100 milliseconds to meters per second.
+	 * 
+	 * @param stepsPerDecisec edges per decisecond
+	 * @return meters per second
+	 */
+	public static double edgesPerDecisecToMetersPerSec(int stepsPerDecisec) {
+		return edgesToMeters(stepsPerDecisec * 10);
+	}
+
+	/**
+	 * Converts from meters to encoder edges.
+	 * 
+	 * @param meters meters
+	 * @return encoder edges
+	 */
+	public static double metersToEdges(double meters) {
+		return (meters / Constants.WHEEL_CIRCUMFERENCE_METERS) * Constants.EDGES_PER_ROTATION;
+	}
+
+	/**
+	 * Converts from meters per second to encoder edges per 100 milliseconds.
+	 * 
+	 * @param metersPerSec meters per second
+	 * @return encoder edges per decisecond
+	 */
+	public static double metersPerSecToEdgesPerDecisec(double metersPerSec) {
+		return metersToEdges(metersPerSec) * .1d;
+	}
+
+	/**
+	 * @return Pose2d
+	 */
+	public Pose2d getCurrentPose() {
+		return m_odometry.getPoseMeters();
+	}
+
+	/**
+	 * Creates a command to follow a Trajectory on the drivetrain.
+	 * 
+	 * @param trajectory trajectory to follow
+	 * @return command that will run the trajectory
+	 */
+	public Command createCommandForTrajectory(Trajectory trajectory) {
+		return new ConditionalCommand(
+				new RamseteCommand(trajectory, this::getCurrentPose,
+						new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA), Constants.DRIVE_KINEMATICS,
+						this::tankDriveVelocity, this).andThen(this::stop, this),
+				new PrintCommand("Cannot run trajectory because encoders are unavailable!!"),
+				this::areEncodersAvailable);
+	}
+
+	public void setupAutoCommands() {
+		// Create a voltage constraint to ensure we don't accelerate too fast
+		var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(Constants.FEED_FORWARD,
+				Constants.DRIVE_KINEMATICS, Constants.DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE);
+
+		// Create config for all trajectories
+		TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond,
+				Constants.kMaxAccelerationMetersPerSecondSquared)
+						// Add kinematics to ensure max speed is actually obeyed
+						.setKinematics(Constants.DRIVE_KINEMATICS)
+						// Apply the voltage constraint
+						.addConstraint(autoVoltageConstraint).setEndVelocity(0.0);
+
+		// Center Trajectory Autonomous Command
+		Trajectory centerTrajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
+				List.of(new Translation2d(0.86, -1.583), new Translation2d(-5.184, -1.881),
+						new Translation2d(-4.768, -0.726)),
+				// new Translation2d(-1.424, -1.785)),
+				// new Translation2d(-4.149, -0.429),
+				// new Translation2d(-1.424, -0.512)),
+
+				new Pose2d(-1.5, -1, new Rotation2d(0)), /* 6.02 radians = 345 degrees */
+				// Pass config
+				config);
+
+		var centerTrajectoryCommand = createCommandForTrajectory(centerTrajectory);
+		RobotContainer.getAutoChooser().setDefaultOption("Center", centerTrajectoryCommand);
+
+		// Left Trajectory Autonomous Command
+		Trajectory leftTrajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
+				List.of(new Translation2d(-0.9, -1.3)),
+
+				new Pose2d(-5.0, -1.6, new Rotation2d(3.14)),
+				// Pass config
+				config);
+
+		var leftTrajectoryCommand = createCommandForTrajectory(leftTrajectory);
+		RobotContainer.getAutoChooser().addOption("Left", leftTrajectoryCommand);
+
+		// Right Trajectory Autonomous Command
+		Trajectory rightTrajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
+				List.of(new Translation2d(-0.9, -1.3)),
+
+				new Pose2d(-5.0, -1.6, new Rotation2d(3.14)),
+				// Pass config
+				config);
+
+		var rightTrajectoryCommand = createCommandForTrajectory(rightTrajectory);
+		RobotContainer.getAutoChooser().addOption("Right", rightTrajectoryCommand);
+
+		SmartDashboard.putData("Auto Chooser", RobotContainer.getAutoChooser());
+	}
+
+	public void setArcadeDrive(double forward, double turn) {
+		forward = deadband(forward) * -1;
+		turn = (deadband(turn) * 0.5) * -1;
+		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
+		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+	}
+
+	public void setAutonomous(boolean isAutonomous) {
+		m_isAutonomous = isAutonomous;
+	}
 }

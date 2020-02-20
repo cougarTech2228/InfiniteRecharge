@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.ControlPanelSubsystem;
@@ -18,7 +17,6 @@ public class PositionControlPanelCommand extends CommandBase {
 
     private String m_startColor;
     private String m_colorStringPosition;
-    private int m_isOnColorIncrementer;
     private boolean m_isFinished = false;
 
     public PositionControlPanelCommand(ControlPanelSubsystem controlPanelSubsystem) {
@@ -32,8 +30,6 @@ public class PositionControlPanelCommand extends CommandBase {
       // Called when the command is initially scheduled.
       @Override
       public void initialize() {
-
-          m_isOnColorIncrementer = 0;
           m_startColor = m_controlPanelSubsystem.parseGameData(); // get the game data color
           System.out.println("Start Motor, p");
           m_colorStringPosition = m_controlPanelSubsystem.getCurrentColor();

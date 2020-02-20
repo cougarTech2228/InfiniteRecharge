@@ -13,7 +13,6 @@ public class RumbleCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     public RumbleCommand() {
-
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
     }
@@ -22,11 +21,6 @@ public class RumbleCommand extends CommandBase {
     @Override
     public void initialize() {
         OI.setXboxRumbleSpeed(Constants.XBOX_RUMBLE_TIME);
-    }
-
-    // Called every time the scheduler runs while the command is scheduled.
-    @Override
-    public void execute() {
     }
 
     // Returns true when the command should end.

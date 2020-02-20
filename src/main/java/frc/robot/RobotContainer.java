@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,30 +19,41 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.CommandToggler;
+import frc.robot.util.TrajectoryManager;
 import frc.robot.util.CommandToggler.CommandState;
 
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including subsystems,
+ * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
 
   private final static OI m_oi = new OI();
 
   // Robot Subsystems
-   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
+  // Since it might take some time for the navigation module (Pigeon or
+  // ADXRS450_Gyro) to
+  // calibrate and come up, we should put this instantiation first.
+  private final static NavigationSubsystem m_navigationSubsystem = new NavigationSubsystem();
+  private final static TrajectoryManager m_trajectoryManager = new TrajectoryManager();
+  private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
   private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
   private final static StorageSubsystem m_storageSubsystem = new StorageSubsystem();
-  private final static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(m_storageSubsystem);
   private final static GarminLidarSubsystem m_garminLidarSubsystem = new GarminLidarSubsystem();
+  private final static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(m_storageSubsystem,
+      m_garminLidarSubsystem);
   private final static ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
   private final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
 
-  // Robot Commands
-  //private final static SampleCommand m_sampleCommand = new SampleCommand(/*m_subSystem*/);
+  private final static SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+
+  private final static TrajectoryCommand m_centerTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getCenterTrajectory(), m_drivebaseSubsystem);
+  private final static TrajectoryCommand m_leftTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getLeftTrajectory(), m_drivebaseSubsystem);
+  private final static TrajectoryCommand m_rightTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getRightTrajectory(), m_drivebaseSubsystem);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -52,16 +64,19 @@ public class RobotContainer {
     configureShuffleboardBindings();
   }
 
-
   // Use this method to define shuffleboard buttons or widgets
   private void configureShuffleboardBindings() {
-    SmartDashboard.putData("Robot machine broke, reset", RobotContainer.getResetEverythingCommand()
-                                                         .beforeStarting(() -> CommandScheduler.getInstance().cancelAll()));
-    SmartDashboard.putData("Reset Drum Array", new PrintCommand("resetting drum array")
-                                              .andThen(() -> m_storageSubsystem.resetDrum()));
+    SmartDashboard.putData("Robot machine broke, reset",
+        RobotContainer.getResetEverythingCommand().beforeStarting(() -> CommandScheduler.getInstance().cancelAll()));
+    SmartDashboard.putData("Reset Drum Array",
+        new PrintCommand("resetting drum array").andThen(() -> m_storageSubsystem.resetDrum()));
     SmartDashboard.putData("Repopulate drum array", getRepopulateArrayCommand());
 
-                                                         
+    SmartDashboard.putData("Auto Chooser", m_autoChooser);
+    m_autoChooser.setDefaultOption("Center", getCenterAutoCommand());
+    m_autoChooser.addOption("Left", getLeftAutoCommand());
+    m_autoChooser.addOption("Right", getRightAutoCommand());
+    
   }
 
   /**
@@ -71,74 +86,67 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // stuff tucker wants
-    // LB - shoot motor (toggle) -done
-    // LT - shoot once -done
-    // RB - Acquirer motor (toggle)
-    // RT -Shoot entire drum -done
-    // X - Rotation -done
-    // Y - Position -done
-    // dpad for climb
+
+    new Button(OI::getXboxDpadLeft).whenPressed(() -> m_shooterSubsystem.setIsShooting(true));
+    new Button(OI::getXboxDpadRight).whenPressed(() -> m_shooterSubsystem.setIsShooting(false));
 
     new Button(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
     new Button(OI::getXboxYButton).whenPressed(getPositionControlPanelCommand());
     new Button(OI::getXboxDpadUp).whenPressed(getRotateDrumOneSectionCommand());
-    new Button(OI::getXboxDpadDown).whenPressed(() -> m_storageSubsystem.resetDrum());
 
     new Button(OI::getXboxLeftTriggerPressed)
         .whenPressed(getShootOnceCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)));
 
-    new CommandToggler( // Shoot Entire Drum Toggle - Left Dpad
-      getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)),
-      null // TODO when the command is interrrupted, the array does not always index properly. 
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxRightTriggerPressed)
-    .setCycle(true);
+    new CommandToggler( // Shoot Entire Drum Toggle - Right Trigger
+        getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)), 
+        null 
+    ).setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxRightTriggerPressed).setCycle(true);
 
     new CommandToggler( // Shooter Motor Toggle - Left Bumper
-      new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
-      new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem)
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxLeftBumper)
-    .setCycle(true);
+        new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
+        new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem))
+            .setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxLeftBumper).setCycle(true);
 
     new CommandToggler( // Drum Motor Toggle - A Button
-      new InstantCommand(m_storageSubsystem::startDrumMotor, m_storageSubsystem),
-      new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem)
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxAButton)
-    .setCycle(true);
+        new InstantCommand(m_storageSubsystem::startDrumMotor, m_storageSubsystem),
+        new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem))
+            .setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxAButton).setCycle(true);
 
     new CommandToggler( // Drum Motor Backwards Toggle - B Button
-      new InstantCommand(m_storageSubsystem::startDrumMotorBackwards, m_storageSubsystem),
-      new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem)
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxBButton)
-    .setCycle(true);
+        new InstantCommand(m_storageSubsystem::startDrumMotorBackwards, m_storageSubsystem),
+        new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem))
+            .setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxBButton).setCycle(true);
+
+    // new CommandToggler( // Acquirer Motor Toggle - Right Bumper
+    // m_acquisitionSubsystem.cmdSetClosedLoop(),
+    // null
+    // )
+    // .setDefaultState(CommandState.Interruptible)
+    // .setToggleButton(OI::getXboxRightBumper)
+    // .setCycle(true);
 
     new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-      m_acquisitionSubsystem.cmdSetClosedLoop(),
-      null
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxRightBumper)
-    .setCycle(true);
+        getRunAcquireMotorCommand(true), null).setDefaultState(CommandState.Interruptible)
+        .setToggleButton(OI::getXboxRightBumper).setCycle(true);
 
-    //------------------
+    // ------------------
 
     // new CommandToggler(
-    //   m_drivebaseSubsystem.cmdUseArcadeDrive(),
-    //   m_drivebaseSubsystem.cmdUseStraightDrive()
+    // m_drivebaseSubsystem.cmdUseArcadeDrive(),
+    // m_drivebaseSubsystem.cmdUseStraightDrive()
     // )
     // .setDefaultState(CommandState.Interruptible)
     // .setToggleButton(OI::getXboxRightJoystickPress)
     // .setCycle(true);
-    //m_drivebaseSubsystem.cmdUseArcadeDrive();
+    // m_drivebaseSubsystem.cmdUseArcadeDrive();
   }
+
+  public static SendableChooser<Command> getAutoChooser() {
+    return m_autoChooser;
+  }
+
+  
+  // Command Getters
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -146,15 +154,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return getAutonomousOneCommand();
+    return m_autoChooser.getSelected();
   }
-
-  // Command Getters
 
   public static RumbleCommand getRumbleCommand() {
     return new RumbleCommand();
   }
-  
+
   public static RotateDrumOneSectionCommand getRotateDrumOneSectionCommand() {
     return new RotateDrumOneSectionCommand(m_storageSubsystem, m_shooterSubsystem);
   }
@@ -172,7 +178,6 @@ public class RobotContainer {
   }
 
   public static ShootOnceCommand getShootOnceCommand() {
-    System.out.println("getShootOnce");
     return new ShootOnceCommand(m_shooterSubsystem);
   }
 
@@ -185,18 +190,44 @@ public class RobotContainer {
   }
 
   public static ResetEverythingCommand getResetEverythingCommand() {
-    return new ResetEverythingCommand(m_storageSubsystem, m_shooterSubsystem, 
-                                      m_garminLidarSubsystem, m_drivebaseSubsystem, 
-                                      m_acquisitionSubsystem, m_climberSubsystem, 
-                                      m_controlPanelSubsystem, m_visionSubsystem);
+    return new ResetEverythingCommand(m_storageSubsystem, m_shooterSubsystem, m_garminLidarSubsystem,
+        m_drivebaseSubsystem, m_acquisitionSubsystem, m_climberSubsystem, m_controlPanelSubsystem, m_visionSubsystem);
   }
 
-  public static AutonomousOneCommand getAutonomousOneCommand() {
-    return new AutonomousOneCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
+  public static CenterAutoCommand getCenterAutoCommand() {
+    return new CenterAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
+  }
+
+  public static LeftAutoCommand getLeftAutoCommand() {
+    return new LeftAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
+  }
+
+  public static RightAutoCommand getRightAutoCommand() {
+    return new RightAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
   }
 
   public static RepopulateArrayCommand getRepopulateArrayCommand() {
     return new RepopulateArrayCommand(m_storageSubsystem);
+  }
+
+  public static TurnRobotCommand getTurnRobotCommand(int turnDegree) {
+    return new TurnRobotCommand(m_drivebaseSubsystem, m_navigationSubsystem, turnDegree);
+  }
+
+  public static RunAcquireMotorCommand getRunAcquireMotorCommand(boolean isTeleOp) {
+    return new RunAcquireMotorCommand(m_acquisitionSubsystem, isTeleOp);
+  }
+
+  public static TrajectoryCommand getLeftTrajectoryCommand() {
+    return m_leftTrajectoryCommand;
+  }
+
+  public static TrajectoryCommand getRightTrajectoryCommand() {
+    return m_rightTrajectoryCommand;
+  }
+
+  public static TrajectoryCommand getCenterTrajectoryCommand() {
+    return m_centerTrajectoryCommand;
   }
 
   // Subsystem Getters
@@ -205,23 +236,33 @@ public class RobotContainer {
     return m_drivebaseSubsystem;
   }
 
-   public static ControlPanelSubsystem getControlPanel() {
-     return m_controlPanelSubsystem;
-   }
+  public static ControlPanelSubsystem getControlPanel() {
+    return m_controlPanelSubsystem;
+  }
 
-  public static AcquisitionSubsystem getAcquisitionSubsystem(){
+  public static AcquisitionSubsystem getAcquisitionSubsystem() {
     return m_acquisitionSubsystem;
   }
 
-  public static StorageSubsystem getStorageSubsystem(){
-     return m_storageSubsystem;
+  public static StorageSubsystem getStorageSubsystem() {
+    return m_storageSubsystem;
   }
 
-   public static ShooterSubsystem getShooterSubystem(){
-     return m_shooterSubsystem;
-   }
+  public static ShooterSubsystem getShooterSubystem() {
+    return m_shooterSubsystem;
+  }
 
-   public static GarminLidarSubsystem getGarminLidarSubsystem() {
-     return m_garminLidarSubsystem;
-   }
+  public static GarminLidarSubsystem getGarminLidarSubsystem() {
+    return m_garminLidarSubsystem;
+  }
+
+  public static NavigationSubsystem getNavigationSubsystem() {
+    return m_navigationSubsystem;
+  }
+
+  // Other methods
+
+  public static void scheduleInstantResetOdometryCommand() {
+    new InstantCommand(m_drivebaseSubsystem::resetOdometry, m_drivebaseSubsystem).schedule();
+  }
 }

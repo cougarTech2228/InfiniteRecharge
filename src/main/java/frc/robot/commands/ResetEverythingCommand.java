@@ -2,10 +2,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.*;
-import  java.util.logging.Logger;
+import java.util.logging.Logger;
 
 /**
  * ResetEverythingCommand
@@ -27,7 +26,7 @@ public class ResetEverythingCommand extends SequentialCommandGroup {
                                   AcquisitionSubsystem acquistionSubsystem, ClimberSubsystem climberSubsystem,
                                   ControlPanelSubsystem controlPanelSubsystem, VisionSubsystem visionSubsystem) 
     {
-
+        System.out.println("ResetEverythingCommand");
         addCommands(
             new PrintCommand("ALERT! ALERT! ROBOT MACHINE BROKE, RESETTING EVERYTHING!")
             .andThen(() -> m_logger.severe("Reset everything"))
@@ -38,7 +37,6 @@ public class ResetEverythingCommand extends SequentialCommandGroup {
             .andThen(() -> controlPanelSubsystem.relatchInterrupts())
             .andThen(() -> controlPanelSubsystem.setHasFiredRotate(false))
         );
-
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
     }

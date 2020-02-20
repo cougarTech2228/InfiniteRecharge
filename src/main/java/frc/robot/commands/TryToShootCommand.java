@@ -17,23 +17,23 @@ public class TryToShootCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     public TryToShootCommand(ShooterSubsystem shooterSubsystem, StorageSubsystem storageSubsystem) {
-
+        System.out.println("TryToShootCommand");
         addCommands(
             new SelectCommand(
                 Map.of(
-                    true,
+                    true, (
                         RobotContainer.getBopperCommand()
-                        .andThen(() -> storageSubsystem.setDrumArray(storageSubsystem.getDrumArrayIndex(), false))
-                        .andThen(() -> storageSubsystem.isDrumFull())
-                        .andThen(RobotContainer.getRotateDrumOneSectionCommand()),
-
-                    false, new PrintCommand("false")
+                        //.andThen(() -> storageSubsystem.setDrumArray(storageSubsystem.getDrumArrayIndex(), false))
+                        .andThen(() -> storageSubsystem.getBallArray().shoot())
                         .andThen(RobotContainer.getRotateDrumOneSectionCommand())
-
+                    ),
+                    false, (
+                        new PrintCommand("false")
+                        .andThen(RobotContainer.getRotateDrumOneSectionCommand())
+                    )
                 ), () -> shooterSubsystem.isShooterSlotOccupied()
             )
         );
-
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
     }

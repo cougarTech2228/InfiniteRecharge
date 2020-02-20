@@ -4,80 +4,73 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.motors.ShooterMotor;
-import frc.robot.util.ShuffleboardAdapter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.HashMap;
-
 public class ShooterSubsystem extends SubsystemBase {
 
     private ShooterMotor m_shooterMotor;
-    private DigitalInput m_inputBallShooterChecker;
-    private DigitalInput m_indexShooterChecker;
+    private DigitalInput m_inputShooterSlotChecker;
+    private DigitalInput m_inputShooterFlagChecker;
     private Solenoid m_bopper;
     private StorageSubsystem m_storageSubsystem;
+    private GarminLidarSubsystem m_garminLidarSubsystem;
     private boolean m_isShooting;
 
-    public ShooterSubsystem(StorageSubsystem storageSubsystem) {
-        // You need to register the subsystem to get it's periodic
-        // method to be called by the Scheduler
+    public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem) {
         register();
 
         m_storageSubsystem = storageSubsystem;
+        m_garminLidarSubsystem = garminLidarSubsystem;
 
         m_shooterMotor = new ShooterMotor();
-        m_bopper = new Solenoid(Constants.PCM_PORT_0);
+        m_bopper = new Solenoid(Constants.BOPPER_PCM_PORT);
+        m_inputShooterSlotChecker = new DigitalInput(Constants.SHOOTER_SLOT_DIO);
+        m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_FLAG_DIO);
 
-        m_inputBallShooterChecker = new DigitalInput(Constants.DIGITAL_IO_3);
-        m_indexShooterChecker = new DigitalInput(Constants.DIGITAL_IO_4);
         m_isShooting = false;
-
-
-        new ShuffleboardAdapter("Shooter")
-            .addDoubleText("target velocity", 0, value -> {
-                //m_shooterMotor.set(ControlMode.Velocity, value);
-                //System.out.println("Set it to: " + value);
-            });
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("isShooterSlotOccupied", !m_inputBallShooterChecker.get());
-        SmartDashboard.putBoolean("isAcquireIndexBlocked" , !m_indexShooterChecker.get());
+        SmartDashboard.putNumber("shooter velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
+        SmartDashboard.putBoolean("isShooterSlotOccupied", !m_inputShooterSlotChecker.get());
+        SmartDashboard.putBoolean("isShooterFlagBlocked" , !m_inputShooterFlagChecker.get());
         SmartDashboard.putBoolean("isShooting", m_isShooting);
     }
+    
     /**
      * Returns the opposite value of the getter for the sensor as for example
      * if the getter returns true that means the sensor is not blocked.
      * @return If the shooter flag was tripped
      */
-    public boolean isIndexShooterCheckerBlocked() {
-        return !m_indexShooterChecker.get();
+    public boolean isShooterFlagTripped() {
+        return !m_inputShooterFlagChecker.get();
     }
+
     /**
      * Returns the opposite value of the getter for the sensor as for example
      * if the getter returns true that means the sensor is not blocked.
      * @return if the shooter slot is occupied by a powercell
      */
-    public boolean isShooterSlotOccupied()
-    {
-        return !m_inputBallShooterChecker.get();
+    public boolean isShooterSlotOccupied() {
+        return !m_inputShooterSlotChecker.get();
     }
+
     /**
      * Raises the solenoid which pushes the powercell into the shooter motor
      */
-    public void raiseBopper()
-    {
+    public void raiseBopper() {
         m_bopper.set(true);
     }
+
     /**
      * Lowers the solenoid
      */
-    public void lowerBopper()
-    {
+    public void lowerBopper() {
         m_bopper.set(false);
     }
+
     /**
      * Returns the boolean isShooting which determines the state of the drum slot location
      * @return boolean isShooting
@@ -85,6 +78,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean getIsShooting() {
         return m_isShooting;
     }
+
     /**
      * Sets isShooting to the passed in value
      * @param isShooting
@@ -93,12 +87,19 @@ public class ShooterSubsystem extends SubsystemBase {
         m_isShooting = isShooting;
     }
 
-
+    /**
+     * Starts the shooter motor, also sets the variable isShooting in the storage subsystem 
+     * and in the shooter subsystem to true
+     */
     public void startShooterMotor() {
         m_storageSubsystem.setIsShooting(true);
-        m_shooterMotor.start();
+        m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
     }
 
+    /**
+     * Starts the shooter motor, also sets the variable isShooting in the storage subsystem 
+     * and in the shooter subsystem to false. Rotates the drum back to acquire position.
+     */
     public void stopShooterMotor() {
         m_storageSubsystem.setIsShooting(false);
         m_shooterMotor.stop();
