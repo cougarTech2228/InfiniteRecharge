@@ -14,7 +14,6 @@ public class ShootOnceCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     public ShootOnceCommand(ShooterSubsystem shooterSubsystem) {
-        System.out.println("ShootOnceCommand");
         addCommands(
             new PrintCommand("shoot once"),
             RobotContainer.getRotateDrumOneSectionCommand()

@@ -26,7 +26,6 @@ public class ResetEverythingCommand extends SequentialCommandGroup {
                                   AcquisitionSubsystem acquistionSubsystem, ClimberSubsystem climberSubsystem,
                                   ControlPanelSubsystem controlPanelSubsystem, VisionSubsystem visionSubsystem) 
     {
-        System.out.println("ResetEverythingCommand");
         addCommands(
             new PrintCommand("ALERT! ALERT! ROBOT MACHINE BROKE, RESETTING EVERYTHING!")
             .andThen(() -> m_logger.severe("Reset everything"))

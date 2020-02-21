@@ -40,34 +40,32 @@ public class TrajectoryManager {
                         // Apply the voltage constraint
                         .addConstraint(autoVoltageConstraint).setEndVelocity(0.0);
 
-        m_centerTrajectory = makeTrajectory("Center", 
+        m_centerTrajectory = makeTrajectory("Center",
         List.of( 
-        //     new Translation2d(0.348, -1.692),
-        //     new Translation2d(-0.217, -1.692),
-        //     new Translation2d(-2.472, -1.692),
-        //     new Translation2d(-3.281, -1.692),
-        //     new Translation2d(-4.209, -1.692),
-        //     new Translation2d(-5.303, -1.69),
-        //     new Translation2d(-4.851, -1.155),
-        //     new Translation2d(-4.149, -1.048),
-        //     new Translation2d(-3.316, -1.036)
-        // ),
-        // new Pose2d(-2.234, -0.976, new Rotation2d(.25)));
-            new Translation2d(0.86, -1.583), 
-            new Translation2d(-5.184, -1.881)),
-            // new Translation2d(-4.768, -0.726)),
-            // new Translation2d(-1.424, -1.785)),
-            // new Translation2d(-4.149, -0.429),
-            // new Translation2d(-1.424, -0.512)),
-        new Pose2d(-2.23, -0.9, new Rotation2d(.1))); /* 6.02 radians = 345 degrees */ 
+            new Translation2d(-0.044, -1.619),
+            //new Translation2d(-2.483, -1.702),
+            new Translation2d(-5.137, -1.69),
+            new Translation2d(-4.09, -1.666)
+        ),
+        new Pose2d(-2.46, -1.692, new Rotation2d(.35)));
+        //     new Translation2d(0.86, -1.583), 
+        //     new Translation2d(-5.184, -1.881)),
+        //     // new Translation2d(-4.768, -0.726)),
+        //     // new Translation2d(-1.424, -1.785)),
+        //     // new Translation2d(-4.149, -0.429),
+        //     // new Translation2d(-1.424, -0.512)),
+        // new Pose2d(-2.23, -0.9, new Rotation2d(.1))); /* 6.02 radians = 345 degrees */ 
 
         m_leftTrajectory = makeTrajectory("Left", 
         List.of(new Translation2d(-0.9, -1.3)),
         new Pose2d(-5.0, -1.6, new Rotation2d(3.14))); 
 
         m_rightTrajectory = makeTrajectory("Right", 
-        List.of(new Translation2d(-0.9, -1.3)),
-        new Pose2d(-5.0, -1.6, new Rotation2d(3.14))); 
+        List.of(
+            new Translation2d(-2.177, -0.381),
+            new Translation2d(-4.997, -0.56)
+        ),
+        new Pose2d(-2.043, -0.369, new Rotation2d(.35)));
     }
 
     public Trajectory makeTrajectory(String shuffleBoardName, List<Translation2d> pathList, Pose2d endPose) {

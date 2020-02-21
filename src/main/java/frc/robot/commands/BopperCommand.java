@@ -16,7 +16,6 @@ public class BopperCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     public BopperCommand(ShooterSubsystem shooterSubsystem) {
-        System.out.println("BopperCommand");
         addCommands(
             new PrintCommand("Bopping ..."),
             new InstantCommand(shooterSubsystem::raiseBopper, shooterSubsystem),

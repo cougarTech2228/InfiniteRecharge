@@ -3,11 +3,14 @@ package frc.robot.motors;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants;
@@ -16,6 +19,7 @@ import frc.robot.util.ShuffleboardAdapter;
 public class ShooterMotor extends TalonSRXMotor {
 
     private HashMap<Integer, Integer> shooterMap;
+    private boolean m_encodersAreAvailable;
 
     public ShooterMotor() {
         super(Constants.SHOOTER_CAN_ID);
@@ -28,7 +32,7 @@ public class ShooterMotor extends TalonSRXMotor {
         shooterMap.put(244, 93500);
 
         talon.configFactoryDefault();
-        talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.PID_PRIMARY, Constants.kTimeoutMs);
+        m_encodersAreAvailable =  talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK;
         talon.config_kP(0, 0.0075, Constants.kTimeoutMs);
         talon.config_kI(0, 0, Constants.kTimeoutMs);
         talon.config_kD(0, 0, Constants.kTimeoutMs);
@@ -65,6 +69,8 @@ public class ShooterMotor extends TalonSRXMotor {
         // .addDouble("Velocity Error", 0, () -> talon.getClosedLoopError())
         // .addDouble("Velocity", 0, () -> talon.getSelectedSensorVelocity())
         // .addDouble("Current", 0, () -> talon.getSupplyCurrent());
+
+        System.out.println(m_encodersAreAvailable);
     }
 
     public void start(int distance) {

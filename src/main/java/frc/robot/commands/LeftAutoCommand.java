@@ -20,7 +20,20 @@ public class LeftAutoCommand extends SequentialCommandGroup {
             DrivebaseSubsystem drivebaseSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         
         addCommands (
-            
+            new PrintCommand("LeftAutoCommand"),
+            RobotContainer.getTurnRobotCommand(-55)
+            .andThen(() -> shooterSubsystem.startShooterMotor()),
+            new WaitCommand(2),
+            //RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
+            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true)),
+            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true)),
+            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
+            .andThen(() -> shooterSubsystem.stopShooterMotor()),
+            RobotContainer.getLeftTrajectoryCommand()
+            .andThen(() -> shooterSubsystem.startShooterMotor()),
+            new WaitCommand(2),
+            RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
+            .andThen(() -> shooterSubsystem.stopShooterMotor())
         );
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();

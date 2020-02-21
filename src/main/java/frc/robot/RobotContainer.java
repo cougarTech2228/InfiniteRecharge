@@ -90,6 +90,8 @@ public class RobotContainer {
     new Button(OI::getXboxDpadLeft).whenPressed(() -> m_shooterSubsystem.setIsShooting(true));
     new Button(OI::getXboxDpadRight).whenPressed(() -> m_shooterSubsystem.setIsShooting(false));
 
+    new Button(OI::getXboxDpadDown).whenPressed(getBopperCommand());
+
     new Button(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
     new Button(OI::getXboxYButton).whenPressed(getPositionControlPanelCommand());
     new Button(OI::getXboxDpadUp).whenPressed(getRotateDrumOneSectionCommand());
@@ -100,22 +102,34 @@ public class RobotContainer {
     new CommandToggler( // Shoot Entire Drum Toggle - Right Trigger
         getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)), 
         null 
-    ).setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxRightTriggerPressed).setCycle(true);
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxRightTriggerPressed)
+    .setCycle(true);
 
     new CommandToggler( // Shooter Motor Toggle - Left Bumper
         new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
-        new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem))
-            .setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxLeftBumper).setCycle(true);
+        new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem)
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxLeftBumper)
+    .setCycle(true);
 
     new CommandToggler( // Drum Motor Toggle - A Button
         new InstantCommand(m_storageSubsystem::startDrumMotor, m_storageSubsystem),
-        new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem))
-            .setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxAButton).setCycle(true);
+        new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem)
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxAButton)
+    .setCycle(true);
 
     new CommandToggler( // Drum Motor Backwards Toggle - B Button
         new InstantCommand(m_storageSubsystem::startDrumMotorBackwards, m_storageSubsystem),
-        new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem))
-            .setDefaultState(CommandState.Interruptible).setToggleButton(OI::getXboxBButton).setCycle(true);
+        new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem)
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxBButton)
+    .setCycle(true);
 
     // new CommandToggler( // Acquirer Motor Toggle - Right Bumper
     // m_acquisitionSubsystem.cmdSetClosedLoop(),
@@ -126,8 +140,12 @@ public class RobotContainer {
     // .setCycle(true);
 
     new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-        getRunAcquireMotorCommand(true), null).setDefaultState(CommandState.Interruptible)
-        .setToggleButton(OI::getXboxRightBumper).setCycle(true);
+        getStartAcquirerCommand(),
+        new InstantCommand(m_acquisitionSubsystem::stopAcquirer, m_acquisitionSubsystem)
+    )
+    .setDefaultState(CommandState.Interruptible)
+    .setToggleButton(OI::getXboxRightBumper)
+    .setCycle(true);
 
     // ------------------
 
@@ -214,8 +232,8 @@ public class RobotContainer {
     return new TurnRobotCommand(m_drivebaseSubsystem, m_navigationSubsystem, turnDegree);
   }
 
-  public static RunAcquireMotorCommand getRunAcquireMotorCommand(boolean isTeleOp) {
-    return new RunAcquireMotorCommand(m_acquisitionSubsystem, isTeleOp);
+  public static StartAcquirerCommand getStartAcquirerCommand() {
+    return new StartAcquirerCommand(m_acquisitionSubsystem);
   }
 
   public static TrajectoryCommand getLeftTrajectoryCommand() {

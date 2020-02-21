@@ -11,18 +11,16 @@ import frc.robot.Constants;
  * 
  * 
  */
-public class RunAcquireMotorCommand extends CommandBase {
+public class StartAcquirerCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private AcquisitionSubsystem m_acquisitionSubsystem;
     private Timer m_timer;
-    private boolean m_isTeleOp;
 
-    public RunAcquireMotorCommand(AcquisitionSubsystem acquisitionSubsystem, boolean isTeleOp) {
+    public StartAcquirerCommand(AcquisitionSubsystem acquisitionSubsystem) {
 
         m_acquisitionSubsystem = acquisitionSubsystem;
         m_timer = new Timer();
-        m_isTeleOp = isTeleOp;
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
     }
@@ -30,39 +28,37 @@ public class RunAcquireMotorCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-       //m_acquisitionSubsystem.setAcquirerSpeed(-0.5);
-       System.out.println("Start acquirer"); 
+        System.out.println("Start acquirer");
+        m_acquisitionSubsystem.deployAcquirer();
+        m_acquisitionSubsystem.setAcquirerSpeed(-0.5);
+        m_acquisitionSubsystem.createStartAcquireCommandInstance(this);
     }
 
      // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // if(m_acquisitionSubsystem.getAcquisitionMotor().getCurrent() > 2 && m_timer.get() == 0) {
-        //     m_timer.start();
-        //     m_acquisitionSubsystem.setAcquirerSpeed(-0.6); 
-        // }
-        // else if(m_timer.get() > 0.2) {
-        //     m_timer.stop();
-        //     m_timer.reset();
-        //     m_acquisitionSubsystem.setAcquirerSpeed(-0.5); 
-        // }
+        if(m_acquisitionSubsystem.getAcquisitionMotor().getCurrent() > 2 && m_timer.get() == 0) {
+            m_timer.start();
+            m_acquisitionSubsystem.setAcquirerSpeed(-0.6); 
+        }
+        else if(m_timer.get() > 0.2) {
+            m_timer.stop();
+            m_timer.reset();
+            m_acquisitionSubsystem.setAcquirerSpeed(-0.5); 
+        }
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if(m_isTeleOp) { 
-            return false; 
-        } else {
-            return m_acquisitionSubsystem.getStopAcquirer();
-        }
+        return false;
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         System.out.println("stop acquirer");
-        //m_acquisitionSubsystem.setAcquirerSpeed(0);
-        m_acquisitionSubsystem.setStopAcquirer(false);
+        m_acquisitionSubsystem.setAcquirerSpeed(0);
+        m_acquisitionSubsystem.retractAcquirer();
     }
 }

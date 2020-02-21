@@ -25,7 +25,6 @@ public class CenterAutoCommand extends SequentialCommandGroup {
 
     public CenterAutoCommand(StorageSubsystem storageSubsystem, ShooterSubsystem shooterSubsystem,
             DrivebaseSubsystem drivebaseSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
-        System.out.println("CenterAutoCommand");
         // addCommands (
         //     new PrintCommand("CenterAutoCommand")
         //     // .andThen(() -> shooterSubsystem.startShooterMotor()),

@@ -18,7 +18,6 @@ public class RepopulateArrayCommand extends SequentialCommandGroup {
 
     public RepopulateArrayCommand(StorageSubsystem storageSubsystem) {
         m_storageSubsystem = storageSubsystem;
-        System.out.println("RepopulateArrayCommand");
         addCommands(
             new PrintCommand("Repopulate Array Command")
             .andThen(() -> m_storageSubsystem.setIsRepopulating(true))

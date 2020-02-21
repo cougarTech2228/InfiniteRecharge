@@ -168,8 +168,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private void arcadeDrive() {
 		m_differentialDrive.feed();
 
-		double forward = -OI.getXboxLeftJoystickY();
-		double turn = -OI.getXboxRightJoystickX();
+		double forward = OI.getXboxLeftJoystickY();
+		double turn = OI.getXboxRightJoystickX();
 		forward = deadband(forward);
 		turn = deadband(turn) * 0.5;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
@@ -313,59 +313,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 						this::tankDriveVelocity, this).andThen(this::stop, this),
 				new PrintCommand("Cannot run trajectory because encoders are unavailable!!"),
 				this::areEncodersAvailable);
-	}
-
-	public void setupAutoCommands() {
-		// Create a voltage constraint to ensure we don't accelerate too fast
-		var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(Constants.FEED_FORWARD,
-				Constants.DRIVE_KINEMATICS, Constants.DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE);
-
-		// Create config for all trajectories
-		TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond,
-				Constants.kMaxAccelerationMetersPerSecondSquared)
-						// Add kinematics to ensure max speed is actually obeyed
-						.setKinematics(Constants.DRIVE_KINEMATICS)
-						// Apply the voltage constraint
-						.addConstraint(autoVoltageConstraint).setEndVelocity(0.0);
-
-		// Center Trajectory Autonomous Command
-		Trajectory centerTrajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
-				List.of(new Translation2d(0.86, -1.583), new Translation2d(-5.184, -1.881),
-						new Translation2d(-4.768, -0.726)),
-				// new Translation2d(-1.424, -1.785)),
-				// new Translation2d(-4.149, -0.429),
-				// new Translation2d(-1.424, -0.512)),
-
-				new Pose2d(-1.5, -1, new Rotation2d(0)), /* 6.02 radians = 345 degrees */
-				// Pass config
-				config);
-
-		var centerTrajectoryCommand = createCommandForTrajectory(centerTrajectory);
-		RobotContainer.getAutoChooser().setDefaultOption("Center", centerTrajectoryCommand);
-
-		// Left Trajectory Autonomous Command
-		Trajectory leftTrajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
-				List.of(new Translation2d(-0.9, -1.3)),
-
-				new Pose2d(-5.0, -1.6, new Rotation2d(3.14)),
-				// Pass config
-				config);
-
-		var leftTrajectoryCommand = createCommandForTrajectory(leftTrajectory);
-		RobotContainer.getAutoChooser().addOption("Left", leftTrajectoryCommand);
-
-		// Right Trajectory Autonomous Command
-		Trajectory rightTrajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
-				List.of(new Translation2d(-0.9, -1.3)),
-
-				new Pose2d(-5.0, -1.6, new Rotation2d(3.14)),
-				// Pass config
-				config);
-
-		var rightTrajectoryCommand = createCommandForTrajectory(rightTrajectory);
-		RobotContainer.getAutoChooser().addOption("Right", rightTrajectoryCommand);
-
-		SmartDashboard.putData("Auto Chooser", RobotContainer.getAutoChooser());
 	}
 
 	public void setArcadeDrive(double forward, double turn) {

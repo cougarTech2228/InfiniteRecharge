@@ -112,14 +112,14 @@ public class StorageSubsystem extends SubsystemBase {
      */
     public void startDrumMotor() {
         System.out.println("start drum motor");
-        m_drumSparkMotor.set(Constants.DRUM_MOTOR_VELOCITY);
+        m_drumSparkMotor.set(-Constants.DRUM_MOTOR_VELOCITY);
     }
 
     /**
      * Starts the drum spark motor backwards
      */
     public void startDrumMotorBackwards() {
-        m_drumSparkMotor.set(-Constants.DRUM_MOTOR_VELOCITY);
+        m_drumSparkMotor.set(Constants.DRUM_MOTOR_VELOCITY);
     }
 
     /**

@@ -17,13 +17,12 @@ public class TryToShootCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     public TryToShootCommand(ShooterSubsystem shooterSubsystem, StorageSubsystem storageSubsystem) {
-        System.out.println("TryToShootCommand");
         addCommands(
+            new PrintCommand("TryToShootOnce"),
             new SelectCommand(
                 Map.of(
                     true, (
                         RobotContainer.getBopperCommand()
-                        //.andThen(() -> storageSubsystem.setDrumArray(storageSubsystem.getDrumArrayIndex(), false))
                         .andThen(() -> storageSubsystem.getBallArray().shoot())
                         .andThen(RobotContainer.getRotateDrumOneSectionCommand())
                     ),

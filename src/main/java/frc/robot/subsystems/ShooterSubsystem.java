@@ -24,7 +24,7 @@ public class ShooterSubsystem extends SubsystemBase {
         m_garminLidarSubsystem = garminLidarSubsystem;
 
         m_shooterMotor = new ShooterMotor();
-        m_bopper = new Solenoid(Constants.BOPPER_PCM_PORT);
+        m_bopper = new Solenoid(Constants.PCM_CAN_ID, Constants.BOPPER_PCM_PORT);
         m_inputShooterSlotChecker = new DigitalInput(Constants.SHOOTER_SLOT_DIO);
         m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_FLAG_DIO);
 
@@ -84,6 +84,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param isShooting
      */
     public void setIsShooting(boolean isShooting) {
+        m_storageSubsystem.setIsShooting(isShooting);
         m_isShooting = isShooting;
     }
 

@@ -18,10 +18,13 @@ public class TurnRobotCommand extends CommandBase {
     private int m_turnDegree;
     private DrivebaseSubsystem m_drivebaseSubsystem;
     private NavigationSubsystem m_navigationSubsystem;
+    private boolean m_isReversed;
 
     public TurnRobotCommand(DrivebaseSubsystem drivebaseSubsystem, NavigationSubsystem navigationSubsystem, int turnDegree) {
         m_turnDegree = turnDegree;
         m_drivebaseSubsystem = drivebaseSubsystem;
+        m_navigationSubsystem = navigationSubsystem;
+        m_isReversed = false;
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
     }
@@ -29,18 +32,27 @@ public class TurnRobotCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("turnRobotCommand");
+        System.out.println("starting to turn robot");
         m_hasRotated = false;
         m_navigationSubsystem.zeroHeading();
-        m_drivebaseSubsystem.setArcadeDrive(0, Constants.autoTurnSpeed);
+        if(m_turnDegree < 0) {
+            m_isReversed = true;
+            m_drivebaseSubsystem.tankDriveVelocity(-Constants.autoTurnSpeed, Constants.autoTurnSpeed);
+        } else {
+            m_drivebaseSubsystem.tankDriveVelocity(Constants.autoTurnSpeed, -Constants.autoTurnSpeed);
+        }
+        
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         SmartDashboard.putNumber("gyro angle", m_navigationSubsystem.getHeading());
-        if(m_navigationSubsystem.getHeading() >= m_turnDegree) {
-            m_drivebaseSubsystem.setArcadeDrive(0, 0);
+        if(!m_isReversed && m_navigationSubsystem.getHeading() >= m_turnDegree) {
+            m_drivebaseSubsystem.tankDriveVelocity(0, 0);
+            m_hasRotated = true;
+        } else if(m_navigationSubsystem.getHeading() <= m_turnDegree) {
+            m_drivebaseSubsystem.tankDriveVelocity(0, 0);
             m_hasRotated = true;
         }
     }
@@ -54,6 +66,7 @@ public class TurnRobotCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        System.out.println("Stop robot");
         m_navigationSubsystem.zeroHeading();
     }
 }

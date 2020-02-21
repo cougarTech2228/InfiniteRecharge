@@ -29,8 +29,8 @@ public final class Constants {
 	public static final int ACQUIRE_SLOT_DIO = 2;
 	public static final int SHOOTER_SLOT_DIO = 3;
 	public static final int SHOOTER_FLAG_DIO = 4;
-	public static final int DIGITAL_IO_5 = 5;
-	public static final int DIGITAL_IO_6 = 6;
+	public static final int CLIMBER_UPPER_PROX_DIO = 5;
+	public static final int CLIMBER_LOWER_PROX_DIO = 6;
 	public static final int DIGITAL_IO_7 = 7;
 	public static final int DIGITAL_IO_8 = 8;
 	public static final int DIGITAL_IO_9 = 9;
@@ -48,6 +48,7 @@ public final class Constants {
 	public static final int CONTROL_PANEL_DEPLOY_PCM_PORT = 5;
 	public static final int PCM_PORT_6 = 6;
 	public static final int PCM_PORT_7 = 7;
+	public static final int PCM_CAN_ID = 0;
 
 	public static final int PWM_PIN_0 = 0;
 	public static final int PWM_PIN_1 = 1;
@@ -237,7 +238,7 @@ public final class Constants {
 	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 	
 	public static final double kMaxSpeedMetersPerSecond = 1.50;
-	public static final double kMaxAccelerationMetersPerSecondSquared = 1.50;
+	public static final double kMaxAccelerationMetersPerSecondSquared = 1;
 
 	public static final double DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE = 10.0;
 
