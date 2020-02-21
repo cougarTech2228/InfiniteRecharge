@@ -13,17 +13,11 @@ import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
 
 /**
  * DrivebaseSubsystem
@@ -291,21 +285,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	 */
 	public Pose2d getCurrentPose() {
 		return m_odometry.getPoseMeters();
-	}
-
-	/**
-	 * Creates a command to follow a Trajectory on the drivetrain.
-	 * 
-	 * @param trajectory trajectory to follow
-	 * @return command that will run the trajectory
-	 */
-	public Command createCommandForTrajectory(Trajectory trajectory) {
-		return new ConditionalCommand(
-				new RamseteCommand(trajectory, this::getCurrentPose,
-						new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA), Constants.DRIVE_KINEMATICS,
-						this::tankDriveVelocity, this).andThen(this::stop, this),
-				new PrintCommand("Cannot run trajectory because encoders are unavailable!!"),
-				this::areEncodersAvailable);
 	}
 
 	public void setArcadeDrive(double forward, double turn) {
