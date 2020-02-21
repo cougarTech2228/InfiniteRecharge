@@ -7,7 +7,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
@@ -38,8 +37,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     // horizontal distance from center of target, positive being to the right
     private NetworkTableEntry m_horzOffInNTE;
-
-    private boolean m_inRange = false;
 
     public VisionSubsystem() {
 

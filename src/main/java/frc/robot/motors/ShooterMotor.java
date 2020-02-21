@@ -2,19 +2,12 @@ package frc.robot.motors;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
-
-import edu.wpi.first.wpilibj.DriverStation;
-
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants;
-import frc.robot.util.ShuffleboardAdapter;
 
 public class ShooterMotor extends TalonSRXMotor {
 
