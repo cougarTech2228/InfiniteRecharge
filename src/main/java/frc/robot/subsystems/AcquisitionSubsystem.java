@@ -46,5 +46,4 @@ public class AcquisitionSubsystem extends SubsystemBase {
     public void retractAcquirer() {
         m_acquirerExtender.set(false);
     }
-
 }

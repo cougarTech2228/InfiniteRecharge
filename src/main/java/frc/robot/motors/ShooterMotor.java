@@ -8,21 +8,28 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants;
+import frc.robot.util.Config;
+import frc.robot.util.Configuration;
 
 public class ShooterMotor extends TalonSRXMotor {
 
-    private HashMap<Integer, Integer> shooterMap;
+    private HashMap<Integer, Integer> m_shooterMap;
     private boolean m_encodersAreAvailable;
+
+    @Config
+    public double m_shooterSpeed = 90000;
 
     public ShooterMotor() {
         super(Constants.SHOOTER_CAN_ID);
 
-        shooterMap = new HashMap<Integer, Integer>();
+        Configuration.create(this); // Creates a configuration for the shooter speed on shuffleboard
+
+        m_shooterMap = new HashMap<Integer, Integer>();
 
         // shooterMap.put(Constants.MIN_SHOOTING_DISTANCE, 100000); // distance (in),
         // Velocity
-        shooterMap.put(139, 85000);
-        shooterMap.put(244, 93500);
+        m_shooterMap.put(139, 85000);
+        m_shooterMap.put(244, 93500);
 
         talon.configFactoryDefault();
         m_encodersAreAvailable =  talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK;
@@ -67,7 +74,8 @@ public class ShooterMotor extends TalonSRXMotor {
     }
 
     public void start(int distance) {
-        talon.set(ControlMode.Velocity, shooterMap.get(closestDistance(distance)));
+        //talon.set(ControlMode.Velocity, m_shooterMap.get(closestDistance(distance)));
+        talon.set(ControlMode.Velocity, m_shooterSpeed);
     }
 
     public void stop() {
@@ -81,7 +89,7 @@ public class ShooterMotor extends TalonSRXMotor {
     public int closestDistance(int distance) {
         int currentClosest = -1;
         boolean firstTime = true;
-        for (int curDistance : shooterMap.keySet()) {
+        for (int curDistance : m_shooterMap.keySet()) {
             if (firstTime) {
                 currentClosest = curDistance;
                 firstTime = false;

@@ -15,13 +15,15 @@ public class ShooterSubsystem extends SubsystemBase {
     private Solenoid m_bopper;
     private StorageSubsystem m_storageSubsystem;
     private GarminLidarSubsystem m_garminLidarSubsystem;
+    private AcquisitionSubsystem m_acquisitionSubsystem;
     private boolean m_isShooting;
 
-    public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem) {
+    public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         register();
 
         m_storageSubsystem = storageSubsystem;
         m_garminLidarSubsystem = garminLidarSubsystem;
+        m_acquisitionSubsystem = acquisitionSubsystem;
 
         m_shooterMotor = new ShooterMotor();
         m_bopper = new Solenoid(Constants.PCM_CAN_ID, Constants.BOPPER_PCM_PORT);
@@ -33,10 +35,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("shooter velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
-        SmartDashboard.putBoolean("isShooterSlotOccupied", !m_inputShooterSlotChecker.get());
-        SmartDashboard.putBoolean("isShooterFlagBlocked" , !m_inputShooterFlagChecker.get());
-        SmartDashboard.putBoolean("isShooting", m_isShooting);
+        SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
+        SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterSlotChecker.get());
+        SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterFlagChecker.get());
+        SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
     }
     
     /**
@@ -88,12 +90,23 @@ public class ShooterSubsystem extends SubsystemBase {
         m_isShooting = isShooting;
     }
 
+    public void setIsShootingTrue() {
+        m_storageSubsystem.setIsShooting(true);
+        m_isShooting = true;
+    }
+
+    public void setIsShootingFalse() {
+        m_storageSubsystem.setIsShooting(false);
+        m_isShooting = false;
+    }
+
     /**
      * Starts the shooter motor, also sets the variable isShooting in the storage subsystem 
      * and in the shooter subsystem to true
      */
     public void startShooterMotor() {
         m_storageSubsystem.setIsShooting(true);
+        m_acquisitionSubsystem.deployAcquirer();
         m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
     }
 
@@ -103,6 +116,7 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void stopShooterMotor() {
         m_storageSubsystem.setIsShooting(false);
+        m_acquisitionSubsystem.retractAcquirer();
         m_shooterMotor.stop();
         m_isShooting = false;
         RobotContainer.getRotateDrumOneSectionCommand().schedule();

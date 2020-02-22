@@ -155,7 +155,7 @@ public class GarminLidarSubsystem extends SubsystemBase
         addValue();
         //System.out.println("Distance in inches: " + getAverage());
         m_netDistance.setDouble(getAverage());
-        SmartDashboard.putNumber("Distance from lidar", getAverage());
+        SmartDashboard.putNumber("Distance", getAverage());
     }
 
       public void addValue() {

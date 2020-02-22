@@ -94,7 +94,7 @@ public final class Constants {
 	public static final double CONTROL_PANEL_MOTOR_VELOCITY_FAST = 0.27;
 	public static final double CONTROL_PANEL_MOTOR_VELOCITY_SLOW = 0.2;
 
-	public static final double DRUM_MOTOR_VELOCITY = 0.45;
+	public static final double DRUM_MOTOR_VELOCITY = 0.45; 
 
 	public static final int SHOOT_MODE_SINGLE_CELL = 0;
 	public static final int SHOOT_MODE_ALL_CELLS = 1;

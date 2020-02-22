@@ -1,10 +1,3 @@
-// Ryan - You can move all the trajectory stuff from DrivebaseSubystem to this class.
-//        In the constructor (or an init() method called from the constructor), you
-//        can build all the trajectories. You can make public getters to retrieve
-//        the trajectories when the commands are created. Instantiate this class from
-//        RobotContainer somewhere before you instantiate anything that would use the
-//        trajectories.
-
 package frc.robot.util;
 
 import java.util.List;

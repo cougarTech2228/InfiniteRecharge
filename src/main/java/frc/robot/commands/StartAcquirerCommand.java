@@ -28,7 +28,7 @@ public class StartAcquirerCommand extends CommandBase {
     public void initialize() {
         System.out.println("Start acquirer");
         m_acquisitionSubsystem.deployAcquirer();
-        m_acquisitionSubsystem.setAcquirerSpeed(-0.5);
+        m_acquisitionSubsystem.setAcquirerSpeed(-0.9);
         m_acquisitionSubsystem.createStartAcquireCommandInstance(this);
     }
 
@@ -37,12 +37,12 @@ public class StartAcquirerCommand extends CommandBase {
     public void execute() {
         if(m_acquisitionSubsystem.getAcquisitionMotor().getCurrent() > 2 && m_timer.get() == 0) {
             m_timer.start();
-            m_acquisitionSubsystem.setAcquirerSpeed(-0.6); 
+            m_acquisitionSubsystem.setAcquirerSpeed(-1); 
         }
         else if(m_timer.get() > 0.2) {
             m_timer.stop();
             m_timer.reset();
-            m_acquisitionSubsystem.setAcquirerSpeed(-0.5); 
+            m_acquisitionSubsystem.setAcquirerSpeed(-0.9); 
         }
     }
 

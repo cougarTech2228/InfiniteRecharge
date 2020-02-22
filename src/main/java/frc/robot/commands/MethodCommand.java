@@ -12,10 +12,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class MethodCommand extends CommandBase {
 
     private Runnable method;
-    private BooleanSupplier endCondition;
     private Runnable endMethod;
     private boolean isFinished;
-
+    private BooleanSupplier endCondition;
     /**
      * This constructor should be used when the user wants to run a single method once.
      * @param method = the method to be run
@@ -23,42 +22,27 @@ public class MethodCommand extends CommandBase {
     public MethodCommand(Runnable method) {
         this.method = method;
         this.isFinished = false;
-        this.endCondition = () -> true;
+        this.endCondition = () -> false;
     }
-    /**
-     * This constructor should be used when the user wants to run a single method every loop iteration with no end condition.
-     * @param method = the method to be run
-     * @param loop = whether to run the method every loop iteration or just once
-     */
-    public MethodCommand(Runnable method, boolean loop) {
-        this.method = method;
+    public MethodCommand() {
+        this.method = null;
         this.isFinished = false;
-        this.endCondition = () -> !loop;
+        this.endCondition = () -> false;
     }
-    /**
-     * This constructor should be used when you need to define when the command should stop.
-     * If the method passed in returns true, it will stop
-     * @param method = the method to be run
-     */
-    public MethodCommand(BooleanSupplier method) {
-        this.endCondition = method;
-        this.isFinished = false;
-    }
-    /**
-     * This makes the command run a given command when it ends
-     * @param command = the command to be run when the first command ends
-     */
-    public MethodCommand runOnEnd(Command command) {
-        this.endMethod = () -> command.schedule();
+    public MethodCommand loop() {
+        endCondition = () -> true;
         return this;
     }
-
-    /**
-     * This makes the command run a given method when it ends
-     * @param method = the method to be run when the command ends
-     */
+    public MethodCommand loopWhile(BooleanSupplier condition) {
+        endCondition = condition;
+        return this;
+    }
     public MethodCommand runOnEnd(Runnable method) {
         this.endMethod = method;
+        return this;
+    }
+    public MethodCommand runOnEnd(Command command) {
+        this.endMethod = () -> command.schedule();
         return this;
     }
     @Override
@@ -66,7 +50,7 @@ public class MethodCommand extends CommandBase {
         if(method != null) {
             method.run();
         }
-        isFinished = endCondition.getAsBoolean();
+        isFinished = !endCondition.getAsBoolean();
     }
     @Override
     public boolean isFinished() {

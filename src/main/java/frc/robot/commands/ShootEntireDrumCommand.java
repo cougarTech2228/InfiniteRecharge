@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -18,14 +19,19 @@ public class ShootEntireDrumCommand extends SequentialCommandGroup {
         //System.out.println("ShootEntireDrumCommand");
         addCommands(
             RobotContainer.getRotateDrumOneSectionCommand(),
+            new PrintCommand("Shoot 1"),
             RobotContainer.getTryToShootCommand(),
             new WaitCommand(Constants.timeBetweenShots),
+            new PrintCommand("Shoot 2"),
             RobotContainer.getTryToShootCommand(),
             new WaitCommand(Constants.timeBetweenShots),
+            new PrintCommand("Shoot 3"),
             RobotContainer.getTryToShootCommand(),
             new WaitCommand(Constants.timeBetweenShots),  
+            new PrintCommand("Shoot 4"),
             RobotContainer.getTryToShootCommand(),
             new WaitCommand(Constants.timeBetweenShots),
+            new PrintCommand("Shoot 5"),
             RobotContainer.getTryToShootCommand()
         );
         // Use addRequirements() here to declare subsystem dependencies.

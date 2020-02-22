@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -32,6 +33,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private DifferentialDrive m_differentialDrive;
 	private boolean m_encodersAreAvailable;
 	private DifferentialDriveOdometry m_odometry;
+	private RamseteController m_ramseteController;
 
 	private Pose2d m_savedPose;
 
@@ -119,6 +121,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 				Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()));
 
 		resetOdometry();
+
+		m_ramseteController = new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA);
 	}
 
 	/* Zero all sensors used */
@@ -296,5 +300,9 @@ public class DrivebaseSubsystem extends SubsystemBase {
 
 	public void setAutonomous(boolean isAutonomous) {
 		m_isAutonomous = isAutonomous;
+	}
+
+	public RamseteController getRamseteController() {
+		return m_ramseteController;
 	}
 }

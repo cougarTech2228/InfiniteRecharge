@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.Scribe;
 
 public class Robot extends TimedRobot {
 	private Command m_autonomousCommand;
@@ -25,6 +26,7 @@ public class Robot extends TimedRobot {
 		// Instantiate our RobotContainer. This will perform all our button bindings,
 		// and put our
 		// autonomous chooser on the dashboard.
+		Scribe.printInfo("Starting Console");
 		m_robotContainer = new RobotContainer();
 	}
 
@@ -88,6 +90,7 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 
 		RobotContainer.getDrivebaseSubsystem().setAutonomous(false);
+		RobotContainer.getDrivebaseSubsystem().getRamseteController().setEnabled(false);
 
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
