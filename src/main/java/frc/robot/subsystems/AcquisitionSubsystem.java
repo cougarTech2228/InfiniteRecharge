@@ -70,21 +70,21 @@ public class AcquisitionSubsystem extends SubsystemBase {
      * Deploys the acquirer by setting the solenoid to true
      */
     public void deployAcquirer() {
-        //m_acquirerExtender.set(true);
+        m_acquirerExtender.set(true);
     }
 
     /**
      * Retracts the acquirer by setting the solenoid to false
      */
     public void retractAcquirer() {
-        //m_acquirerExtender.set(false);
+        m_acquirerExtender.set(false);
     }
 
     public void startAcquirerMotor() {
-        m_acquisitionMotor.set(Constants.ACQUIRER_MOTOR_SPEED);
+        //m_acquisitionMotor.set(Constants.ACQUIRER_MOTOR_SPEED);
     }
 
     public void stopAcquirerMotor() {
-        m_acquisitionMotor.set(0);
+        //m_acquisitionMotor.set(0);
     }
 }

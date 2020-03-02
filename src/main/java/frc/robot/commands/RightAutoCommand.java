@@ -20,7 +20,7 @@ public class RightAutoCommand extends SequentialCommandGroup {
         
         addCommands (
             new PrintCommand("RightAutoCommand")
-            .andThen(() -> RobotContainer.getRightTrajectoryCommand())
+            //.andThen(() -> RobotContainer.getRightTrajectoryCommand())
         );
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();

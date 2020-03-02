@@ -60,7 +60,7 @@ public class NavigationSubsystem extends SubsystemBase {
      */
     public Rotation2d getHeading() {
         // TODO - need to see if this is giving us correct heading values for the Ramsete Controller
-        System.out.println("Heading: " + Math.IEEEremainder(getYaw(), 360.0d));
+        //System.out.println("Heading: " + Math.IEEEremainder(getYaw(), 360.0d));
         return Rotation2d.fromDegrees(Math.IEEEremainder(getYaw(), 360.0d));
     }
 }

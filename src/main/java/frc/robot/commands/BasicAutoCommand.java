@@ -19,13 +19,13 @@ public class BasicAutoCommand extends SequentialCommandGroup {
             DrivebaseSubsystem drivebaseSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         
         addCommands (
-            new PrintCommand("BasicAutoCommand"),
+            new PrintCommand("BasicAutoCommand")
             // .andThen(() -> shooterSubsystem.startShooterMotor()),
             // new WaitCommand(2),
             // RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
             // .andThen(() -> shooterSubsystem.stopShooterMotor())
             // .andThen(() -> RobotContainer.getNavigationSubsystem().resetYaw()),
-            RobotContainer.getBasicTrajectoryCommand()
+            // RobotContainer.getBasicTrajectoryCommand()
         );
     }
 }

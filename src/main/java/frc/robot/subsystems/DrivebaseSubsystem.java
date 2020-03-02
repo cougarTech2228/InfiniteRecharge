@@ -58,42 +58,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 
 		enableEncoders();
 
-// TODO Can the stuff below go away?????????????????????????????
-
-		/*
-		 * Setup difference signal to be used for turn when performing Drive Straight
-		 * with encoders
-		 */
-		// Feedback Device of Remote Talon
-		m_rightMaster.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.RemoteSensor0, Constants.kTimeoutMs);
-
-		// Quadrature Encoder of current Talon
-		m_rightMaster.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.QuadEncoder, Constants.kTimeoutMs);
-
-		/*
-		 * Difference term calculated by right Talon configured to be selected sensor of
-		 * turn PID
-		 */
-		m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, Constants.PID_TURN,
-				Constants.kTimeoutMs);
-
-		/* Scale the Feedback Sensor using a coefficient */
-		/**
-		 * Heading units should be scaled to ~4000 per 360 deg, due to the following
-		 * limitations... - Target param for aux PID1 is 18bits with a range of
-		 * [-131072,+131072] units. - Target for aux PID1 in motion profile is 14bits
-		 * with a range of [-8192,+8192] units. ... so at 3600 units per 360', that
-		 * ensures 0.1 degree precision in firmware closed-loop and motion profile
-		 * trajectory points can range +-2 rotations.
-		 */
-		m_rightMaster.configSelectedFeedbackCoefficient(
-				Constants.kTurnTravelUnitsPerRotation / Constants.kEncoderUnitsPerRotation, // Coefficient
-				Constants.PID_TURN, // PID Slot of Source
-				Constants.kTimeoutMs); // Configuration Timeout
-
-// TODO Can the stuff above go away?????????????????????????????
-
-
 		/* Set open and closed loop values */
 		m_leftMaster.configOpenloopRamp(0.25);
 		m_leftMaster.configClosedloopRamp(0);
@@ -120,8 +84,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightFollower.configPeakCurrentDuration(Constants.DRIVE_CURRENT_DURATION);
 		m_rightMaster.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_rightFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
-		m_rightMaster.enableCurrentLimit(false);
-		m_rightFollower.enableCurrentLimit(false);
+		m_rightMaster.enableCurrentLimit(true);
+		m_rightFollower.enableCurrentLimit(true);
 		// TODO can we set these back to true?
 
 		m_leftMaster.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
@@ -130,22 +94,22 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_leftFollower.configPeakCurrentDuration(Constants.DRIVE_CURRENT_DURATION);
 		m_leftMaster.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_leftFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
-		m_leftMaster.enableCurrentLimit(false);
-		m_leftFollower.enableCurrentLimit(false);
+		m_leftMaster.enableCurrentLimit(true);
+		m_leftFollower.enableCurrentLimit(true);
 		// TODO can we set these back to true?
 
-		m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
-		m_differentialDrive.setRightSideInverted(true);
+		// m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
+		// m_differentialDrive.setRightSideInverted(true);
 
-		zeroSensors();
+		// zeroSensors();
 
-		RobotContainer.getNavigationSubsystem().resetYaw();
+		// RobotContainer.getNavigationSubsystem().resetYaw();
 
-		m_odometry = new DifferentialDriveOdometry(RobotContainer.getNavigationSubsystem().getHeading());
+		// m_odometry = new DifferentialDriveOdometry(RobotContainer.getNavigationSubsystem().getHeading());
 
-		resetOdometry();
+		// resetOdometry();
 
-		m_ramseteController = new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA);
+		// m_ramseteController = new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA);
 	}
 
 	/* Zero all sensors used */
@@ -194,13 +158,13 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	public void periodic() {
 		if (m_isAutonomous) {
 			//System.out.println("update odometry");
-			 m_odometry.update(RobotContainer.getNavigationSubsystem().getHeading(),
-			 		edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
+			 //m_odometry.update(RobotContainer.getNavigationSubsystem().getHeading(),
+			 		//edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
 		} else {
 			 arcadeDrive();
 		}
 
-		m_differentialDrive.feed();
+		//m_differentialDrive.feed();
 	}
 
 	// Put methods for controlling this subsystem

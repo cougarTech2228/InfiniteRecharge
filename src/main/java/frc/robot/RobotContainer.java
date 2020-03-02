@@ -50,10 +50,10 @@ public class RobotContainer {
   private final static ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   private final static SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final static TrajectoryCommand m_centerTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getCenterTrajectory(), m_drivebaseSubsystem);
-  private final static TrajectoryCommand m_leftTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getLeftTrajectory(), m_drivebaseSubsystem);
-  private final static TrajectoryCommand m_rightTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getRightTrajectory(), m_drivebaseSubsystem);
-  private final static TrajectoryCommand m_basicTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getBasicTrajectory(), m_drivebaseSubsystem);
+  // private final static TrajectoryCommand m_centerTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getCenterTrajectory(), m_drivebaseSubsystem);
+  // private final static TrajectoryCommand m_leftTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getLeftTrajectory(), m_drivebaseSubsystem);
+  // private final static TrajectoryCommand m_rightTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getRightTrajectory(), m_drivebaseSubsystem);
+  // private final static TrajectoryCommand m_basicTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getBasicTrajectory(), m_drivebaseSubsystem);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -78,7 +78,8 @@ public class RobotContainer {
     // Autonomous Options
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
-    m_autoChooser.setDefaultOption("Basic", getBasicAutoCommand());
+    m_autoChooser.setDefaultOption("Minimum", getMinAutoCommand());
+    m_autoChooser.addOption("Basic", getBasicAutoCommand());
     m_autoChooser.addOption("Center", getCenterAutoCommand());
     m_autoChooser.addOption("Left", getLeftAutoCommand());
     m_autoChooser.addOption("Right", getRightAutoCommand());
@@ -232,21 +233,21 @@ public class RobotContainer {
     return new RepopulateArrayCommand(m_storageSubsystem);
   }
 
-  public static TrajectoryCommand getLeftTrajectoryCommand() {
-    return m_leftTrajectoryCommand;
-  }
+  // public static TrajectoryCommand getLeftTrajectoryCommand() {
+  //   return m_leftTrajectoryCommand;
+  // }
 
-  public static TrajectoryCommand getRightTrajectoryCommand() {
-    return m_rightTrajectoryCommand;
-  }
+  // public static TrajectoryCommand getRightTrajectoryCommand() {
+  //   return m_rightTrajectoryCommand;
+  // }
 
-  public static TrajectoryCommand getCenterTrajectoryCommand() {
-    return m_centerTrajectoryCommand;
-  }
+  // public static TrajectoryCommand getCenterTrajectoryCommand() {
+  //   return m_centerTrajectoryCommand;
+  // }
 
-  public static TrajectoryCommand getBasicTrajectoryCommand() {
-    return m_basicTrajectoryCommand;
-  }
+  // public static TrajectoryCommand getBasicTrajectoryCommand() {
+  //   return m_basicTrajectoryCommand;
+  // }
 
   public static BasicAutoCommand getBasicAutoCommand() {
     return new BasicAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
@@ -258,6 +259,10 @@ public class RobotContainer {
 
   public static ShakeDialCommand getShakeDial() {
     return new ShakeDialCommand(m_storageSubsystem);
+  }
+
+  public static MinAutoCommand getMinAutoCommand() {
+    return new MinAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
   }
 
   // Subsystem Getters

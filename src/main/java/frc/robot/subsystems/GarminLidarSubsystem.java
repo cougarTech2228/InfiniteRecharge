@@ -145,7 +145,7 @@ public class GarminLidarSubsystem extends SubsystemBase
     public void periodic() {
         // Put code here to be run every loop
         addValue();
-        System.out.println("Distance in inches: " + getAverage());
+        //System.out.println("Distance in inches: " + getAverage());
         SmartDashboard.putNumber("Distance", getAverage());
     }
 

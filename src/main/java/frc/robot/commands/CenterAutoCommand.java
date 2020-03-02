@@ -25,13 +25,13 @@ public class CenterAutoCommand extends SequentialCommandGroup {
     public CenterAutoCommand(StorageSubsystem storageSubsystem, ShooterSubsystem shooterSubsystem,
             DrivebaseSubsystem drivebaseSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         addCommands(
-            new PrintCommand("CenterAutoCommand"),
+            new PrintCommand("CenterAutoCommand")
             // .andThen(() -> shooterSubsystem.startShooterMotor()),
             // new WaitCommand(2),
             // RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
             // .andThen(() -> shooterSubsystem.stopShooterMotor()),
             //.andThen(() -> RobotContainer.getNavigationSubsystem().resetYaw()),
-            RobotContainer.getCenterTrajectoryCommand()
+            //RobotContainer.getCenterTrajectoryCommand()
             // .andThen(() -> shooterSubsystem.startShooterMotor()),
             // new WaitCommand(2),
             // RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
