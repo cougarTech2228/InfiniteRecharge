@@ -34,7 +34,7 @@ public class NavigationSubsystem extends SubsystemBase {
      */
     public double getYaw() {
         m_pigeon.getYawPitchRoll(m_yawPitchRoll);
-        return m_yawPitchRoll[0];
+        return Math.IEEEremainder(m_yawPitchRoll[0], 360.0d);
     }
 
     /** 
