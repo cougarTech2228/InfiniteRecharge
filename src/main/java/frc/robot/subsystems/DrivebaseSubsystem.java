@@ -57,6 +57,9 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightMaster.setNeutralMode(NeutralMode.Brake);
 
 		enableEncoders();
+
+// TODO Can the stuff below go away?????????????????????????????
+
 		/*
 		 * Setup difference signal to be used for turn when performing Drive Straight
 		 * with encoders
@@ -88,6 +91,9 @@ public class DrivebaseSubsystem extends SubsystemBase {
 				Constants.PID_TURN, // PID Slot of Source
 				Constants.kTimeoutMs); // Configuration Timeout
 
+// TODO Can the stuff above go away?????????????????????????????
+
+
 		/* Set open and closed loop values */
 		m_leftMaster.configOpenloopRamp(0.25);
 		m_leftMaster.configClosedloopRamp(0);
@@ -116,6 +122,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_rightMaster.enableCurrentLimit(false);
 		m_rightFollower.enableCurrentLimit(false);
+		// TODO can we set these back to true?
 
 		m_leftMaster.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
 		m_leftFollower.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
@@ -125,6 +132,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_leftFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_leftMaster.enableCurrentLimit(false);
 		m_leftFollower.enableCurrentLimit(false);
+		// TODO can we set these back to true?
 
 		m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
 		m_differentialDrive.setRightSideInverted(true);
