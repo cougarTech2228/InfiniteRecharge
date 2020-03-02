@@ -32,11 +32,6 @@ import java.util.ArrayList;
 import frc.robot.subsystems.GarminLidarSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
-
 //----------------------------------------------------------------------------
 //Class Declarations
 //----------------------------------------------------------------------------
@@ -120,9 +115,6 @@ public class GarminLidarSubsystem extends SubsystemBase
       private double m_TotalDist = 0;
       private int m_Dist = 0;
       private double m_Average = 0;
-      private NetworkTableInstance m_lidarDataTableInst = NetworkTableInstance.getDefault();
-      private NetworkTable m_networkTable = m_lidarDataTableInst.getTable("lidartable");
-      private NetworkTableEntry m_netDistance = m_networkTable.getEntry("distance");
       
 
       // --------------------------------------------------------------------
@@ -140,7 +132,7 @@ public class GarminLidarSubsystem extends SubsystemBase
         I2CJNI.i2CInitialize(mPort);
         register();
         
-        this.turnOnDebug();
+        //this.turnOnDebug();
         this.setI2CAddressToSerialNumber(m_Address, m_Serial, true);
         this.configure(GarminLidarSubsystem.BALANCED_PERFORMANCE);
         this.turnOffDebug();
@@ -153,8 +145,7 @@ public class GarminLidarSubsystem extends SubsystemBase
     public void periodic() {
         // Put code here to be run every loop
         addValue();
-        //System.out.println("Distance in inches: " + getAverage());
-        m_netDistance.setDouble(getAverage());
+        System.out.println("Distance in inches: " + getAverage());
         SmartDashboard.putNumber("Distance", getAverage());
     }
 

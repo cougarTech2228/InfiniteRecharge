@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.AcquisitionSubsystem;
 import frc.robot.subsystems.DrivebaseSubsystem;
@@ -20,20 +19,8 @@ public class LeftAutoCommand extends SequentialCommandGroup {
             DrivebaseSubsystem drivebaseSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         
         addCommands (
-            new PrintCommand("LeftAutoCommand"),
-            RobotContainer.getTurnRobotCommand(-55)
-            .andThen(() -> shooterSubsystem.startShooterMotor()),
-            new WaitCommand(2),
-            //RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true)),
-            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true)),
-            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            .andThen(() -> shooterSubsystem.stopShooterMotor()),
-            RobotContainer.getLeftTrajectoryCommand()
-            .andThen(() -> shooterSubsystem.startShooterMotor()),
-            new WaitCommand(2),
-            RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            .andThen(() -> shooterSubsystem.stopShooterMotor())
+            new PrintCommand("LeftAutoCommand")
+            .andThen(() -> RobotContainer.getLeftTrajectoryCommand())
         );
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();

@@ -6,7 +6,6 @@ import frc.robot.RobotContainer;
 import frc.robot.motors.ShooterMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ShooterSubsystem extends SubsystemBase {
 
     private ShooterMotor m_shooterMotor;
@@ -18,6 +17,10 @@ public class ShooterSubsystem extends SubsystemBase {
     private AcquisitionSubsystem m_acquisitionSubsystem;
     private boolean m_isShooting;
 
+    //private final static DigitalInput m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_POSITION_DIO);
+
+    //private RotateDrumOneSectionCommand m_rotateDrumOneSectionCommand;
+
     public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         register();
 
@@ -27,18 +30,43 @@ public class ShooterSubsystem extends SubsystemBase {
 
         m_shooterMotor = new ShooterMotor();
         m_bopper = new Solenoid(Constants.PCM_CAN_ID, Constants.BOPPER_PCM_PORT);
-        m_inputShooterSlotChecker = new DigitalInput(Constants.SHOOTER_SLOT_DIO);
-        m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_FLAG_DIO);
+        m_inputShooterSlotChecker = new DigitalInput(Constants.SHOOTER_BALL_DIO);
+        m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_POSITION_DIO);
 
         m_isShooting = false;
+
+        // ----------------------------------ShooterFlagInterrupt----------------------------------
+        // m_inputShooterFlagChecker.requestInterrupts(new InterruptHandlerFunction<Object>() {
+
+        //     @Override
+        //     public void interruptFired(int interruptAssertedMask, Object param) {
+        //         System.out.println("Shooter interrupt fired");
+
+        //         if (getIsShooting()) {
+        //             m_rotateDrumOneSectionCommand.cancel();
+        //             m_storageSubsystem.stopDrumMotor();
+        //             m_storageSubsystem.finishIndex();
+        //             m_storageSubsystem.isDrumFull();
+        //         }
+        //         else
+        //         {
+        //             // We're in acquire mode so we're not going to do anything
+        //         }
+        //     }
+        // });
+
+        // m_inputShooterFlagChecker.setUpSourceEdge(false, true);
+
+        // // Enable digital interrupt pin
+        // m_inputShooterFlagChecker.enableInterrupts();
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
-        SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterSlotChecker.get());
-        SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterFlagChecker.get());
-        SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
+        // SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
+        // SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterSlotChecker.get());
+        // SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterFlagChecker.get());
+        // SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
     }
     
     /**
@@ -106,6 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void startShooterMotor() {
         m_storageSubsystem.setIsShooting(true);
+        m_acquisitionSubsystem.stopAcquirerMotor();
         m_acquisitionSubsystem.deployAcquirer();
         m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
     }
@@ -121,4 +150,9 @@ public class ShooterSubsystem extends SubsystemBase {
         m_isShooting = false;
         RobotContainer.getRotateDrumOneSectionCommand().schedule();
     }
+
+    // public void setRotateDrumOneSectionCommand(RotateDrumOneSectionCommand rotateDrumOneSectionCommand)
+    // {
+    //     m_rotateDrumOneSectionCommand = rotateDrumOneSectionCommand;
+    // }
 }

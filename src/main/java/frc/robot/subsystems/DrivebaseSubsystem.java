@@ -37,7 +37,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 
 	private Pose2d m_savedPose;
 
-	private boolean m_isAutonomous = false;
+	private boolean m_isAutonomous = true;
 
 	public DrivebaseSubsystem() {
 
@@ -57,7 +57,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightMaster.setNeutralMode(NeutralMode.Brake);
 
 		enableEncoders();
-
 		/*
 		 * Setup difference signal to be used for turn when performing Drive Straight
 		 * with encoders
@@ -109,16 +108,32 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightFollower.setInverted(false);
 		m_rightFollower.follow(m_rightMaster);
 
+		m_rightMaster.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
+		m_rightFollower.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
+		m_rightMaster.configPeakCurrentDuration(Constants.DRIVE_CURRENT_DURATION);
+		m_rightFollower.configPeakCurrentDuration(Constants.DRIVE_CURRENT_DURATION);
+		m_rightMaster.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
+		m_rightFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
+		m_rightMaster.enableCurrentLimit(false);
+		m_rightFollower.enableCurrentLimit(false);
+
+		m_leftMaster.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
+		m_leftFollower.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
+		m_leftMaster.configPeakCurrentDuration(Constants.DRIVE_CURRENT_DURATION);
+		m_leftFollower.configPeakCurrentDuration(Constants.DRIVE_CURRENT_DURATION);
+		m_leftMaster.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
+		m_leftFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
+		m_leftMaster.enableCurrentLimit(false);
+		m_leftFollower.enableCurrentLimit(false);
+
 		m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
 		m_differentialDrive.setRightSideInverted(true);
 
 		zeroSensors();
 
-		RobotContainer.getNavigationSubsystem().calibrateADXRS450();
-		RobotContainer.getNavigationSubsystem().zeroHeading();
+		RobotContainer.getNavigationSubsystem().resetYaw();
 
-		m_odometry = new DifferentialDriveOdometry(
-				Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()));
+		m_odometry = new DifferentialDriveOdometry(RobotContainer.getNavigationSubsystem().getHeading());
 
 		resetOdometry();
 
@@ -139,6 +154,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 						Constants.kTimeoutMs) == ErrorCode.OK;
 		if (!m_encodersAreAvailable) {
 			DriverStation.reportError("Failed to configure Drivetrain encoders!!", false);
+			System.out.println("Encoders aren't available");
 		}
 	}
 	
@@ -152,29 +168,31 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		if (value <= -0.1)
 			return value;
 
-		/* Outside deadband */
-		return 0;
+		/* Inside deadband */
+		return 0.0;
 	}
 
 	private void arcadeDrive() {
-		m_differentialDrive.feed();
-
 		double forward = OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
+
 		forward = deadband(forward);
 		turn = deadband(turn) * 0.5;
-		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
+		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn); 
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
 	}
 
 	@Override
 	public void periodic() {
 		if (m_isAutonomous) {
-			m_odometry.update(Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()),
-					edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
+			//System.out.println("update odometry");
+			 m_odometry.update(RobotContainer.getNavigationSubsystem().getHeading(),
+			 		edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
 		} else {
-			arcadeDrive();
+			 arcadeDrive();
 		}
+
+		m_differentialDrive.feed();
 	}
 
 	// Put methods for controlling this subsystem
@@ -188,10 +206,13 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	 * @param rightVelocity right velocity in meters per second
 	 */
 	public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
+		leftVelocity *= -1;
+		rightVelocity *= -1;
 
 		var leftAccel = (leftVelocity - edgesPerDecisecToMetersPerSec(m_leftMaster.getSelectedSensorVelocity())) / .02;
 		var rightAccel = (rightVelocity - edgesPerDecisecToMetersPerSec(m_rightMaster.getSelectedSensorVelocity()))
 				/ .02;
+
 		var leftFeedForwardVolts = Constants.FEED_FORWARD.calculate(leftVelocity, leftAccel);
 		var rightFeedForwardVolts = Constants.FEED_FORWARD.calculate(rightVelocity, rightAccel);
 
@@ -199,7 +220,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 				DemandType.ArbitraryFeedForward, leftFeedForwardVolts / 12);
 		m_rightMaster.set(ControlMode.Velocity, metersPerSecToEdgesPerDecisec(rightVelocity),
 				DemandType.ArbitraryFeedForward, rightFeedForwardVolts / 12);
-		m_differentialDrive.feed();
 	}
 
 	/**
@@ -207,6 +227,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	 */
 	public void stop() {
 		tankDriveVelocity(0, 0);
+		setArcadeDrive(0, 0);
 	}
 
 	/**
@@ -215,8 +236,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	public void resetOdometry() {
 		zeroSensors();
 		m_savedPose = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
-		m_odometry.resetPosition(m_savedPose,
-				Rotation2d.fromDegrees(RobotContainer.getNavigationSubsystem().getHeading()));
+		m_odometry.resetPosition(m_savedPose, RobotContainer.getNavigationSubsystem().getHeading());
 	}
 
 	/**
@@ -292,8 +312,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	}
 
 	public void setArcadeDrive(double forward, double turn) {
-		forward = deadband(forward) * -1;
-		turn = (deadband(turn) * 0.5) * -1;
+		forward = deadband(forward);
+		turn = (deadband(turn) * 0.5);
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn);
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
 	}

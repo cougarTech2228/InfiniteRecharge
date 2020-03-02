@@ -3,15 +3,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commands.UnstoppableCommand;
 import frc.robot.util.BallArray;
 
 public class StorageSubsystem extends SubsystemBase {
@@ -27,11 +24,15 @@ public class StorageSubsystem extends SubsystemBase {
     private boolean m_isRepopulating;
     private BallArray m_ballArray = new BallArray();
 
+    //private final static DigitalInput m_inputAcquireFlagChecker = new DigitalInput(Constants.ACQUIRE_POSITION_DIO);
+
+    //private RotateDrumOneSectionCommand m_rotateDrumOneSectionCommand;
+
     public StorageSubsystem() {
         register();
 
-        m_inputAcquireSlotChecker = new DigitalInput(Constants.ACQUIRE_SLOT_DIO);
-        m_inputAcquireFlagChecker = new DigitalInput(Constants.ACQUIRE_FLAG_DIO);
+        m_inputAcquireSlotChecker = new DigitalInput(Constants.ACQUIRE_BALL_DIO);
+        m_inputAcquireFlagChecker = new DigitalInput(Constants.ACQUIRE_POSITION_DIO);
         m_drumSparkMotor = new Spark(Constants.DRUM_SPARK_PWM_ID);
 
         m_isFull = false;
@@ -43,6 +44,29 @@ public class StorageSubsystem extends SubsystemBase {
         Shuffleboard.getTab("drum")
         .add(m_ballArray)
         .withWidget("DrumWidget");
+
+        // ----------------------------------AcquireFlagInterrupt----------------------------------
+        // m_inputAcquireFlagChecker.requestInterrupts(new InterruptHandlerFunction<Object>() {
+
+        //     @Override
+        //     public void interruptFired(int interruptAssertedMask, Object param) {
+        //         System.out.println("Storage interrut fired");
+
+        //         if (RobotContainer.getShooterSubsystem().getIsShooting()) {
+        //             // Ignore this interrupt since we're in shooting mode, not acquiring mode
+        //         } else {
+        //             m_rotateDrumOneSectionCommand.cancel();
+        //             stopDrumMotor();
+        //             finishIndex();
+        //             isDrumFull();
+        //         }
+        //     }
+        // });
+
+        // m_inputAcquireFlagChecker.setUpSourceEdge(false, true);
+
+        // // Enable digital interrupt pin
+        // m_inputAcquireFlagChecker.enableInterrupts();
     }
 
     @Override
@@ -59,12 +83,10 @@ public class StorageSubsystem extends SubsystemBase {
                         m_hasBeenTripped = true;
                         m_ballArray.acquire();
 
-                        new UnstoppableCommand(
                             new SequentialCommandGroup(
                                 new WaitCommand(0.5),
                                 RobotContainer.getRotateDrumOneSectionCommand()
-                            )
-                        ).schedule();
+                            ).schedule();
 
                     } else { /* System.out.println("Ball detected, but robot is repopulating"); */ }
 
@@ -73,9 +95,9 @@ public class StorageSubsystem extends SubsystemBase {
             } else { /* System.out.println("Ball detected, but robot is full"); */  }
         }
 
-        SmartDashboard.putBoolean("Is Robot Full", m_isFull);
-        SmartDashboard.putBoolean("Is Acquire Flag Tripped", !m_inputAcquireFlagChecker.get());
-        SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireSlotChecker.get());
+        // SmartDashboard.putBoolean("Is Robot Full", m_isFull);
+        // SmartDashboard.putBoolean("Is Acquire Flag Tripped", !m_inputAcquireFlagChecker.get());
+        // SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireSlotChecker.get());
     }
 
     /**
@@ -117,14 +139,14 @@ public class StorageSubsystem extends SubsystemBase {
      */
     public void startDrumMotor() {
         System.out.println("start drum motor");
-        m_drumSparkMotor.set(Constants.DRUM_MOTOR_VELOCITY);
+        m_drumSparkMotor.set(-Constants.DRUM_MOTOR_VELOCITY);
     }
 
     /**
      * Starts the drum spark motor backwards
      */
     public void startDrumMotorBackwards() {
-        m_drumSparkMotor.set(-Constants.DRUM_MOTOR_VELOCITY);
+        m_drumSparkMotor.set(Constants.DRUM_MOTOR_VELOCITY);
     }
 
     /**
@@ -201,4 +223,9 @@ public class StorageSubsystem extends SubsystemBase {
     public boolean isDrumVariableFull() {
         return m_isFull;
     }
+
+    // public void setRotateDrumOneSectionCommand(RotateDrumOneSectionCommand rotateDrumOneSectionCommand)
+    // {
+    //     m_rotateDrumOneSectionCommand = rotateDrumOneSectionCommand;
+    // }
 }

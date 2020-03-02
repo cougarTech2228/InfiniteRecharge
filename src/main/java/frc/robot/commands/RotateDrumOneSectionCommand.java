@@ -29,9 +29,14 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     @Override
     public void initialize() {
         System.out.println("rotate drum one section");
+
+        //m_storageSubsystem.setRotateDrumOneSectionCommand(this);
+        //m_shooterSubsystem.setRotateDrumOneSectionCommand(this);
+
         m_storageSubsystem.getBallArray().rotate();
         m_commandExecutionCount = 0;
         m_storageSubsystem.startDrumMotor();
+
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -57,6 +62,11 @@ public class RotateDrumOneSectionCommand extends CommandBase {
         {
             return false;
         }
+
+        // Command will end when the AcquireFlag or ShooterFlag interrupt is fired
+        // depending on the shooting/acquiring mode of the robot.
+
+        //return false; 
     }
 
     // Called once the command ends or is interrupted.

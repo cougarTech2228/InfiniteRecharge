@@ -88,7 +88,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-
 		RobotContainer.getDrivebaseSubsystem().setAutonomous(false);
 		RobotContainer.getDrivebaseSubsystem().getRamseteController().setEnabled(false);
 

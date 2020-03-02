@@ -33,6 +33,7 @@ public class ShootEntireDrumCommand extends SequentialCommandGroup {
             new WaitCommand(Constants.timeBetweenShots),
             new PrintCommand("Shoot 5"),
             RobotContainer.getTryToShootCommand()
+            .andThen(() -> shooterSubsystem.setIsShooting(false))
         );
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();

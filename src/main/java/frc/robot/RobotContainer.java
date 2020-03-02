@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -47,12 +48,12 @@ public class RobotContainer {
   private final static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(m_storageSubsystem,
       m_garminLidarSubsystem, m_acquisitionSubsystem);
   private final static ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-  private final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
 
   private final static SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final static TrajectoryCommand m_centerTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getCenterTrajectory(), m_drivebaseSubsystem);
   private final static TrajectoryCommand m_leftTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getLeftTrajectory(), m_drivebaseSubsystem);
   private final static TrajectoryCommand m_rightTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getRightTrajectory(), m_drivebaseSubsystem);
+  private final static TrajectoryCommand m_basicTrajectoryCommand = new TrajectoryCommand(m_trajectoryManager.getBasicTrajectory(), m_drivebaseSubsystem);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -89,8 +90,9 @@ public class RobotContainer {
     SmartDashboard.putData("Stop Drum Motor", new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem));
     SmartDashboard.putData("Change mode to shooting", new InstantCommand(m_shooterSubsystem::setIsShootingTrue, m_shooterSubsystem));
     SmartDashboard.putData("Change mode to acquiring", new InstantCommand(m_shooterSubsystem::setIsShootingFalse, m_shooterSubsystem));
-    SmartDashboard.putData("Rotate drum one index", getRotateControlPanelCommand());
+    SmartDashboard.putData("Rotate drum one index", getRotateDrumOneSectionCommand());
     SmartDashboard.putData("Bopper", getBopperCommand());
+    SmartDashboard.putData("Shake Dial", getShakeDial());
   }
 
   /**
@@ -146,13 +148,23 @@ public class RobotContainer {
 
 
 
+
     new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-        getStartAcquirerCommand(),
-        new InstantCommand(m_acquisitionSubsystem::stopAcquirer, m_acquisitionSubsystem)
+        new SequentialCommandGroup(
+          new PrintCommand("Deploy Acquirer")
+          .andThen(() -> m_acquisitionSubsystem.startAcquirerMotor())
+          .andThen(() -> m_acquisitionSubsystem.deployAcquirer())
+        ),
+        new SequentialCommandGroup(
+          new PrintCommand("Retract Acquirer")
+          .andThen(() -> m_acquisitionSubsystem.stopAcquirerMotor())
+          .andThen(() -> m_acquisitionSubsystem.retractAcquirer())
+        )
     )
     .setDefaultState(CommandState.Interruptible)
     .setToggleButton(OI::getXboxRightBumper)
     .setCycle(true);
+
 
   }
 
@@ -201,7 +213,7 @@ public class RobotContainer {
 
   public static ResetEverythingCommand getResetEverythingCommand() {
     return new ResetEverythingCommand(m_storageSubsystem, m_shooterSubsystem, m_garminLidarSubsystem,
-        m_drivebaseSubsystem, m_acquisitionSubsystem, m_climberSubsystem, m_controlPanelSubsystem, m_visionSubsystem);
+        m_drivebaseSubsystem, m_acquisitionSubsystem, m_climberSubsystem, m_controlPanelSubsystem);
   }
 
   public static CenterAutoCommand getCenterAutoCommand() {
@@ -220,14 +232,6 @@ public class RobotContainer {
     return new RepopulateArrayCommand(m_storageSubsystem);
   }
 
-  public static TurnRobotCommand getTurnRobotCommand(int turnDegree) {
-    return new TurnRobotCommand(m_drivebaseSubsystem, m_navigationSubsystem, turnDegree);
-  }
-
-  public static StartAcquirerCommand getStartAcquirerCommand() {
-    return new StartAcquirerCommand(m_acquisitionSubsystem);
-  }
-
   public static TrajectoryCommand getLeftTrajectoryCommand() {
     return m_leftTrajectoryCommand;
   }
@@ -240,12 +244,20 @@ public class RobotContainer {
     return m_centerTrajectoryCommand;
   }
 
+  public static TrajectoryCommand getBasicTrajectoryCommand() {
+    return m_basicTrajectoryCommand;
+  }
+
   public static BasicAutoCommand getBasicAutoCommand() {
     return new BasicAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem, m_acquisitionSubsystem);
   }
 
   public static ShootWhenHeldCommand getShootWhenHeld() {
     return new ShootWhenHeldCommand(m_shooterSubsystem);
+  }
+
+  public static ShakeDialCommand getShakeDial() {
+    return new ShakeDialCommand(m_storageSubsystem);
   }
 
   // Subsystem Getters
@@ -266,7 +278,7 @@ public class RobotContainer {
     return m_storageSubsystem;
   }
 
-  public static ShooterSubsystem getShooterSubystem() {
+  public static ShooterSubsystem getShooterSubsystem() {
     return m_shooterSubsystem;
   }
 
@@ -277,6 +289,7 @@ public class RobotContainer {
   public static NavigationSubsystem getNavigationSubsystem() {
     return m_navigationSubsystem;
   }
+
 
   // Other methods
 

@@ -25,10 +25,10 @@ import frc.robot.motors.Gains;
 public final class Constants {
 
 	public static final int CONTROL_PANEL_INTERRUPT_DIO = 0;
-	public static final int ACQUIRE_FLAG_DIO = 1;
-	public static final int ACQUIRE_SLOT_DIO = 2;
-	public static final int SHOOTER_SLOT_DIO = 3;
-	public static final int SHOOTER_FLAG_DIO = 4;
+	public static final int ACQUIRE_POSITION_DIO = 4;
+	public static final int ACQUIRE_BALL_DIO = 2;
+	public static final int SHOOTER_BALL_DIO = 3;
+	public static final int SHOOTER_POSITION_DIO = 1;
 	public static final int CLIMBER_UPPER_PROX_DIO = 5;
 	public static final int CLIMBER_LOWER_PROX_DIO = 6;
 	public static final int DIGITAL_IO_7 = 7;
@@ -110,8 +110,22 @@ public final class Constants {
 	public static final int MAX_SHOOTING_DISTANCE = 0;
 
 	public static final double autoTurnSpeed = 0.6;
-	public static final double timeBetweenShots = 0.5;
-	public static final double bopperWaitTime = 0.1;
+	public static final double timeBetweenShots = 0.2;
+	public static final double bopperWaitTime = 0.5;
+
+	public static final int DRIVE_CURRENT_LIMIT = 60;
+	public static final int DRIVE_CURRENT_DURATION = 100;
+	public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
+
+	public static final int ACQUIRE_CURRENT_LIMIT = 40;
+	public static final int ACQUIRE_CURRENT_DURATION = 100;
+	public static final int ACQUIRE_CONTINUOUS_CURRENT_LIMIT = 35;
+
+	public static final int SHOOTER_CURRENT_LIMIT = 40;
+	public static final int SHOOTER_CURRENT_DURATION = 100;
+	public static final int SHOOTER_CONTINUOUS_CURRENT_LIMIT = 35;
+
+	public static final int ACQUIRER_CURRENT_THRESHOLD = 2;
 	
 	/**
 	 * Number of joystick buttons to poll. 10 means buttons[1,9] are polled, which
@@ -213,12 +227,12 @@ public final class Constants {
 	// when we're trying to manually create autonomous paths
 	public final static boolean kGyroReversed = true;
 
-	public static final int EDGES_PER_ROTATION = 512;
-    public static final double WHEEL_DIAMETER_INCHES = 4d; // TODO change to 8 on competition bot
+	public static final int EDGES_PER_ROTATION = 826000;
+	public static final double WHEEL_DIAMETER_INCHES = 8.0; // TODO 4 on Pizza Box, change to 8 on Xi
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
 
-    public static final double TRACK_WIDTH_METERS = 0.647;
+    public static final double TRACK_WIDTH_METERS = 1.314; //0.647;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
 			TRACK_WIDTH_METERS);
 
@@ -226,20 +240,22 @@ public final class Constants {
 	public static final double RAMSETE_B = 2;
 	public static final double RAMSETE_ZETA = 0.7;
 
-	// Voltage needed to overcome the motorâ€™s static friction. kS 
-	public static final double kS = 1.55;
+	// Voltage needed to overcome the motors static friction. kS 
+	public static final double kS = 0.923; //1.55;
 
 	// Voltage needed to hold (or "cruise") at a given constant velocity. kV
-	public static final double kV = 2.73;
+	public static final double kV = 1.42; //2.73; 
 
 	// Voltage needed to induce a given acceleration in the motor shaft. kA 
-	public static final double kA = 0.184;
+	public static final double kA = 0.414; //0.184;
 
 	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 	
-	public static final double kMaxSpeedMetersPerSecond = 1.50;
-	public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+	public static final double kMaxSpeedMetersPerSecond = 1.5;
+	public static final double kMaxAccelerationMetersPerSecondSquared = 1.0;
 
 	public static final double DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE = 10.0;
+
+	public static final double ACQUIRER_MOTOR_SPEED = 0.45;
 
 }

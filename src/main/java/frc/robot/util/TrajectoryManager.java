@@ -18,6 +18,7 @@ public class TrajectoryManager {
     private Trajectory m_centerTrajectory;
     private Trajectory m_leftTrajectory;
     private Trajectory m_rightTrajectory;
+    private Trajectory m_basicTrajectory;
 
     public TrajectoryManager() {
 
@@ -59,6 +60,12 @@ public class TrajectoryManager {
             new Translation2d(-4.997, -0.56)
         ),
         new Pose2d(-2.043, -0.369, new Rotation2d(.35)));
+
+        m_basicTrajectory = makeTrajectory("Basic",
+        List.of(
+            new Translation2d(1, 0)
+        ),
+        new Pose2d(2, 0, new Rotation2d(0)));
     }
 
     public Trajectory makeTrajectory(String shuffleBoardName, List<Translation2d> pathList, Pose2d endPose) {
@@ -81,6 +88,10 @@ public class TrajectoryManager {
 
     public Trajectory getRightTrajectory() {
         return m_rightTrajectory;
+    }
+
+    public Trajectory getBasicTrajectory() {
+        return m_basicTrajectory;
     }
 
 }

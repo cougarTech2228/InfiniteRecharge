@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.OI;
+import frc.robot.RobotContainer;
 import frc.robot.commands.MethodCommand;
-import frc.robot.util.CommandToggler;
 import frc.robot.util.Config;
 import frc.robot.util.ConfigurableSubsystem;
 
@@ -59,6 +59,7 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
 
         new Button(() -> OI.getXboxDpadUp())
             .whenPressed(() -> {
+                RobotContainer.getAcquisitionSubsystem().deployAcquirer();
                 brake.set(true);
                 deploy.set(true);
                 climberMotor.set(climbSpeed);

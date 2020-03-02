@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.AcquisitionSubsystem;
 import frc.robot.subsystems.DrivebaseSubsystem;
@@ -25,51 +24,18 @@ public class CenterAutoCommand extends SequentialCommandGroup {
 
     public CenterAutoCommand(StorageSubsystem storageSubsystem, ShooterSubsystem shooterSubsystem,
             DrivebaseSubsystem drivebaseSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
-        // addCommands (
-        //     new PrintCommand("CenterAutoCommand")
-        //     // .andThen(() -> shooterSubsystem.startShooterMotor()),
-        //     // new WaitCommand(2),
-        //     // RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-        //     // .andThen(() -> shooterSubsystem.stopShooterMotor())
-        //     // .andThen(RobotContainer.getTurnRobotCommand(90))
-        //     // .andThen(() -> drivebaseSubsystem.setArcadeDrive(-0.6, 0)), // -0.2, 4
-        //     // new WaitCommand(.9)
-        //     // .andThen(() -> drivebaseSubsystem.setArcadeDrive(0, 0))
-        //     // .andThen(RobotContainer.getTurnRobotCommand(75))
-            
-        //     .alongWith(RobotContainer.getRunAcquireMotorCommand(false), (
-        //         new SequentialCommandGroup(
-        //             new PrintCommand("started acquirer")
-        //             .andThen(() -> drivebaseSubsystem.setArcadeDrive(-0.6, 0)), /// -0.2, 9
-        //             new WaitCommand(1) // 2.1
-        //             .andThen(() -> drivebaseSubsystem.setArcadeDrive(0, 0))
-        //             .andThen(() -> acquisitionSubsystem.setStopAcquirer(true))
-        //     )))
-        //     //.andThen(() -> drivebaseSubsystem.setArcadeDrive(0, 0))
-
-        //     // start acquirer motor
-        //     // .andThen(() -> drivebaseSubsystem.setArcadeDrive(-0.6, 0)), /// -0.2, 9
-        //     // new WaitCommand(2.1)
-        //     // .andThen(() -> drivebaseSubsystem.setArcadeDrive(0, 0))
-        //     // stop acquirer motor
-        // );
-
-
-
         addCommands(
-            new PrintCommand("CenterAutoCommand")
-            .andThen(() -> shooterSubsystem.startShooterMotor()),
-            new WaitCommand(2),
-            //RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true)),
-            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true)),
-            RobotContainer.getShootOnceCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            .andThen(() -> shooterSubsystem.stopShooterMotor()),
+            new PrintCommand("CenterAutoCommand"),
+            // .andThen(() -> shooterSubsystem.startShooterMotor()),
+            // new WaitCommand(2),
+            // RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
+            // .andThen(() -> shooterSubsystem.stopShooterMotor()),
+            //.andThen(() -> RobotContainer.getNavigationSubsystem().resetYaw()),
             RobotContainer.getCenterTrajectoryCommand()
-            .andThen(() -> shooterSubsystem.startShooterMotor()),
-            new WaitCommand(2),
-            RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            .andThen(() -> shooterSubsystem.stopShooterMotor())
+            // .andThen(() -> shooterSubsystem.startShooterMotor()),
+            // new WaitCommand(2),
+            // RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
+            // .andThen(() -> shooterSubsystem.stopShooterMotor())
         );
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();
