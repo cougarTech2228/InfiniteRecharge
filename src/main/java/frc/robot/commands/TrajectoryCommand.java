@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -17,7 +16,7 @@ public class TrajectoryCommand extends SequentialCommandGroup {
     public TrajectoryCommand(Trajectory trajectory, DrivebaseSubsystem drivebaseSubsystem) {
         addCommands(
             new RamseteCommand(trajectory, drivebaseSubsystem::getCurrentPose,
-            new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA), Constants.DRIVE_KINEMATICS,
+            drivebaseSubsystem.getRamseteController(), Constants.DRIVE_KINEMATICS,
             drivebaseSubsystem::tankDriveVelocity, drivebaseSubsystem).andThen(() -> drivebaseSubsystem.stop())
         );
         
