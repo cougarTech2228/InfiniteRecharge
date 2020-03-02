@@ -227,12 +227,12 @@ public final class Constants {
 	// when we're trying to manually create autonomous paths
 	public final static boolean kGyroReversed = true;
 
-	public static final int EDGES_PER_ROTATION = 826000;
+	public static final int EDGES_PER_ROTATION = 512;
 	public static final double WHEEL_DIAMETER_INCHES = 8.0; // TODO 4 on Pizza Box, change to 8 on Xi
     public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
 
-    public static final double TRACK_WIDTH_METERS = 1.314; //0.647;
+    public static final double TRACK_WIDTH_METERS = .590; //0.647;
     public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
 			TRACK_WIDTH_METERS);
 
@@ -241,13 +241,13 @@ public final class Constants {
 	public static final double RAMSETE_ZETA = 0.7;
 
 	// Voltage needed to overcome the motors static friction. kS 
-	public static final double kS = 0.923; //1.55;
+	public static final double kS = 0.923; //PB value = 1.55;
 
 	// Voltage needed to hold (or "cruise") at a given constant velocity. kV
-	public static final double kV = 1.42; //2.73; 
+	public static final double kV = 1.42; //PB value = 2.73; 
 
 	// Voltage needed to induce a given acceleration in the motor shaft. kA 
-	public static final double kA = 0.414; //0.184;
+	public static final double kA = 0.414; //PB value = 0.184;
 
 	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(kS, kV, kA);
 	

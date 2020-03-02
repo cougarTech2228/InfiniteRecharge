@@ -59,6 +59,7 @@ public class NavigationSubsystem extends SubsystemBase {
      * @return the robot's heading in degrees, from -180 to 180
      */
     public Rotation2d getHeading() {
+        // TODO - need to see if this is giving us correct heading values for the Ramsete Controller
         System.out.println("Heading: " + Math.IEEEremainder(getYaw(), 360.0d));
         return Rotation2d.fromDegrees(Math.IEEEremainder(getYaw(), 360.0d));
     }
