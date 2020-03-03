@@ -17,12 +17,12 @@ public class BopperCommand extends SequentialCommandGroup {
 
     public BopperCommand(ShooterSubsystem shooterSubsystem) {
         addCommands(
-            new PrintCommand("Bopping ..."),
-            new InstantCommand(shooterSubsystem::raiseBopper, shooterSubsystem),
-            new WaitCommand(Constants.bopperWaitTime),
-            new InstantCommand(shooterSubsystem::lowerBopper, shooterSubsystem)
+            new PrintCommand("Bopping ...")
+            .andThen(() -> shooterSubsystem.raiseBopper()),
+            new WaitCommand(Constants.bopperWaitTime)
+            .andThen(() -> shooterSubsystem.lowerBopper())
         );
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(shooterSubsystem);
+        // addRequirements(shooterSubsystem);
     }
 }

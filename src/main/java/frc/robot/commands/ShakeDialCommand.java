@@ -6,8 +6,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.StorageSubsystem;
 
 /**
- * BasicAutoCommand
+ * ShakeDialCommand
  * 
+ * Jiggles the dial to get balls unstuck
  */
 public class ShakeDialCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })

@@ -77,9 +77,8 @@ public class ControlPanelSubsystem extends SubsystemBase {
                     System.out.println("ControlPanel Digital Interrupt fired");
                     m_logger.info("ControlPanel Digital Interrupt fired");
 
-                    CommandScheduler.getInstance().schedule(
-                            RobotContainer.getRumbleCommand().withTimeout(Constants.XBOX_RUMBLE_COMMAND_TIMEOUT)
-                                    .alongWith(RobotContainer.getRotateControlPanelCommand()));
+                    RobotContainer.getRumbleCommand(1)
+                    .andThen(RobotContainer.getRotateControlPanelCommand()).schedule();
                 }
             }
         });

@@ -6,20 +6,17 @@ import frc.robot.RobotContainer;
 import frc.robot.motors.ShooterMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ShooterSubsystem extends SubsystemBase {
 
     private ShooterMotor m_shooterMotor;
-    private DigitalInput m_inputShooterSlotChecker;
-    private DigitalInput m_inputShooterFlagChecker;
+    private DigitalInput m_inputShooterBallChecker;
+    private DigitalInput m_inputShooterPositionChecker;
     private Solenoid m_bopper;
     private StorageSubsystem m_storageSubsystem;
     private GarminLidarSubsystem m_garminLidarSubsystem;
     private AcquisitionSubsystem m_acquisitionSubsystem;
     private boolean m_isShooting;
-
-    //private final static DigitalInput m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_POSITION_DIO);
-
-    //private RotateDrumOneSectionCommand m_rotateDrumOneSectionCommand;
 
     public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         register();
@@ -30,41 +27,16 @@ public class ShooterSubsystem extends SubsystemBase {
 
         m_shooterMotor = new ShooterMotor();
         m_bopper = new Solenoid(Constants.PCM_CAN_ID, Constants.BOPPER_PCM_PORT);
-        m_inputShooterSlotChecker = new DigitalInput(Constants.SHOOTER_BALL_DIO);
-        m_inputShooterFlagChecker = new DigitalInput(Constants.SHOOTER_POSITION_DIO);
+        m_inputShooterBallChecker = new DigitalInput(Constants.SHOOTER_BALL_DIO);
+        m_inputShooterPositionChecker = new DigitalInput(Constants.SHOOTER_POSITION_DIO);
 
         m_isShooting = false;
-
-        // ----------------------------------ShooterFlagInterrupt----------------------------------
-        // m_inputShooterFlagChecker.requestInterrupts(new InterruptHandlerFunction<Object>() {
-
-        //     @Override
-        //     public void interruptFired(int interruptAssertedMask, Object param) {
-        //         System.out.println("Shooter interrupt fired");
-
-        //         if (getIsShooting()) {
-        //             m_rotateDrumOneSectionCommand.cancel();
-        //             m_storageSubsystem.stopDrumMotor();
-        //             m_storageSubsystem.finishIndex();
-        //             m_storageSubsystem.isDrumFull();
-        //         }
-        //         else
-        //         {
-        //             // We're in acquire mode so we're not going to do anything
-        //         }
-        //     }
-        // });
-
-        // m_inputShooterFlagChecker.setUpSourceEdge(false, true);
-
-        // // Enable digital interrupt pin
-        // m_inputShooterFlagChecker.enableInterrupts();
     }
 
     @Override
     public void periodic() {
         // SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
-        // SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterSlotChecker.get());
+        SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterBallChecker.get());
         // SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterFlagChecker.get());
         // SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
     }
@@ -72,19 +44,21 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Returns the opposite value of the getter for the sensor as for example
      * if the getter returns true that means the sensor is not blocked.
+     * 
      * @return If the shooter flag was tripped
      */
-    public boolean isShooterFlagTripped() {
-        return !m_inputShooterFlagChecker.get();
+    public boolean isShooterPositionTripped() {
+        return !m_inputShooterPositionChecker.get();
     }
 
     /**
      * Returns the opposite value of the getter for the sensor as for example
      * if the getter returns true that means the sensor is not blocked.
+     * 
      * @return if the shooter slot is occupied by a powercell
      */
-    public boolean isShooterSlotOccupied() {
-        return !m_inputShooterSlotChecker.get();
+    public boolean isShooterBallOccupied() {
+        return !m_inputShooterBallChecker.get();
     }
 
     /**
@@ -118,16 +92,6 @@ public class ShooterSubsystem extends SubsystemBase {
         m_isShooting = isShooting;
     }
 
-    public void setIsShootingTrue() {
-        m_storageSubsystem.setIsShooting(true);
-        m_isShooting = true;
-    }
-
-    public void setIsShootingFalse() {
-        m_storageSubsystem.setIsShooting(false);
-        m_isShooting = false;
-    }
-
     /**
      * Starts the shooter motor, also sets the variable isShooting in the storage subsystem 
      * and in the shooter subsystem to true
@@ -150,9 +114,4 @@ public class ShooterSubsystem extends SubsystemBase {
         m_isShooting = false;
         RobotContainer.getRotateDrumOneSectionCommand().schedule();
     }
-
-    // public void setRotateDrumOneSectionCommand(RotateDrumOneSectionCommand rotateDrumOneSectionCommand)
-    // {
-    //     m_rotateDrumOneSectionCommand = rotateDrumOneSectionCommand;
-    // }
 }

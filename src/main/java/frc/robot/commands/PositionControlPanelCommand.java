@@ -66,7 +66,6 @@ public class PositionControlPanelCommand extends CommandBase {
       public void end(boolean interrupted) {
         new WaitCommand(0.3)
         .andThen(() -> m_controlPanelSubsystem.getWheelMotor().set(0))
-        .andThen(RobotContainer.getRumbleCommand()
-        .withTimeout(Constants.XBOX_RUMBLE_COMMAND_TIMEOUT)).schedule();
+        .andThen(RobotContainer.getRumbleCommand(1)).schedule();
       }
 }

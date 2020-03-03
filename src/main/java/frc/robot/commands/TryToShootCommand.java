@@ -30,7 +30,7 @@ public class TryToShootCommand extends SequentialCommandGroup {
                         new PrintCommand("false")
                         .andThen(RobotContainer.getRotateDrumOneSectionCommand())
                     )
-                ), () -> shooterSubsystem.isShooterSlotOccupied()
+                ), () -> shooterSubsystem.isShooterBallOccupied()
             )
         );
         // Use addRequirements() here to declare subsystem dependencies.

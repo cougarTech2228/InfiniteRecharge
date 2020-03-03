@@ -119,6 +119,12 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		System.out.println("[Quadrature Encoders] All sensors are zeroed.\n");
 	}
 
+
+	/**
+	 * Enables the encoders
+	 * 
+	 * Reports an error to the drive station and prints out a message if the encoders are not available
+	 */
 	private void enableEncoders() {
 		m_encodersAreAvailable = m_leftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder,
 				Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK
@@ -144,6 +150,11 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		return 0.0;
 	}
 
+	/**
+	 * Arcade drive that takes in the left joystick for forward and the right joystick for turn
+	 * 
+	 * Uses the deadband and the PercentOutput control mode
+	 */
 	private void arcadeDrive() {
 		double forward = OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
@@ -156,12 +167,12 @@ public class DrivebaseSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (m_isAutonomous) {
-			//System.out.println("update odometry");
-			 //m_odometry.update(RobotContainer.getNavigationSubsystem().getHeading(),
-			 		//edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
+		if (!m_isAutonomous) {
+			arcadeDrive();		
 		} else {
-			 arcadeDrive();
+			 //System.out.println("update odometry");
+			 //m_odometry.update(RobotContainer.getNavigationSubsystem().getHeading(),
+		     //edgesToMeters(getLeftEncoderPosition()), edgesToMeters(getRightEncoderPosition()));
 		}
 
 		//m_differentialDrive.feed();
@@ -283,6 +294,14 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		return m_odometry.getPoseMeters();
 	}
 
+	/**
+	 * Sets the arcade drive for a certain forward and turn value
+	 * Will run until stop() and setArcadeDrive(0, 0) is called
+	 * 
+	 * @param forward Value to be set for forward. Value between -1.0 and 1.0
+	 * @param turn Value to be set for turn. Value between -1.0 and 1.0
+	 * 
+	 */
 	public void setArcadeDrive(double forward, double turn) {
 		forward = deadband(forward);
 		turn = (deadband(turn) * 0.5);
@@ -290,10 +309,18 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
 	}
 
+	/**
+	 * Sets the Autonomous value, dictates on when the arcade drive will be run
+	 * 
+	 * @param isAutonomous is in autonomous mode
+	 */
 	public void setAutonomous(boolean isAutonomous) {
 		m_isAutonomous = isAutonomous;
 	}
 
+	/**
+	 * Gets the Rameste Controller
+	 */
 	public RamseteController getRamseteController() {
 		return m_ramseteController;
 	}

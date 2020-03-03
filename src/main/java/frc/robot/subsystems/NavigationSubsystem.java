@@ -14,22 +14,29 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class NavigationSubsystem extends SubsystemBase {
     
     private PigeonIMU m_pigeon; 
-
     private double[] m_yawPitchRoll = new double[3];
 
     public NavigationSubsystem() {
         m_pigeon = new PigeonIMU(Constants.PIGEON_IMU_CAN_ID);
     }
 
+    /**
+     * Calibrate the pigeon
+     */
     public void calibratePigeon() {
         m_pigeon.enterCalibrationMode(CalibrationMode.BootTareGyroAccel);
     }
 
+    /**
+     * Resets the yaw by setting it to 0
+     */
     public void resetYaw() {
         m_pigeon.setYaw(0);
     }
     
     /** 
+     * Gets the yaw
+     * 
      * @return double
      */
     public double getYaw() {
@@ -38,6 +45,8 @@ public class NavigationSubsystem extends SubsystemBase {
     }
 
     /** 
+     * Gets the pitch
+     * 
      * @return double
      */
     public double getPitch() {
@@ -46,6 +55,8 @@ public class NavigationSubsystem extends SubsystemBase {
     }
 
     /** 
+     * Gets the roll
+     * 
      * @return double
      */
     public double getRoll() {
@@ -59,8 +70,6 @@ public class NavigationSubsystem extends SubsystemBase {
      * @return the robot's heading in degrees, from -180 to 180
      */
     public Rotation2d getHeading() {
-        // TODO - need to see if this is giving us correct heading values for the Ramsete Controller
-        //System.out.println("Heading: " + Math.IEEEremainder(getYaw(), 360.0d));
         return Rotation2d.fromDegrees(Math.IEEEremainder(getYaw(), 360.0d));
     }
 }

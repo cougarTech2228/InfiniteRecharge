@@ -8,7 +8,7 @@ import frc.robot.subsystems.StorageSubsystem;
 /**
  * RepopulateArrayCommand
  * 
- * This command repopulates the drum array with the correct values
+ * This command repopulates the drum widget with the correct values
  * Stops in acquire position
  */
 public class RepopulateArrayCommand extends SequentialCommandGroup {
@@ -42,9 +42,7 @@ public class RepopulateArrayCommand extends SequentialCommandGroup {
      */
     public void populateIndex() {
         System.out.println("populateIndex");
-        if(m_storageSubsystem.isAcquireSlotOccupied()) {
-            //int currentDrumIndex = m_storageSubsystem.getDrumArrayIndex();
-            //m_storageSubsystem.setDrumArray(currentDrumIndex, true);
+        if(m_storageSubsystem.isAcquireBallOccupied()) {
             m_storageSubsystem.getBallArray().acquire();
         }
     }

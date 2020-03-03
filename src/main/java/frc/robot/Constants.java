@@ -85,7 +85,7 @@ public final class Constants {
 
 	public static final double ARCADE_DRIVE_TURN_DEADBAND = .03;
 
-	public static final double XBOX_RUMBLE_TIME = 1.0;
+	public static final double XBOX_RUMBLE_SPEED = 1.0;
 
 	public static final double WHEEL_MOTOR_VELOCITY = 0.1;
 

@@ -104,7 +104,6 @@ public class RotateControlPanelCommand extends CommandBase {
       // Called once the command ends or is interrupted.
       @Override
       public void end(boolean interrupted) {
-        (RobotContainer.getRumbleCommand()
-        .withTimeout(Constants.XBOX_RUMBLE_COMMAND_TIMEOUT)).schedule();
+        RobotContainer.getRumbleCommand(1).schedule();
       }
 }

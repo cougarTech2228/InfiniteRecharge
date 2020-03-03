@@ -28,11 +28,6 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("rotate drum one section");
-
-        //m_storageSubsystem.setRotateDrumOneSectionCommand(this);
-        //m_shooterSubsystem.setRotateDrumOneSectionCommand(this);
-
         m_storageSubsystem.getBallArray().rotate();
         m_commandExecutionCount = 0;
         m_storageSubsystem.startDrumMotor();
@@ -50,16 +45,14 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         if(m_commandExecutionCount > Constants.LOOPS_TO_WAIT) {
+
             if(m_shooterSubsystem.getIsShooting()) {
-                return m_shooterSubsystem.isShooterFlagTripped();
+                return m_shooterSubsystem.isShooterPositionTripped();
+            } else {
+                return m_storageSubsystem.isAcquirePositionTripped();
             }
-            else
-            {
-                return m_storageSubsystem.isAcquireFlagTripped();
-            }
-        }
-        else
-        {
+
+        } else {
             return false;
         }
 
@@ -73,7 +66,7 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_storageSubsystem.stopDrumMotor();
-        m_storageSubsystem.finishIndex();
-        m_storageSubsystem.isDrumFull();
+        m_storageSubsystem.resetHasBeenTripped();
+        m_storageSubsystem.checkIfDrumFull();
     }
 }
