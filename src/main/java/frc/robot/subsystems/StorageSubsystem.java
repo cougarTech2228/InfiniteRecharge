@@ -19,7 +19,6 @@ public class StorageSubsystem extends SubsystemBase {
     private Spark m_drumSparkMotor;
     private boolean m_hasBeenTripped;
     private boolean m_isFull;
-    private boolean m_isShooting;
     private boolean m_isRepopulating;
     private BallArray m_ballArray = new BallArray();
 
@@ -31,7 +30,6 @@ public class StorageSubsystem extends SubsystemBase {
         m_drumSparkMotor = new Spark(Constants.DRUM_SPARK_PWM_ID);
 
         m_isFull = false;
-        m_isShooting = false;
         m_hasBeenTripped = false;
         m_isRepopulating = false;
         SendableRegistry.add(m_ballArray, "balls");
@@ -46,19 +44,20 @@ public class StorageSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if (!m_inputAcquireBallChecker.get() && !m_hasBeenTripped)  // is there a ball in the acquire position?
+        if (!RobotContainer.getShooterSubsystem().getIsShooting()) 
         {
-            if (!m_isFull) // if the drum is full, dont try to check if it needs to rotate again
+            if (!m_inputAcquireBallChecker.get() && !m_hasBeenTripped)  // is there a ball in the acquire position?
             {
-                if (!m_isShooting) 
+                if (!m_isFull) // if the drum is full, dont try to check if it needs to rotate again
                 {
                     if (!m_isRepopulating) 
                     {
+                        System.out.println("Ball detected");
                         m_hasBeenTripped = true;
                         m_ballArray.acquire();
 
                             new SequentialCommandGroup(
-                                new WaitCommand(0.5),
+                                new WaitCommand(0.25),
                                 RobotContainer.getRotateDrumOneSectionCommand()
                             ).schedule();
 
@@ -71,11 +70,12 @@ public class StorageSubsystem extends SubsystemBase {
 
         // SmartDashboard.putBoolean("Is Robot Full", m_isFull);
         // SmartDashboard.putBoolean("Is Acquire Flag Tripped", !m_inputAcquirePositionChecker.get());
-        SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireBallChecker.get());
+        // SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireBallChecker.get());
     }
 
     /**
-     * Set the repopulating variable 
+     * Set the repopulating variable
+     * 
      * @param isRepopulating the value to be set
      */
     public void setIsRepopulating(boolean isRepopulating) {
@@ -84,6 +84,7 @@ public class StorageSubsystem extends SubsystemBase {
 
     /**
      * Determines if the acquierer slot is occupied
+     * 
      * @return if the the acquierer slot is occupied
      */
     public boolean isAcquireBallOccupied() {
@@ -91,19 +92,9 @@ public class StorageSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets isShooting to the passed in value
-     * 
-     * @param isShooting the value to be passed in
-     */
-    public void setIsShooting(boolean value) {
-        //System.out.println("setting shooting mode: " + value);
-        m_isShooting = value;
-    }
-
-    /**
      * Sets all elements in drumArray to false Sets m_isFull to false
      */
-    public void resetDrum() { 
+    public void resetDrum() {
         System.out.println("reset drum");
         m_ballArray.data = 0;
     }
@@ -112,7 +103,7 @@ public class StorageSubsystem extends SubsystemBase {
      * Starts the drum spark motor
      */
     public void startDrumMotor() {
-        //System.out.println("start drum motor");
+        // System.out.println("start drum motor");
         m_drumSparkMotor.set(-Constants.DRUM_MOTOR_VELOCITY);
     }
 
@@ -127,7 +118,7 @@ public class StorageSubsystem extends SubsystemBase {
      * Stops the drum spark motor
      */
     public void stopDrumMotor() {
-        //System.out.println("stop drum motor");
+        // System.out.println("stop drum motor");
         m_drumSparkMotor.set(0);
     }
 

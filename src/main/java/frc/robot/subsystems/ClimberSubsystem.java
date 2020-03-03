@@ -21,8 +21,8 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
     Solenoid brake, deploy;
     DigitalInput topFlag, bottomFlag;
 
-    @Config
-    public double climbSpeed = 0.05;
+    
+    public double climbSpeed = 0.2;
 
     public ClimberSubsystem() {
         register();

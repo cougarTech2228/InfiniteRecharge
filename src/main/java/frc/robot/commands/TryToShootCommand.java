@@ -27,7 +27,7 @@ public class TryToShootCommand extends SequentialCommandGroup {
                         .andThen(RobotContainer.getRotateDrumOneSectionCommand())
                     ),
                     false, (
-                        new PrintCommand("false")
+                        new PrintCommand("Tried to shoot but no ball was there, drum might be empty")
                         .andThen(RobotContainer.getRotateDrumOneSectionCommand())
                     )
                 ), () -> shooterSubsystem.isShooterBallOccupied()

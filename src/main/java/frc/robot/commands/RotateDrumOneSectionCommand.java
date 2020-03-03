@@ -18,6 +18,7 @@ public class RotateDrumOneSectionCommand extends CommandBase {
     private int m_commandExecutionCount;
 
     public RotateDrumOneSectionCommand(StorageSubsystem storageSubsystem, ShooterSubsystem shooterSubsystem) {
+        System.out.println("Rotate drum one section");
         m_storageSubsystem = storageSubsystem;
         m_shooterSubsystem = shooterSubsystem;
 

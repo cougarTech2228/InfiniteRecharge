@@ -36,8 +36,8 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
-        SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterBallChecker.get());
-        // SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterFlagChecker.get());
+        // SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterBallChecker.get());
+        // SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterPositionChecker.get());
         // SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
     }
     
@@ -88,7 +88,6 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param isShooting
      */
     public void setIsShooting(boolean isShooting) {
-        m_storageSubsystem.setIsShooting(isShooting);
         m_isShooting = isShooting;
     }
 
@@ -97,7 +96,6 @@ public class ShooterSubsystem extends SubsystemBase {
      * and in the shooter subsystem to true
      */
     public void startShooterMotor() {
-        m_storageSubsystem.setIsShooting(true);
         m_acquisitionSubsystem.stopAcquirerMotor();
         m_acquisitionSubsystem.deployAcquirer();
         m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
@@ -108,7 +106,6 @@ public class ShooterSubsystem extends SubsystemBase {
      * and in the shooter subsystem to false. Rotates the drum back to acquire position.
      */
     public void stopShooterMotor() {
-        m_storageSubsystem.setIsShooting(false);
         m_acquisitionSubsystem.retractAcquirer();
         m_shooterMotor.stop();
         m_isShooting = false;

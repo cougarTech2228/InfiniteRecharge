@@ -59,10 +59,10 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		enableEncoders();
 
 		/* Set open and closed loop values */
-		m_leftMaster.configOpenloopRamp(0.25);
+		m_leftMaster.configOpenloopRamp(0.5);
 		m_leftMaster.configClosedloopRamp(0);
 
-		m_rightMaster.configOpenloopRamp(0.25);
+		m_rightMaster.configOpenloopRamp(0.5);
 		m_rightMaster.configClosedloopRamp(0);
 
 		/* Configure output and sensor direction */
