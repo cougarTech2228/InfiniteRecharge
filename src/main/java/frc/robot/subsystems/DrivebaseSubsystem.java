@@ -59,10 +59,10 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		enableEncoders();
 
 		/* Set open and closed loop values */
-		m_leftMaster.configOpenloopRamp(0.5);
+		m_leftMaster.configOpenloopRamp(0);
 		m_leftMaster.configClosedloopRamp(0);
 
-		m_rightMaster.configOpenloopRamp(0.5);
+		m_rightMaster.configOpenloopRamp(0);
 		m_rightMaster.configClosedloopRamp(0);
 
 		/* Configure output and sensor direction */
@@ -160,7 +160,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		double turn = OI.getXboxRightJoystickX();
 
 		forward = deadband(forward);
-		turn = deadband(turn) * 0.5;
+		turn = deadband(turn) * 0.65;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn); 
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
 	}

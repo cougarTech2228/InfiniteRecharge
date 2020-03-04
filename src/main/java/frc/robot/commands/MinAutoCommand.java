@@ -21,10 +21,10 @@ public class MinAutoCommand extends SequentialCommandGroup {
         
         addCommands (
             new PrintCommand("MinAutoCommand")
-            /*.andThen(() -> shooterSubsystem.startShooterMotor()),
+            .andThen(() -> shooterSubsystem.startShooterMotor()),
             new WaitCommand(2),
             RobotContainer.getShootEntireDrumCommand().beforeStarting(() -> shooterSubsystem.setIsShooting(true))
-            .andThen(() -> shooterSubsystem.stopShooterMotor())*/
+            .andThen(() -> shooterSubsystem.stopShooterMotor())
             .andThen(() -> drivebaseSubsystem.setArcadeDrive(.5, 0)),
             new WaitCommand(2)
             .andThen(() -> drivebaseSubsystem.stop())

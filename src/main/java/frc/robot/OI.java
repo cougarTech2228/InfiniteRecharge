@@ -39,7 +39,7 @@ public class OI {
     private static XboxController m_xboxController;
    
     public OI() {
-        m_xboxController = new XboxController(0);
+        m_xboxController = new XboxController(1);
     }
 
     public static boolean getXboxAButton() {

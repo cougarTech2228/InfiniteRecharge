@@ -68,9 +68,9 @@ public class StorageSubsystem extends SubsystemBase {
             } else { /* System.out.println("Ball detected, but robot is full"); */  }
         }
 
-        // SmartDashboard.putBoolean("Is Robot Full", m_isFull);
-        // SmartDashboard.putBoolean("Is Acquire Flag Tripped", !m_inputAcquirePositionChecker.get());
-        // SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireBallChecker.get());
+        SmartDashboard.putBoolean("Is Robot Full", m_isFull);
+        SmartDashboard.putBoolean("Is Acquire Flag Tripped", !m_inputAcquirePositionChecker.get());
+        SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireBallChecker.get());
     }
 
     /**
