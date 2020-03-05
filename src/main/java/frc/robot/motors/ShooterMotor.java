@@ -18,7 +18,7 @@ public class ShooterMotor {//extends TalonSRXMotor {
     private boolean m_encodersAreAvailable;
     private WPI_TalonSRX m_talon;
 
-    public double m_shooterSpeed = 90000;
+    public double m_shooterSpeed = 120000;
 
     public ShooterMotor() {
         //super(Constants.SHOOTER_CAN_ID);

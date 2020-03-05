@@ -38,7 +38,7 @@ public class ShooterSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
         SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterBallChecker.get());
         SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterPositionChecker.get());
-        // SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
+        SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
     }
     
     /**

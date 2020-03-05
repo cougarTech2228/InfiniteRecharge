@@ -25,7 +25,9 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
     public double climbSpeed = 0.2;
 
     public ClimberSubsystem() {
-        register();
+        // You need to register the subsystem to get it's periodic
+        // method to be called by the Scheduler
+        // register();
 
         climberMotor = new CANSparkMax(42, MotorType.kBrushless);
 

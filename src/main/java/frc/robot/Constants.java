@@ -111,7 +111,7 @@ public final class Constants {
 
 	public static final double autoTurnSpeed = 0.6;
 	public static final double timeBetweenShots = 0.2;
-	public static final double bopperWaitTime = 0.25;
+	public static final double bopperWaitTime = 0.15;
 
 	public static final int DRIVE_CURRENT_LIMIT = 60;
 	public static final int DRIVE_CURRENT_DURATION = 100;

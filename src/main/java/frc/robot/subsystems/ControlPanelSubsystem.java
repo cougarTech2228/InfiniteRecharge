@@ -51,6 +51,10 @@ public class ControlPanelSubsystem extends SubsystemBase {
 
     public ControlPanelSubsystem() {
 
+        // You need to register the subsystem to get it's periodic
+        // method to be called by the Scheduler
+        //register();
+
         m_wheelMotor = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
 
         m_colorMatcher.addColorMatch(m_kBlueTarget);

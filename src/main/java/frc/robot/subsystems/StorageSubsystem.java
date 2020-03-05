@@ -34,11 +34,11 @@ public class StorageSubsystem extends SubsystemBase {
         m_isRepopulating = false;
         SendableRegistry.add(m_ballArray, "balls");
 
-        // Shuffleboard.getTab("drum")
-        // .add(m_ballArray)
-        // .withWidget("DrumWidget");
+        Shuffleboard.getTab("drum")
+        .add(m_ballArray)
+        .withWidget("DrumWidget");
 
-        SmartDashboard.putData(m_ballArray);
+        //SmartDashboard.putData(m_ballArray);
     }
 
     @Override
