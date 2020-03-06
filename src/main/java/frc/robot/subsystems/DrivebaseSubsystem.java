@@ -9,12 +9,10 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -30,7 +28,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private WPI_TalonSRX m_leftMaster = new WPI_TalonSRX(Constants.LEFT_FRONT_MOTOR_CAN_ID);
 	private WPI_TalonSRX m_leftFollower = new WPI_TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
 
-	private DifferentialDrive m_differentialDrive;
+	//private DifferentialDrive m_differentialDrive;
 	private boolean m_encodersAreAvailable;
 	private DifferentialDriveOdometry m_odometry;
 	private RamseteController m_ramseteController;
@@ -86,7 +84,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_rightMaster.enableCurrentLimit(true);
 		m_rightFollower.enableCurrentLimit(true);
-		// TODO can we set these back to true?
 
 		m_leftMaster.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
 		m_leftFollower.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
@@ -96,7 +93,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_leftFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_leftMaster.enableCurrentLimit(true);
 		m_leftFollower.enableCurrentLimit(true);
-		// TODO can we set these back to true?
 
 		// m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
 		// m_differentialDrive.setRightSideInverted(true);
@@ -219,7 +215,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	public void resetOdometry() {
 		zeroSensors();
 		m_savedPose = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
-		m_odometry.resetPosition(m_savedPose, RobotContainer.getNavigationSubsystem().getHeading());
+		//m_odometry.resetPosition(m_savedPose, RobotContainer.getNavigationSubsystem().getHeading());
 	}
 
 	/**

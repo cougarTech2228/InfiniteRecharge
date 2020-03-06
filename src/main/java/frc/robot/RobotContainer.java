@@ -38,7 +38,7 @@ public class RobotContainer {
   // Robot Subsystems
   // Since it might take some time for the navigation module (Pigeon or ADXRS450_Gyro) to
   // calibrate and come up, we should put this instantiation first.
-  private final static NavigationSubsystem m_navigationSubsystem = new NavigationSubsystem();
+  // private final static NavigationSubsystem m_navigationSubsystem = new NavigationSubsystem();
   private final static TrajectoryManager m_trajectoryManager = new TrajectoryManager();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
   private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
@@ -97,8 +97,11 @@ public class RobotContainer {
     SmartDashboard.putData("Run Acquirer Motor", new InstantCommand(m_acquisitionSubsystem::startAcquirerMotor));
     SmartDashboard.putData("Stop Acquirer Motor", new InstantCommand(m_acquisitionSubsystem::stopAcquirerMotor));
     SmartDashboard.putData("Deploy Acquirer", new InstantCommand(m_acquisitionSubsystem::deployAcquirer));
-    SmartDashboard.putData("Deploy Acquirer", new InstantCommand(m_acquisitionSubsystem::retractAcquirer));
+    SmartDashboard.putData("Retract Acquirer", new InstantCommand(m_acquisitionSubsystem::retractAcquirer));
     SmartDashboard.putData("Reverse Acquirer", new InstantCommand(m_acquisitionSubsystem::reverseAcquirer));
+
+    // TODO - do we need stuff for elevator retract/deploy?
+
   }
 
   /**
@@ -322,9 +325,9 @@ public class RobotContainer {
     return m_garminLidarSubsystem;
   }
 
-  public static NavigationSubsystem getNavigationSubsystem() {
-    return m_navigationSubsystem;
-  }
+  // public static NavigationSubsystem getNavigationSubsystem() {
+  //   return m_navigationSubsystem;
+  // }
 
 
   // Other methods

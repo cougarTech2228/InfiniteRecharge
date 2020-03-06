@@ -33,7 +33,7 @@ public class ShootWhenHeldCommand extends CommandBase {
         if(!m_isShooting) {
             m_isShooting = true;
             RobotContainer.getTryToShootCommand()
-            .andThen(new WaitCommand(Constants.timeBetweenShots))
+            .andThen(new WaitCommand(Constants.TIME_BETWEEN_SHOTS))
             .andThen(() -> m_isShooting = false).schedule();
         }
     }

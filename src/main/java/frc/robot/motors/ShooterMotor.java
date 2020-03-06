@@ -9,7 +9,6 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants;
-import frc.robot.util.Config;
 import frc.robot.util.Configuration;
 
 public class ShooterMotor {//extends TalonSRXMotor {

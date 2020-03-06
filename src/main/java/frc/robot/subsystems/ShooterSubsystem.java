@@ -13,7 +13,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private DigitalInput m_inputShooterBallChecker;
     private DigitalInput m_inputShooterPositionChecker;
     private Solenoid m_bopper;
-    private StorageSubsystem m_storageSubsystem;
     private GarminLidarSubsystem m_garminLidarSubsystem;
     private AcquisitionSubsystem m_acquisitionSubsystem;
     private boolean m_isShooting;
@@ -21,7 +20,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         register();
 
-        m_storageSubsystem = storageSubsystem;
         m_garminLidarSubsystem = garminLidarSubsystem;
         m_acquisitionSubsystem = acquisitionSubsystem;
 
