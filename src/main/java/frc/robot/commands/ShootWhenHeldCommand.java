@@ -23,7 +23,7 @@ public class ShootWhenHeldCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        m_shooterSubsystem.setIsShooting(true);
+        System.out.println("Shoot when held");
         m_isShooting = false;
     }
 

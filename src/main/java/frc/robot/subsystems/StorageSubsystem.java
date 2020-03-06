@@ -57,7 +57,7 @@ public class StorageSubsystem extends SubsystemBase {
                         m_ballArray.acquire();
 
                             new SequentialCommandGroup(
-                                new WaitCommand(0.25),
+                                new WaitCommand(0.1),
                                 RobotContainer.getRotateDrumOneSectionCommand()
                             ).schedule();
 

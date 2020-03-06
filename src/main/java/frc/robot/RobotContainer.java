@@ -111,8 +111,8 @@ public class RobotContainer {
     // new Button(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
     // new Button(OI::getXboxYButton).whenPressed(getPositionControlPanelCommand());
 
-    new Button(OI::getXboxLeftTriggerPressed)
-        .whenPressed(getShootOnceCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)));
+//    new Button(OI::getXboxLeftTriggerPressed)
+//        .whenPressed(getShootOnceCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)));
 
     new CommandToggler( // Shoot Entire Drum Toggle - Right Trigger
         getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)), 
@@ -122,7 +122,13 @@ public class RobotContainer {
     .setToggleButton(OI::getXboxRightTriggerPressed)
     .setCycle(true);
 
-    // new Button(OI::getXboxRightTriggerPressed).whenHeld(getShootWhenHeld());
+    new Button(OI::getXboxRightTriggerPressed).whenHeld(getShootWhenHeld()
+    .beforeStarting(() -> {
+      new SequentialCommandGroup(
+        new InstantCommand(() -> m_shooterSubsystem.setIsShooting(true)),
+        getRotateDrumOneSectionCommand()
+      ).schedule();
+    }));
 
     new CommandToggler( // Shooter Motor Toggle - Left Bumper
         new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
