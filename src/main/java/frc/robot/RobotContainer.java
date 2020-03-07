@@ -125,7 +125,7 @@ public class RobotContainer {
     .setToggleButton(OI::getXboxRightTriggerPressed)
     .setCycle(true);
 
-    new Button(OI::getXboxRightTriggerPressed).whenHeld(getShootWhenHeld()
+    new Button(OI::getXboxLeftTriggerPressed).whenHeld(getShootWhenHeld()
     .beforeStarting(() -> {
       new SequentialCommandGroup(
         new InstantCommand(() -> m_shooterSubsystem.setIsShooting(true)),
@@ -162,28 +162,20 @@ public class RobotContainer {
     .setCycle(true);
 
     new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-        new InstantCommand(() -> m_acquisitionSubsystem.deployAndOrStartMotor(true, true)),
-        new InstantCommand(() -> m_acquisitionSubsystem.retractAndOrStopMotor(true, true))   
-    ) 
+        new SequentialCommandGroup(
+          new PrintCommand("Deploy Acquirer")
+          .andThen(() -> m_acquisitionSubsystem.startAcquirerMotor())
+          .andThen(() -> m_acquisitionSubsystem.deployAcquirer())
+        ),
+        new SequentialCommandGroup(
+          new PrintCommand("Retract Acquirer")
+          .andThen(() -> m_acquisitionSubsystem.stopAcquirerMotor())
+          .andThen(() -> m_acquisitionSubsystem.retractAcquirer())
+        )
+    )
     .setDefaultState(CommandState.Interruptible)
     .setToggleButton(OI::getXboxRightBumper)
     .setCycle(true);
-
-    // new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-    //     new SequentialCommandGroup(
-    //       new PrintCommand("Deploy Acquirer")
-    //       .andThen(() -> m_acquisitionSubsystem.startAcquirerMotor())
-    //       .andThen(() -> m_acquisitionSubsystem.deployAcquirer())
-    //     ),
-    //     new SequentialCommandGroup(
-    //       new PrintCommand("Retract Acquirer")
-    //       .andThen(() -> m_acquisitionSubsystem.stopAcquirerMotor())
-    //       .andThen(() -> m_acquisitionSubsystem.retractAcquirer())
-    //     )
-    // )
-    // .setDefaultState(CommandState.Interruptible)
-    // .setToggleButton(OI::getXboxRightBumper)
-    // .setCycle(true);
 
   }
 
@@ -323,6 +315,10 @@ public class RobotContainer {
 
   public static GarminLidarSubsystem getGarminLidarSubsystem() {
     return m_garminLidarSubsystem;
+  }
+
+  public static ClimberSubsystem getClimberSubsystem() {
+    return m_climberSubsystem;
   }
 
   // public static NavigationSubsystem getNavigationSubsystem() {

@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants;
 import frc.robot.util.Configuration;
+import frc.robot.util.ShuffleboardAdapter;
 
 public class ShooterMotor {//extends TalonSRXMotor {
 
@@ -34,15 +35,15 @@ public class ShooterMotor {//extends TalonSRXMotor {
 
         m_talon.configFactoryDefault();
         m_encodersAreAvailable =  m_talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK;
-        m_talon.config_kP(0, 0.0075, Constants.kTimeoutMs);
+        m_talon.config_kP(0, 0.00682, Constants.kTimeoutMs); //.0465
         m_talon.config_kI(0, 0, Constants.kTimeoutMs);
         m_talon.config_kD(0, 0, Constants.kTimeoutMs);
-        m_talon.config_kF(0, 0.00854, Constants.kTimeoutMs);
+        m_talon.config_kF(0, 0.00851, Constants.kTimeoutMs);
         m_talon.config_IntegralZone(0, 0, Constants.kTimeoutMs);
         m_talon.configClosedLoopPeakOutput(0, 1.0, Constants.kTimeoutMs);
         m_talon.configAllowableClosedloopError(0, 0, Constants.kTimeoutMs);
         m_talon.setInverted(true);
-        m_talon.setSensorPhase(true);
+        m_talon.setSensorPhase(false);
         m_talon.configVoltageCompSaturation(11);
 
         m_talon.configClosedLoopPeriod(0, 1, Constants.kTimeoutMs);
@@ -64,17 +65,17 @@ public class ShooterMotor {//extends TalonSRXMotor {
          * m_talon.setPID(0, new Gains(0.01, 0, 0, 0, 0, 1.0));
          */
 
-        // new ShuffleboardAdapter("shooter")
-        // .addDoubleText("kP", 0, value -> {m_talon.config_kP(0, value); })
+        new ShuffleboardAdapter("shooter")
+         .addDoubleText("kP", 0, value -> {m_talon.config_kP(0, value); })
         // // .addDoubleText("kI", 0, value -> {m_talon.config_kF(0, value); })
         // // .addDoubleText("kD", 0, value -> {m_talon.config_kI(0, value); })
         // .addDoubleText("kF", 0, value -> {m_talon.config_kF(0, value); })
         // // .addDoubleText("kIZone", 0, value -> {m_talon.config_IntegralZone(0,
-        // (int)value); })
+        // // (int)value); })
         // .addDoubleText("TargetVel", 0, value -> m_talon.set(ControlMode.Velocity,
         // value))
-        // .addDouble("Velocity Error", 0, () -> m_talon.getClosedLoopError())
-        // .addDouble("Velocity", 0, () -> m_talon.getSelectedSensorVelocity())
+        .addDouble("Velocity Error", 0, () -> m_talon.getClosedLoopError());
+        //.addDouble("Velocity", 0, () -> m_talon.getSelectedSensorVelocity());
         // .addDouble("Current", 0, () -> m_talon.getSupplyCurrent());
 
         System.out.println(m_encodersAreAvailable);

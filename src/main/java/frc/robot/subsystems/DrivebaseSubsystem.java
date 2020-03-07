@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import frc.robot.RobotContainer;
 
 /**
  * DrivebaseSubsystem
@@ -159,6 +158,10 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		turn = deadband(turn) * 0.65;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn); 
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+	}
+
+	public double getCurrentMoveSpeedAverage() {
+		return (m_leftMaster.get() + m_rightMaster.get()) / 2;
 	}
 
 	@Override

@@ -116,9 +116,9 @@ public final class Constants {
 	public static final int DRIVE_CURRENT_DURATION = 100;
 	public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
 
-	public static final int ACQUIRE_CURRENT_LIMIT = 40;
+	public static final int ACQUIRE_CURRENT_LIMIT = 30;
 	public static final int ACQUIRE_CURRENT_DURATION = 100;
-	public static final int ACQUIRE_CONTINUOUS_CURRENT_LIMIT = 35;
+	public static final int ACQUIRE_CONTINUOUS_CURRENT_LIMIT = 18;
 
 	public static final int SHOOTER_CURRENT_LIMIT = 40;
 	public static final int SHOOTER_CURRENT_DURATION = 100;
@@ -255,6 +255,6 @@ public final class Constants {
 
 	public static final double DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE = 10.0;
 
-	public static final double ACQUIRER_MOTOR_SPEED = 0.45;
+	public static final double ACQUIRER_MOTOR_SPEED = 0.70;
 
 }

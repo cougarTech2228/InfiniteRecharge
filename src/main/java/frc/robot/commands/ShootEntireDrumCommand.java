@@ -18,7 +18,7 @@ public class ShootEntireDrumCommand extends SequentialCommandGroup {
     public ShootEntireDrumCommand(ShooterSubsystem shooterSubsystem) {
         //System.out.println("ShootEntireDrumCommand");
         addCommands(
-            new PrintCommand("Shoot entire drum0"),
+            new PrintCommand("Shoot entire drum"),
             RobotContainer.getRotateDrumOneSectionCommand(),
             new PrintCommand("Shoot 1"),
             RobotContainer.getTryToShootCommand(),

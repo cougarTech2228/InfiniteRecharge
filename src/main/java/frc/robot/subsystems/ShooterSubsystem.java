@@ -86,6 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param isShooting
      */
     public void setIsShooting(boolean isShooting) {
+        System.out.println("Setting is shooting to: " + isShooting);
         m_isShooting = isShooting;
     }
 
@@ -94,9 +95,15 @@ public class ShooterSubsystem extends SubsystemBase {
      * and in the shooter subsystem to true
      */
     public void startShooterMotor() {
-        m_acquisitionSubsystem.stopAcquirerMotor();
-        m_acquisitionSubsystem.deployAcquirer();
-        m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
+        double currentMoveSpeed = RobotContainer.getDrivebaseSubsystem().getCurrentMoveSpeedAverage();
+
+        if(currentMoveSpeed < 0.5 && currentMoveSpeed > -0.5 && !RobotContainer.getClimberSubsystem().isClimbing()) { // make sure the robot is lower than half speed
+                m_acquisitionSubsystem.stopAcquirerMotor();
+                m_acquisitionSubsystem.deployAcquirer();
+                m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
+        } else {
+            System.out.println("Robot is running to fast to start shooter motor");
+        }
     }
 
     /**

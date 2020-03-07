@@ -20,6 +20,7 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
     CANSparkMax climberMotor;
     Solenoid brake, deploy;
     DigitalInput topFlag, bottomFlag;
+    private boolean m_startedClimb;
 
     
     public double climbSpeed = 0.2;
@@ -30,6 +31,8 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
         // register();
 
         climberMotor = new CANSparkMax(42, MotorType.kBrushless);
+
+        m_startedClimb = false;
 
         brake = new Solenoid(1);
         deploy = new Solenoid(2);
@@ -61,6 +64,7 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
 
         new Button(() -> OI.getXboxDpadUp())
             .whenPressed(() -> {
+                m_startedClimb = true;
                 RobotContainer.getAcquisitionSubsystem().deployAcquirer();
                 brake.set(true);
                 deploy.set(true);
@@ -98,5 +102,9 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
         return new MethodCommand(() -> climberMotor.set(-climbSpeed));
         //    .loopWhile(() -> bottomFlag.get())
         //    .andThen(() -> climberMotor.set(0));
+    }
+
+    public boolean isClimbing() {
+        return m_startedClimb;
     }
 }

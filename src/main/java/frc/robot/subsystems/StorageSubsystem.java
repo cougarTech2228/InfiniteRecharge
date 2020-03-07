@@ -71,6 +71,7 @@ public class StorageSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Is Robot Full", m_isFull);
         SmartDashboard.putBoolean("Is Acquire Flag Tripped", !m_inputAcquirePositionChecker.get());
         SmartDashboard.putBoolean("Is Acquire Slot Occupied", !m_inputAcquireBallChecker.get());
+        SmartDashboard.putBoolean("Is Robot Empty", m_ballArray.isEmpty());
     }
 
     /**
