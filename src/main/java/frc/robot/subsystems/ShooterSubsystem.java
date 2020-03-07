@@ -46,7 +46,11 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return If the shooter flag was tripped
      */
     public boolean isShooterPositionTripped() {
-        return !m_inputShooterPositionChecker.get();
+        boolean b = !m_inputShooterPositionChecker.get();
+        if(b) {
+            System.out.println("Shooter Position True");
+        }
+        return b;
     }
 
     /**

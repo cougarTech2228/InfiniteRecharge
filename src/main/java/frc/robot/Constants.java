@@ -104,13 +104,13 @@ public final class Constants {
 	public static final int SHOOTER_CAN_ID = 41;
 	public static final int DRUM_SPARK_PWM_ID = 0;
 
-	public static final int LOOPS_TO_WAIT = 5;
+	public static final int LOOPS_TO_WAIT = 10;
 	public static final double SHOOTER_MOTOR_SPEED = 120000.0;
 	public static final int MIN_SHOOTING_DISTANCE = 61;
 	public static final int MAX_SHOOTING_DISTANCE = 0;
 
-	public static final double TIME_BETWEEN_SHOTS = 0.5;
-	public static final double BOPPER_WAIT_TIME = 0.25;
+	public static final double TIME_BETWEEN_SHOTS = 0.5; // 1.0
+	public static final double BOPPER_WAIT_TIME = 0.1;
 
 	public static final int DRIVE_CURRENT_LIMIT = 60;
 	public static final int DRIVE_CURRENT_DURATION = 100;

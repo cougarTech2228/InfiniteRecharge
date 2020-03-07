@@ -61,23 +61,6 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
         });
         topFlag.setUpSourceEdge(false, true);
         topFlag.enableInterrupts();
-
-        new Button(() -> OI.getXboxDpadUp())
-            .whenPressed(() -> {
-                m_startedClimb = true;
-                RobotContainer.getAcquisitionSubsystem().deployAcquirer();
-                brake.set(true);
-                deploy.set(true);
-                climberMotor.set(climbSpeed);
-            })
-            .whenReleased(() -> climberMotor.set(0));
-
-        new Button(() -> OI.getXboxDpadDown())
-            .whenPressed(() -> {
-                brake.set(false);
-                climberMotor.set(-climbSpeed);
-            })
-            .whenReleased(() -> climberMotor.set(0));
         /*
         new CommandToggler(
             new MethodCommand(() -> deploy.set(true))
@@ -106,5 +89,34 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
 
     public boolean isClimbing() {
         return m_startedClimb;
+    }
+
+    public void deployElevator() {
+        deploy.set(true);
+    }
+    public void retractElevator() {
+        deploy.set(false);
+    }
+    public Command cmdRaiseElevator() {
+        return new MethodCommand(() -> {
+            m_startedClimb = true;
+            RobotContainer.getAcquisitionSubsystem().deployAcquirer();
+            brake.set(true);
+            climberMotor.set(climbSpeed);
+        })
+        .loop()
+        .runOnEnd(() -> {
+            climberMotor.set(0);
+        });
+    }
+    public Command cmdLowerElevator() {
+        return new MethodCommand(() -> {
+            brake.set(false);
+            climberMotor.set(-climbSpeed);
+        })
+        .loop()
+        .runOnEnd(() -> {
+            climberMotor.set(0);
+        });
     }
 }

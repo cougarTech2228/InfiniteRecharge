@@ -18,7 +18,7 @@ public class ShooterMotor {//extends TalonSRXMotor {
     private boolean m_encodersAreAvailable;
     private WPI_TalonSRX m_talon;
 
-    public double m_shooterSpeed = 120000;
+    public double m_shooterSpeed = 90000;
 
     public ShooterMotor() {
         //super(Constants.SHOOTER_CAN_ID);
@@ -30,12 +30,13 @@ public class ShooterMotor {//extends TalonSRXMotor {
 
         // shooterMap.put(Constants.MIN_SHOOTING_DISTANCE, 100000); // distance (in),
         // Velocity
-        m_shooterMap.put(139, 85000);
-        m_shooterMap.put(244, 93500);
+        m_shooterMap.put(122, 75000);
+        m_shooterMap.put(227, 77000);
+        m_shooterMap.put(304, 85000);
 
         m_talon.configFactoryDefault();
         m_encodersAreAvailable =  m_talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK;
-        m_talon.config_kP(0, 0.00682, Constants.kTimeoutMs); //.0465
+        m_talon.config_kP(0, 0.01764, Constants.kTimeoutMs); //.0465
         m_talon.config_kI(0, 0, Constants.kTimeoutMs);
         m_talon.config_kD(0, 0, Constants.kTimeoutMs);
         m_talon.config_kF(0, 0.00851, Constants.kTimeoutMs);
@@ -82,8 +83,8 @@ public class ShooterMotor {//extends TalonSRXMotor {
     }
 
     public void start(int distance) {
-        //m_talon.set(ControlMode.Velocity, m_shooterMap.get(closestDistance(distance)));
-        m_talon.set(ControlMode.Velocity, m_shooterSpeed);
+        m_talon.set(ControlMode.Velocity, m_shooterMap.get(closestDistance(distance)));
+        //m_talon.set(ControlMode.Velocity, m_shooterSpeed);
     }
 
     public void stop() {
