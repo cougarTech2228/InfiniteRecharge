@@ -18,7 +18,7 @@ public class ShooterMotor {//extends TalonSRXMotor {
     private boolean m_encodersAreAvailable;
     private WPI_TalonSRX m_talon;
 
-    public double m_shooterSpeed = 90000;
+    private double m_shooterSpeed = 105000;
 
     public ShooterMotor() {
         //super(Constants.SHOOTER_CAN_ID);
@@ -30,6 +30,8 @@ public class ShooterMotor {//extends TalonSRXMotor {
 
         // shooterMap.put(Constants.MIN_SHOOTING_DISTANCE, 100000); // distance (in),
         // Velocity
+        m_shooterMap.put(80, 10500);
+        m_shooterMap.put(97, 87500);
         m_shooterMap.put(122, 75000);
         m_shooterMap.put(227, 77000);
         m_shooterMap.put(304, 85000);
@@ -75,20 +77,25 @@ public class ShooterMotor {//extends TalonSRXMotor {
         // // (int)value); })
         // .addDoubleText("TargetVel", 0, value -> m_talon.set(ControlMode.Velocity,
         // value))
-        .addDouble("Velocity Error", 0, () -> m_talon.getClosedLoopError());
-        //.addDouble("Velocity", 0, () -> m_talon.getSelectedSensorVelocity());
+        .addDouble("Velocity Error", 0, () -> m_talon.getClosedLoopError())
+        .addDouble("Velocity", 0, () -> m_talon.getSelectedSensorVelocity());
         // .addDouble("Current", 0, () -> m_talon.getSupplyCurrent());
 
         System.out.println(m_encodersAreAvailable);
     }
 
     public void start(int distance) {
+        System.out.println("Distance gettened've'd: " + closestDistance(distance));
         m_talon.set(ControlMode.Velocity, m_shooterMap.get(closestDistance(distance)));
         //m_talon.set(ControlMode.Velocity, m_shooterSpeed);
     }
 
     public void stop() {
         m_talon.set(ControlMode.Velocity, 0);
+    }
+
+    public double getSpeed() {
+        return m_talon.getSelectedSensorVelocity();
     }
 
     public WPI_TalonSRX getTalon() {

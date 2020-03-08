@@ -16,10 +16,19 @@ public class BopperCommand extends SequentialCommandGroup {
 
     public BopperCommand(ShooterSubsystem shooterSubsystem) {
         addCommands(
-            new PrintCommand("Bopping ...")
-            .andThen(() -> shooterSubsystem.raiseBopper()),
-            new WaitCommand(Constants.BOPPER_WAIT_TIME)
-            .andThen(() -> shooterSubsystem.lowerBopper())
+           new PrintCommand("Bopping...?")
+           .andThen(() -> {
+               if(shooterSubsystem.getIsRunningShooterMotor()) {
+                    new SequentialCommandGroup(
+                        new PrintCommand("Bopping ...")
+                        .andThen(() -> shooterSubsystem.raiseBopper()),
+                        new WaitCommand(Constants.BOPPER_WAIT_TIME)
+                        .andThen(() -> shooterSubsystem.lowerBopper())
+                    ).schedule();
+               } else {
+                   System.out.println("Can't bop, shooter motor isn't on");
+               }
+           })
         );
         // Use addRequirements() here to declare subsystem dependencies.
         // addRequirements(shooterSubsystem);

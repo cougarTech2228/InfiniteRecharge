@@ -128,89 +128,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    // --------------------------Ryan's controls--------------------------------
+    new DriverMappings("Tucker AKA Brix4thot / Zach", () -> {
 
-    new DriverMappings("Ryan the epic gamer", () -> {
+      // --------------------------------------Acquirer Buttons-----------------------------------------------------
 
-      new CommandToggler() // Shoot Entire Drum Toggle - Right Trigger
-          .setDefaultState(CommandState.Interruptible)
-          .addJumpCommand (
-            getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)),
-            CommandState.Interruptible
-          )
-          .addCommand(null)
-          .setToggleButton(OI::getXboxRightTriggerPressed)
-          .setCycle(true);
-
-      // Shoot when held - Left Trigger
-      new Button(OI::getXboxLeftTriggerPressed).whenHeld(getShootWhenHeld().beforeStarting(() -> {
-        new SequentialCommandGroup(
-          new InstantCommand(() -> m_shooterSubsystem.setIsShooting(true)),
-            getRotateDrumOneSectionCommand()
-        ).schedule();
-      }));
-
-      new CommandToggler( // Shooter Motor Toggle - Left Bumper
-          new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
-          new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem)
-      )
-      .setDefaultState(CommandState.Interruptible)
-      .setToggleButton(OI::getXboxLeftBumper)
-      .setCycle(true);
-
-      new CommandToggler( // Drum Motor Toggle - A Button
-          new InstantCommand(m_storageSubsystem::startDrumMotor, m_storageSubsystem),
-          new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem)
-      )
-      .setDefaultState(CommandState.Interruptible)
-      .setToggleButton(OI::getXboxAButton)
-      .setCycle(true);
-
-      new CommandToggler( // Drum Motor Backwards Toggle - B Button
-          new InstantCommand(m_storageSubsystem::startDrumMotorBackwards, m_storageSubsystem),
-          new InstantCommand(m_storageSubsystem::stopDrumMotor, m_storageSubsystem)
-      )
-      .setDefaultState(CommandState.Interruptible)
-      .setToggleButton(OI::getXboxBButton)
-      .setCycle(true);
-
-      new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-          new SequentialCommandGroup(
-              new PrintCommand("Deploy Acquirer")
-              .andThen(() -> m_acquisitionSubsystem.startAcquirerMotor(false))
-              .andThen(() -> m_acquisitionSubsystem.deployAcquirer())
-          ),
-          new SequentialCommandGroup(
-              new PrintCommand("Retract Acquirer")
-              .andThen(() -> m_acquisitionSubsystem.stopAcquirerMotor())
-              .andThen(() -> m_acquisitionSubsystem.retractAcquirer())
-          )
-      )
-      .setDefaultState(CommandState.Interruptible)
-      .setToggleButton(OI::getXboxRightBumper)
-      .setCycle(true);
-      
-      new CommandToggler( // Deploy/Retract Elevator toggle - start button
-          new InstantCommand(m_climberSubsystem::deployElevator),
-          new InstantCommand(m_climberSubsystem::retractElevator)
-      )
-      .setDefaultState(CommandState.Interruptible)
-      .setToggleButton(OI::getXboxStartButton)
-      .setCycle(true);
-            
-      new Button(OI::getXboxDpadUp).whenHeld(m_climberSubsystem.cmdRaiseElevator());
-      new Button(OI::getXboxDpadDown).whenHeld(m_climberSubsystem.cmdLowerElevator());
-
-      // new Button(OI::getXboxXButton).whenPressed(() -> m_controlPanelSubsystem.startMotor());
-      // new Button(OI::getXboxYButton).whenPressed(() -> m_controlPanelSubsystem.stopMotor());
-
-      new Button(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
-      new Button(OI::getXboxYButton).whenPressed(getPositionControlPanelCommand());
-    });
-
-    // ---------------------------------Tucker's Controls--------------------------
-
-    new DriverMappings("Tucker AKA Brix4thot", () -> {
       new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor(false));
       new Button(OI::getXboxRightTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
 
@@ -218,18 +139,14 @@ public class RobotContainer {
       new Button(OI::getXboxLeftTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
 
       new CommandToggler( // Acquirer Motor Toggle - Right Bumper
-          new SequentialCommandGroup(
-              new InstantCommand(() -> m_acquisitionSubsystem.startAcquirerMotor(false)),
-              new InstantCommand(m_acquisitionSubsystem::deployAcquirer)
-          ),
-          new SequentialCommandGroup(
-              new InstantCommand(m_acquisitionSubsystem::stopAcquirerMotor),
-              new InstantCommand(m_acquisitionSubsystem::retractAcquirer)
-          )
+          new InstantCommand(m_acquisitionSubsystem::deployAcquirer),
+          new InstantCommand(m_acquisitionSubsystem::retractAcquirer)
       )
       .setDefaultState(CommandState.Interruptible)
       .setToggleButton(OI::getXboxRightBumper)
       .setCycle(true);
+
+      //--------------------------------------Shooter Buttons--------------------------------------------------------
 
       new CommandToggler( // Shooter Motor Toggle - Left Bumper
           new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
@@ -239,18 +156,7 @@ public class RobotContainer {
       .setToggleButton(OI::getXboxLeftBumper)
       .setCycle(true);
 
-      new CommandToggler( // Deploy/Retract Elevator toggle - start button
-          new InstantCommand(m_climberSubsystem::deployElevator),
-          new InstantCommand(m_climberSubsystem::retractElevator)
-      )
-      .setDefaultState(CommandState.Interruptible)
-      .setToggleButton(OI::getXboxStartButton)
-      .setCycle(true);
-
-      new Button(OI::getXboxDpadUp).whenHeld(m_climberSubsystem.cmdRaiseElevator());
-      new Button(OI::getXboxDpadDown).whenHeld(m_climberSubsystem.cmdLowerElevator());
-
-      new CommandToggler() // Shoot Entire Drum Toggle - Right Trigger
+      new CommandToggler() // Shoot Entire Drum Toggle - A Button
           .setDefaultState(CommandState.Interruptible)
           .addJumpCommand(
             getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)),
@@ -260,11 +166,127 @@ public class RobotContainer {
           .setToggleButton(OI::getXboxAButton)
           .setCycle(true);
 
-      new Button(OI::getXboxXButton).whenPressed(getShakeDial());
+      //--------------------------------------Elevator Buttons-------------------------------------------------------
+      
+      new CommandToggler( // Deploy/Retract Elevator toggle - start button
+          new InstantCommand(m_climberSubsystem::deployElevator),
+          new InstantCommand(m_climberSubsystem::retractElevator)
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxStartButton)
+      .setCycle(true);
+
+      new Button(OI::getXboxDpadUp).whenHeld(m_climberSubsystem.cmdRaiseElevator());
+      new Button(OI::getXboxDpadDown).whenHeld(m_climberSubsystem.cmdLowerElevator());
+
+      //--------------------------------------Dial Buttons-----------------------------------------------------------
+
+      new Button(OI::getXboxBButton).whenPressed(getShakeDial());
 
     });
 
-    // --------------------------------Zachk's Controls----------------------------------
+    new DriverMappings("Justin our programming overlord", () -> {
+
+        // --------------------------------------Acquirer Buttons-----------------------------------------------------
+
+        new Button(OI::getXboxRightTriggerPressed).whenHeld(getShootWhenHeld().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)));
+
+        new CommandToggler( // Shooter Motor Toggle - Right Bumper
+          new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
+          new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem)
+        )
+        .setDefaultState(CommandState.Interruptible)
+        .setToggleButton(OI::getXboxRightBumper)
+        .setCycle(true);
+
+        new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor(false));
+        new Button(OI::getXboxLeftTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
+
+        new Button(OI::getXboxLeftBumper).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotorReverse());
+        new Button(OI::getXboxLeftBumper).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
+
+        //--------------------------------------Shooter Buttons--------------------------------------------------------
+
+        new CommandToggler( // Acquirer Motor Toggle - Right Joystick Button
+              new InstantCommand(m_acquisitionSubsystem::deployAcquirer),
+              new InstantCommand(m_acquisitionSubsystem::retractAcquirer)
+        )
+        .setDefaultState(CommandState.Interruptible)
+        .setToggleButton(OI::getXboxRightJoystickPress)
+        .setCycle(true);
+
+        //--------------------------------------Elevator Buttons-------------------------------------------------------
+
+        new CommandToggler( // Deploy/Retract Elevator toggle - start button
+            new InstantCommand(m_climberSubsystem::deployElevator),
+            new InstantCommand(m_climberSubsystem::retractElevator)
+        )
+        .setDefaultState(CommandState.Interruptible)
+        .setToggleButton(OI::getXboxStartButton)
+        .setCycle(true);
+
+        new Button(OI::getXboxDpadUp).whenHeld(m_climberSubsystem.cmdRaiseElevator());
+        new Button(OI::getXboxDpadDown).whenHeld(m_climberSubsystem.cmdLowerElevator());
+
+        //--------------------------------------Dial Buttons----------------------------------------------------------
+
+        new Button(OI::getXboxXButton).whenPressed(getShakeDial());
+    });
+
+    new DriverMappings("Diagnostics", () ->{
+        // --------------------------------------Acquirer Buttons-----------------------------------------------------
+
+        new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor(false));
+        new Button(OI::getXboxRightTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
+
+        new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotorReverse());
+        new Button(OI::getXboxLeftTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
+
+        new CommandToggler( // Acquirer Motor Toggle - Right Bumper
+          new InstantCommand(m_acquisitionSubsystem::deployAcquirer),
+          new InstantCommand(m_acquisitionSubsystem::retractAcquirer)
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxRightBumper)
+      .setCycle(true);
+
+      //--------------------------------------Shooter Buttons--------------------------------------------------------
+
+      new CommandToggler( // Shooter Motor Toggle - Left Bumper
+          new InstantCommand(m_shooterSubsystem::startShooterMotor, m_shooterSubsystem),
+          new InstantCommand(m_shooterSubsystem::stopShooterMotor, m_shooterSubsystem)
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxLeftBumper)
+      .setCycle(true);
+
+      new CommandToggler() // Shoot Entire Drum Toggle - A Button
+          .setDefaultState(CommandState.Interruptible)
+          .addJumpCommand(
+            getShootEntireDrumCommand().beforeStarting(() -> m_shooterSubsystem.setIsShooting(true)),
+            CommandState.Interruptible
+          )
+          .addCommand(null)
+          .setToggleButton(OI::getXboxAButton)
+          .setCycle(true);
+
+      //--------------------------------------Elevator Buttons-------------------------------------------------------
+      
+      new CommandToggler( // Deploy/Retract Elevator toggle - start button
+          new InstantCommand(m_climberSubsystem::deployElevator),
+          new InstantCommand(m_climberSubsystem::retractElevator)
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxStartButton)
+      .setCycle(true);
+
+      new Button(OI::getXboxDpadUp).whenHeld(m_climberSubsystem.cmdRaiseElevator());
+      new Button(OI::getXboxDpadDown).whenHeld(m_climberSubsystem.cmdLowerElevator());
+
+      //--------------------------------------Dial Buttons-----------------------------------------------------------
+
+      new Button(OI::getXboxBButton).whenPressed(getShakeDial());
+    });
 
     SmartDashboard.putData(DriverMappings.getChooser());
   }

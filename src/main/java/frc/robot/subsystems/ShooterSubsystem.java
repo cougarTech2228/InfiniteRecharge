@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.motors.ShooterMotor;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,6 +19,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private GarminLidarSubsystem m_garminLidarSubsystem;
     private AcquisitionSubsystem m_acquisitionSubsystem;
     private boolean m_isShooting;
+    private boolean m_isRunningShooterMotor;
 
     public ShooterSubsystem(StorageSubsystem storageSubsystem, GarminLidarSubsystem garminLidarSubsystem, AcquisitionSubsystem acquisitionSubsystem) {
         register();
@@ -29,6 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
         m_inputShooterPositionChecker = new DigitalInput(Constants.SHOOTER_POSITION_DIO);
 
         m_isShooting = false;
+        m_isRunningShooterMotor = false;
     }
 
     @Override
@@ -102,9 +107,14 @@ public class ShooterSubsystem extends SubsystemBase {
         double currentMoveSpeed = RobotContainer.getDrivebaseSubsystem().getCurrentMoveSpeedAverage();
 
         if(currentMoveSpeed < 0.5 && currentMoveSpeed > -0.5 && !RobotContainer.getClimberSubsystem().isClimbing()) { // make sure the robot is lower than half speed
+
+
                 m_acquisitionSubsystem.stopAcquirerMotor();
                 m_acquisitionSubsystem.deployAcquirer();
+                m_isRunningShooterMotor = true;
                 m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
+
+
         } else {
             System.out.println("Robot is running to fast to start shooter motor");
         }
@@ -117,7 +127,16 @@ public class ShooterSubsystem extends SubsystemBase {
     public void stopShooterMotor() {
         m_acquisitionSubsystem.retractAcquirer();
         m_shooterMotor.stop();
+        m_isRunningShooterMotor = false;
         m_isShooting = false;
         RobotContainer.getRotateDrumOneSectionCommand().schedule();
+    }
+
+    public boolean getIsRunningShooterMotor() {
+        return m_isRunningShooterMotor;
+    }
+
+    public ShooterMotor getShooterMotor() {
+        return m_shooterMotor;
     }
 }

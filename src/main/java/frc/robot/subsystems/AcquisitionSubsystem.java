@@ -46,13 +46,13 @@ public class AcquisitionSubsystem extends SubsystemBase {
         //     m_compressor.start();
         // }
 
-        if(RobotContainer.getStorageSubsystem().isAcquireBallOccupied() && m_isRunningAcquirer) {
-            m_stoppedAcquirer = true;
-            stopAcquirerMotor();
-        } else if(!RobotContainer.getStorageSubsystem().isAcquireBallOccupied() && m_stoppedAcquirer) {
-            startAcquirerMotor(true);
-            m_stoppedAcquirer = false;
-        }
+        // if(RobotContainer.getStorageSubsystem().isAcquireBallOccupied() && m_isRunningAcquirer) {
+        //     m_stoppedAcquirer = true;
+        //     stopAcquirerMotor();
+        // } else if(!RobotContainer.getStorageSubsystem().isAcquireBallOccupied() && m_stoppedAcquirer) {
+        //     startAcquirerMotor(true);
+        //     m_stoppedAcquirer = false;
+        // }
 
         SmartDashboard.putBoolean("Is Running Acquirer", m_isRunningAcquirer);
     }
@@ -69,11 +69,11 @@ public class AcquisitionSubsystem extends SubsystemBase {
      */
     public void retractAcquirer() {
         m_acquirerExtender.set(false);
-        new SequentialCommandGroup(
-            new InstantCommand(this::startAcquirerMotorReverse),
-            new WaitCommand(1),
-            new InstantCommand(this::stopAcquirerMotor)
-        ).schedule();
+        // new SequentialCommandGroup(
+        //     new InstantCommand(this::startAcquirerMotorReverse),
+        //     new WaitCommand(1),
+        //     new InstantCommand(this::stopAcquirerMotor)
+        // ).schedule();
     }
 
     /**

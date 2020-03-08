@@ -24,7 +24,8 @@ public class ShootWhenHeldCommand extends CommandBase {
     @Override
     public void initialize() {
         System.out.println("Shoot when held");
-        m_isShooting = false;
+        RobotContainer.getRotateDrumOneSectionCommand()
+        .andThen(() -> m_isShooting = false).schedule();
     }
 
      // Called every time the scheduler runs while the command is scheduled.
