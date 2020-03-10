@@ -3,12 +3,15 @@ package frc.robot.motors;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.RobotBase;
+
 import java.util.HashMap;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.util.Configuration;
 import frc.robot.util.ShuffleboardAdapter;
 
@@ -34,7 +37,7 @@ public class ShooterMotor {//extends TalonSRXMotor {
         m_shooterMap.put(97, 87500);
         m_shooterMap.put(122, 75000);
         m_shooterMap.put(227, 77000);
-        m_shooterMap.put(304, 85000);
+        m_shooterMap.put(304, 82000);
 
         m_talon.configFactoryDefault();
         m_encodersAreAvailable =  m_talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.PID_PRIMARY, Constants.kTimeoutMs) == ErrorCode.OK;
@@ -68,8 +71,8 @@ public class ShooterMotor {//extends TalonSRXMotor {
          * m_talon.setPID(0, new Gains(0.01, 0, 0, 0, 0, 1.0));
          */
 
-        new ShuffleboardAdapter("shooter")
-         .addDoubleText("kP", 0, value -> {m_talon.config_kP(0, value); })
+        //new ShuffleboardAdapter("shooter")
+         //.addDoubleText("kP", 0, value -> {m_talon.config_kP(0, value); })
         // // .addDoubleText("kI", 0, value -> {m_talon.config_kF(0, value); })
         // // .addDoubleText("kD", 0, value -> {m_talon.config_kI(0, value); })
         // .addDoubleText("kF", 0, value -> {m_talon.config_kF(0, value); })
@@ -77,17 +80,24 @@ public class ShooterMotor {//extends TalonSRXMotor {
         // // (int)value); })
         // .addDoubleText("TargetVel", 0, value -> m_talon.set(ControlMode.Velocity,
         // value))
-        .addDouble("Velocity Error", 0, () -> m_talon.getClosedLoopError())
-        .addDouble("Velocity", 0, () -> m_talon.getSelectedSensorVelocity());
+        //.addDouble("Velocity Error", 0, () -> m_talon.getClosedLoopError())
+        //.addDouble("Velocity", 0, () -> m_talon.getSelectedSensorVelocity());
         // .addDouble("Current", 0, () -> m_talon.getSupplyCurrent());
 
         System.out.println(m_encodersAreAvailable);
     }
 
     public void start(int distance) {
-        System.out.println("Distance gettened've'd: " + closestDistance(distance));
-        m_talon.set(ControlMode.Velocity, m_shooterMap.get(closestDistance(distance)));
-        //m_talon.set(ControlMode.Velocity, m_shooterSpeed);
+        System.out.println("Distance: " + closestDistance(distance));
+        double manualVelocity = RobotContainer.getManualVelocity();
+        double velocity = 1.6186 * Math.pow(distance, 2) - (680.53 * distance) + 141735;
+
+        if(manualVelocity == -1) {
+            m_talon.set(ControlMode.Velocity, velocity);
+        } else {
+            m_talon.set(ControlMode.Velocity, manualVelocity);
+        }
+
     }
 
     public void stop() {

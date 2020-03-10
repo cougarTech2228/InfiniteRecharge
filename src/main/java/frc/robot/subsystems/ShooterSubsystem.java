@@ -5,8 +5,6 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.motors.ShooterMotor;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,7 +36,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getTalon().getSelectedSensorVelocity());
+        SmartDashboard.putNumber("Shooter Velocity", m_shooterMotor.getSpeed());
         SmartDashboard.putBoolean("Is Shooter Slot Occupied", !m_inputShooterBallChecker.get());
         SmartDashboard.putBoolean("Is Shooter Flag Blocked" , !m_inputShooterPositionChecker.get());
         SmartDashboard.putBoolean("Is Robot Shooting", m_isShooting);
@@ -51,11 +49,8 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return If the shooter flag was tripped
      */
     public boolean isShooterPositionTripped() {
-        boolean b = !m_inputShooterPositionChecker.get();
-        if(b) {
-            System.out.println("Shooter Position True");
-        }
-        return b;
+        return !m_inputShooterPositionChecker.get();
+        
     }
 
     /**
@@ -106,15 +101,12 @@ public class ShooterSubsystem extends SubsystemBase {
     public void startShooterMotor() {
         double currentMoveSpeed = RobotContainer.getDrivebaseSubsystem().getCurrentMoveSpeedAverage();
 
-        if(currentMoveSpeed < 0.5 && currentMoveSpeed > -0.5 && !RobotContainer.getClimberSubsystem().isClimbing()) { // make sure the robot is lower than half speed
-
-
+        if(currentMoveSpeed < 0.5 && currentMoveSpeed > -0.5 
+            && !RobotContainer.getClimberSubsystem().isClimbing()) { // make sure the robot is lower than half speed
                 m_acquisitionSubsystem.stopAcquirerMotor();
                 m_acquisitionSubsystem.deployAcquirer();
                 m_isRunningShooterMotor = true;
                 m_shooterMotor.start(m_garminLidarSubsystem.getAverage());
-
-
         } else {
             System.out.println("Robot is running to fast to start shooter motor");
         }
@@ -125,7 +117,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * and in the shooter subsystem to false. Rotates the drum back to acquire position.
      */
     public void stopShooterMotor() {
-        m_acquisitionSubsystem.retractAcquirer();
+        //m_acquisitionSubsystem.retractAcquirer();
         m_shooterMotor.stop();
         m_isRunningShooterMotor = false;
         m_isShooting = false;

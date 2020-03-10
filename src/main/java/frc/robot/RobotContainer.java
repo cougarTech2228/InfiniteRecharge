@@ -53,6 +53,7 @@ public class RobotContainer {
   private final static ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   private final static SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+  private final static SendableChooser<Double> m_manualVelocityChooser = new SendableChooser<>();
   // private final static TrajectoryCommand m_centerTrajectoryCommand = new
   // TrajectoryCommand(m_trajectoryManager.getCenterTrajectory(),
   // m_drivebaseSubsystem);
@@ -77,6 +78,15 @@ public class RobotContainer {
 
   // Use this method to define shuffleboard buttons or widgets
   private void configureShuffleboardBindings() {
+
+    // Velocity Options
+
+    SmartDashboard.putData("Velocity Chooser", m_manualVelocityChooser);
+    m_manualVelocityChooser.setDefaultOption("Use Lidar", -1.0);
+    m_manualVelocityChooser.addOption("Initiation Line", 75000.0);
+    m_manualVelocityChooser.addOption("Trench", 77000.0);
+    m_manualVelocityChooser.addOption("Control Panel", 85000.0);
+    m_manualVelocityChooser.addOption("Diagnostic Velocity", 30000.0);
 
     // Command Buttons
 
@@ -109,8 +119,8 @@ public class RobotContainer {
         new InstantCommand(() -> m_shooterSubsystem.setIsShooting(false), m_shooterSubsystem));
     SmartDashboard.putData("Rotate drum one index", getRotateDrumOneSectionCommand());
     SmartDashboard.putData("Bopper", getBopperCommand());
-    SmartDashboard.putData("Shake Dial", getShakeDial());
-    SmartDashboard.putData("Run Acquirer Motor", new InstantCommand(() -> m_acquisitionSubsystem.startAcquirerMotor(false)));
+    SmartDashboard.putData("Wiggle", getShakeDial());
+    SmartDashboard.putData("Run Acquirer Motor", new InstantCommand(() -> m_acquisitionSubsystem.startAcquirerMotor()));
     SmartDashboard.putData("Stop Acquirer Motor", new InstantCommand(m_acquisitionSubsystem::stopAcquirerMotor));
     SmartDashboard.putData("Deploy Acquirer", new InstantCommand(m_acquisitionSubsystem::deployAcquirer));
     SmartDashboard.putData("Retract Acquirer", new InstantCommand(m_acquisitionSubsystem::retractAcquirer));
@@ -132,7 +142,7 @@ public class RobotContainer {
 
       // --------------------------------------Acquirer Buttons-----------------------------------------------------
 
-      new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor(false));
+      new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor());
       new Button(OI::getXboxRightTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
 
       new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotorReverse());
@@ -183,6 +193,9 @@ public class RobotContainer {
 
       new Button(OI::getXboxBButton).whenPressed(getShakeDial());
 
+      new Button(OI::getXboxXButton).whenPressed(getRotateControlPanelCommand());
+      new Button(OI::getXboxYButton).whenPressed(getPositionControlPanelCommand());
+
     });
 
     new DriverMappings("Justin our programming overlord", () -> {
@@ -199,7 +212,7 @@ public class RobotContainer {
         .setToggleButton(OI::getXboxRightBumper)
         .setCycle(true);
 
-        new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor(false));
+        new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor());
         new Button(OI::getXboxLeftTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
 
         new Button(OI::getXboxLeftBumper).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotorReverse());
@@ -233,10 +246,10 @@ public class RobotContainer {
         new Button(OI::getXboxXButton).whenPressed(getShakeDial());
     });
 
-    new DriverMappings("Diagnostics", () ->{
+    new DriverMappings("Diagnostics", () -> {
         // --------------------------------------Acquirer Buttons-----------------------------------------------------
 
-        new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor(false));
+        new Button(OI::getXboxRightTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotor());
         new Button(OI::getXboxRightTriggerPressed).whenReleased(() -> m_acquisitionSubsystem.stopAcquirerMotor());
 
         new Button(OI::getXboxLeftTriggerPressed).whenPressed(() -> m_acquisitionSubsystem.startAcquirerMotorReverse());
@@ -306,6 +319,10 @@ public class RobotContainer {
 
   public static RumbleCommand getRumbleCommand(double time) {
     return new RumbleCommand(time);
+  }
+
+  public static Double getManualVelocity() {
+    return m_manualVelocityChooser.getSelected();
   }
 
   // Control Panel Commands

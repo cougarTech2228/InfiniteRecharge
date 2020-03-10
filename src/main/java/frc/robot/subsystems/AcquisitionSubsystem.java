@@ -83,19 +83,19 @@ public class AcquisitionSubsystem extends SubsystemBase {
      * this should be only be true when the method is used for restarting the motor in the periodic of
      * the acquistion subsystem.
      */
-    public void startAcquirerMotor(boolean shouldWait) {
+    public void startAcquirerMotor() {//boolean shouldWait) {
         if(!RobotContainer.getClimberSubsystem().isClimbing()) {
-            if(shouldWait) {
-                new SequentialCommandGroup(
-                    new WaitCommand(0.5)
-                    .andThen(() -> m_acquisitionMotor.set(Constants.ACQUIRER_MOTOR_SPEED))
-                ).schedule();
-            } else {
+            // if(shouldWait) {
+            //     new SequentialCommandGroup(
+            //         new WaitCommand(0.5)
+            //         .andThen(() -> m_acquisitionMotor.set(Constants.ACQUIRER_MOTOR_SPEED))
+            //     ).schedule();
+            // } else {
                 m_acquisitionMotor.set(Constants.ACQUIRER_MOTOR_SPEED);
-            }
-            
+            //}
+            m_isRunningAcquirer = true;
         }
-        m_isRunningAcquirer = true;
+        
     }
 
     /**

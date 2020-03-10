@@ -147,11 +147,7 @@ public class StorageSubsystem extends SubsystemBase {
      * @return If the acquire flag was tripped
      */
     public boolean isAcquirePositionTripped() {
-        boolean b = !m_inputAcquirePositionChecker.get();
-        if(b) {
-            System.out.println("Storage Position True");
-        }
-        return b;
+        return !m_inputAcquirePositionChecker.get();
     }
 
     /**
