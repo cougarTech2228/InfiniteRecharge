@@ -126,6 +126,8 @@ public final class Constants {
 
 	public static final int ACQUIRER_CURRENT_THRESHOLD = 2;
 	
+	public static final double ELEVATOR_DEPLOY_SPEED_LOWER = 0.5;
+
 	/**
 	 * Number of joystick buttons to poll. 10 means buttons[1,9] are polled, which
 	 * is actually 9 buttons.

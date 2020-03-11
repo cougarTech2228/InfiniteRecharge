@@ -89,7 +89,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		DriverMappings.apply();
+		//DriverMappings.apply();
 		RobotContainer.getDrivebaseSubsystem().setAutonomous(false);
 		//RobotContainer.getDrivebaseSubsystem().getRamseteController().setEnabled(false);
 

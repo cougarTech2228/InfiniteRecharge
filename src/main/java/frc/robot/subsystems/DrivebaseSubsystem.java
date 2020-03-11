@@ -35,6 +35,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private Pose2d m_savedPose;
 
 	private boolean m_isAutonomous = true;
+	private boolean m_shouldHalfSpeed;
 
 	public DrivebaseSubsystem() {
 
@@ -105,6 +106,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		// resetOdometry();
 
 		// m_ramseteController = new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA);
+
+		m_shouldHalfSpeed = false;
 	}
 
 	/* Zero all sensors used */
@@ -154,6 +157,11 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		double forward = OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
 
+		if(m_shouldHalfSpeed) {
+			forward *= Constants.ELEVATOR_DEPLOY_SPEED_LOWER;
+			turn *= Constants.ELEVATOR_DEPLOY_SPEED_LOWER;
+		} 
+
 		forward = deadband(forward);
 		turn = deadband(turn) * 0.65;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn); 
@@ -162,6 +170,10 @@ public class DrivebaseSubsystem extends SubsystemBase {
 
 	public double getCurrentMoveSpeedAverage() {
 		return (m_leftMaster.get() + m_rightMaster.get()) / 2;
+	}
+
+	public void setShouldHalfSpeed(boolean shouldHalfSpeed) {
+		m_shouldHalfSpeed = shouldHalfSpeed;
 	}
 
 	@Override

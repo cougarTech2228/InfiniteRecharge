@@ -99,7 +99,8 @@ public class ControlPanelSubsystem extends SubsystemBase {
         // Put code here to be run every loop
         // Put methods for controlling this subsystem
         // here. Call these from Commands.
-        SmartDashboard.putString("Current color", getCurrentColor());
+        //SmartDashboard.putString("Current color", getCurrentColor());
+        SmartDashboard.putString("FMS color", parseGameData());
     }
 
     // Put methods for controlling this subsystem
