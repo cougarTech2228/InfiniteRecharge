@@ -6,8 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
- * The ContinuousCommand class is meant to be used to easily define commands. It
- * can be used to run any methods it has access to, or define its own to use.
+ * The ContinuousCommand class is meant to be used to easily define commands with complex logic
  */
 public class ContinuousCommand extends CommandBase {
     private Controller controller;
@@ -17,6 +16,10 @@ public class ContinuousCommand extends CommandBase {
     private boolean cancelOnFinished;
     private Command runOnEnd;
 
+    /**
+     * define a ContinuousCommand with the specified conditions
+     * <p>Note: all commands that are run in a single iteration are executed parallelly to eachother</p>
+     */
     public ContinuousCommand(Function<Controller, Controller> conditions) {
         this.conditions = conditions;
         this.isFinished = false;
@@ -25,7 +28,7 @@ public class ContinuousCommand extends CommandBase {
     }
     private void startNext() {
         if(!controller.isFinished) {
-            controller.activeCommand.andThen(() -> {
+            controller.getActiveCommand().andThen(() -> {
                 if(controller.afterwardStop || isFinished) {
                     isFinished = true;
                 } else {
@@ -62,7 +65,7 @@ public class ContinuousCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         if(cancelOnFinished) {
-            controller.activeCommand.cancel();
+            controller.getActiveCommand().cancel();
         }
         if(runOnEnd != null) {
             runOnEnd.schedule();
@@ -76,6 +79,9 @@ public class ContinuousCommand extends CommandBase {
         runOnEnd = new MethodCommand(r);
         return this;
     }
+    /**
+     * The Controller has a crap ton of options to very quickly and easily define complex logic for commands
+     */
     public final class Controller {
         private int iteration;
         private Boolean when;
@@ -90,84 +96,128 @@ public class ContinuousCommand extends CommandBase {
             this.wasJustTrue = false;
             this.afterwardStop = false;
         }
+        /**
+         * gets how many times this controller has been checked
+         */
         public int getIteration() {
             return iteration;
         }
+        /**
+         * ends if the previous condition returned true
+         */
         public Controller endAfterward() {
             if(wasJustTrue) afterwardStop = true;
             return this;
         }
+        /**
+         * ends if the condition is true
+         */
         public Controller endWhen(boolean b) {
             wasJustTrue = false;
             if(b) isFinished = true;
             return this;
         }
+        /**
+         * ends on the specified iteration. It skips running the commands
+         */
         public Controller endOn(int iteration) {
             wasJustTrue = false;
             if(this.iteration == iteration) isFinished = true;
             return this;
         }
+        /**
+         * ends after the specified iteration
+         */
         public Controller endAfter(int iteration) {
             wasJustTrue = false;
             if(this.iteration == iteration + 1) isFinished = true;
             return this;
         }
-        public Controller when(boolean b, Command c) {
+        /**
+         * when the condition is true, the command is scheduled to run
+         */
+        public Controller when(boolean condition, Command command) {
             wasJustTrue = false;
-            if(b) {
-                addCommand(c);
+            if(condition) {
+                addCommand(command);
                 wasJustTrue = true;
             }
-            when = b;
+            when = condition;
             return this;
         }
-        public Controller when(boolean b, Runnable r) {
-            return when(b, new MethodCommand(r));
+        /**
+         * when the condition is true, the method is scheduled to run
+         */
+        public Controller when(boolean condition, Runnable method) {
+            return when(condition, new MethodCommand(method));
         }
-        public Controller otherwiseWhen(boolean b, Command c) {
+        /**
+         * if the previous condition is false, and this one is true, the command is scheduled to run
+         */
+        public Controller otherwiseWhen(boolean condition, Command command) {
             wasJustTrue = false;
             if(when == null) {
                 //ahh
             }
-            else if(!when && b) {
-                addCommand(c);
+            else if(!when && condition) {
+                addCommand(command);
                 wasJustTrue = true;
             }
-            when = when || b;
+            when = when || condition;
             return this;
         }
-        public Controller otherwiseWhen(boolean b, Runnable r) {
-            return otherwiseWhen(b, new MethodCommand(r));
+        /**
+         * if the previous condition is false, and this one is true, the method is scheduled to run
+         */
+        public Controller otherwiseWhen(boolean condition, Runnable method) {
+            return otherwiseWhen(condition, new MethodCommand(method));
         }
-        public Controller otherwise(Command c) {
+        /**
+         * if all previous conditions are false, this command is scheduled to run
+         */
+        public Controller otherwise(Command command) {
             wasJustTrue = false;
             if(when == null) {
                 //ahh
             }
             else if(!when) {
-                addCommand(c);
+                addCommand(command);
                 wasJustTrue = true;
             }
             when = null;
             return this;
         }
-        public Controller otherwise(Runnable r) {
-            return otherwise(new MethodCommand(r));
+        /**
+         * if all previous conditions are false, this method is scheduled to run
+         */
+        public Controller otherwise(Runnable method) {
+            return otherwise(new MethodCommand(method));
         }
-        public Controller run(Command c) {
+        /**
+         * this command will run each iteration, unconditionally
+         */
+        public Controller run(Command command) {
             wasJustTrue = false;
-            addCommand(c);
+            addCommand(command);
             return this;
         }
-        public Controller run(Runnable r) {
-            return run(new MethodCommand(r));
+        /**
+         * this method will run once each iteration, unconditionally
+         */
+        public Controller run(Runnable method) {
+            return run(new MethodCommand(method));
         }
-        private void addCommand(Command c) {
+        private void addCommand(Command command) {
             if(activeCommand == null) {
-                activeCommand = c;
+                activeCommand = command;
             } else {
-                activeCommand = activeCommand.alongWith(c);
+                activeCommand = activeCommand.alongWith(command);
             }
+        }
+        private Command getActiveCommand() {
+            if(activeCommand == null)
+                return new MethodCommand();
+            return activeCommand;
         }
     }
 }

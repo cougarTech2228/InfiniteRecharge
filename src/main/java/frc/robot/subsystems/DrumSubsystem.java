@@ -53,7 +53,7 @@ public class DrumSubsystem extends SubsystemBase {
 
     }
     /**
-     * This command independently schedules the TryShootOnce command while active to allow the driver to hold shoot while holding a button
+     * This command shoots repeatedly while holding a button
      */
     public Command cmdShootWhileHeld() {
         return new ContinuousCommand(c -> c
@@ -61,13 +61,14 @@ public class DrumSubsystem extends SubsystemBase {
         ).runOnEnd(cmdSetMode(StorageState.Acquiring));
     }
     /**
-     * Spins drum until a ball is loaded, then shoots
+     * Spins drum until a ball located, then shoots
      */
     public Command cmdShootNext() {
         return cmdSetMode(StorageState.Shooting)
         .andThen(
             new ContinuousCommand(c -> c
-                .when(!m_shootBallChecker.get(), cmdBop())
+                .when(!m_shootBallChecker.get(), cmdBop().andThen(cmdRotateDrumOnce()))
+                .endAfterward()
                 .otherwise(new WaitCommand(0.04).andThen(cmdRotateDrumOnce()))
                 .endAfter(5)
             ),

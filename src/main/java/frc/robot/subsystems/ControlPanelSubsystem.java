@@ -33,6 +33,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
     private final Color m_kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
     public ControlPanelSubsystem() {
+        register();
 
         m_newWheelTalonSRX = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
 
@@ -40,8 +41,6 @@ public class ControlPanelSubsystem extends SubsystemBase {
         m_colorMatcher.addColorMatch(m_kGreenTarget);
         m_colorMatcher.addColorMatch(m_kRedTarget);
         m_colorMatcher.addColorMatch(m_kYellowTarget);
-
-        register();
     }
 
     @Override
@@ -49,8 +48,14 @@ public class ControlPanelSubsystem extends SubsystemBase {
         SmartDashboard.putString("FMS color", parseGameData());
     }
 
+    /**
+     * Spins to the color specified by the gameData at a certain speed
+     */
     public Command cmdSpinToColor(double speed) {
-        return new MethodCommand(() -> gameData = parseGameData()).andThen(
+        return new MethodCommand(() -> {
+            gameData = parseGameData();
+            m_newWheelTalonSRX.set(speed);
+        }).andThen(
             new ContinuousCommand(c -> c
                 .when(
                     gameData.equals(getCurrentColor()) && getConfidence() > .97,
@@ -60,7 +65,11 @@ public class ControlPanelSubsystem extends SubsystemBase {
             )
         );
     }
+
     private String spinStartColor;
+    /**
+     * Spins the color wheel 4 times, counting by color
+     */
     public Command cmdSpin4Times() {
         return new ContinuousCommand(c -> c
             .when(c.getIteration() == 0, () -> m_newWheelTalonSRX.set(0.5))
@@ -77,11 +86,19 @@ public class ControlPanelSubsystem extends SubsystemBase {
         .runOnEnd(() -> m_newWheelTalonSRX.set(0))
         .beforeStarting(() -> spinStartColor = getCurrentColor());
     }
+
+    /**
+     * Spins the color wheel while the command is active
+     */
     public Command cmdSpinWhileActive() {
         return new MethodCommand(() -> m_newWheelTalonSRX.set(0.5))
             .runOnEnd(() -> m_newWheelTalonSRX.set(0))
             .perpetually();
     }
+
+    /**
+     * gets the current color
+     */
     public String getCurrentColor() 
     {
         Color detectedColor = m_colorSensor.getColor();
@@ -99,12 +116,19 @@ public class ControlPanelSubsystem extends SubsystemBase {
             return "UnknownColor";
         }
     }
+
+    /**
+     * gets the sensor's confidence on how sure it is on its color choice
+     */
     public double getConfidence() {
         Color detectedColor = m_colorSensor.getColor();
         ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
         return match.confidence;
     }
-
+    
+    /**
+     * gets the color from from the driverstation
+     */
     public String parseGameData()
     {
         gameData = DriverStation.getInstance().getGameSpecificMessage();

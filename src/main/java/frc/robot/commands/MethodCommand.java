@@ -26,10 +26,18 @@ public class MethodCommand extends CommandBase {
         this.method = null;
         this.isFinished = false;
     }
+    /**
+     * This method is only useful when the command is told to run perpetually,
+     * if it is perpetual, when the command is canceled, it will run this method
+     */
     public MethodCommand runOnEnd(Runnable method) {
         this.endMethod = method;
         return this;
     }
+    /**
+     * This method is only useful when the command is told to run perpetually,
+     * if it is perpetual, when the command is canceled, it will run this command
+     */
     public MethodCommand runOnEnd(Command command) {
         this.endMethod = () -> command.schedule();
         return this;

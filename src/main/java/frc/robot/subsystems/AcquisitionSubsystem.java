@@ -15,7 +15,13 @@ public class AcquisitionSubsystem extends SubsystemBase {
     private Solenoid m_acquirerExtender;
     private double acquirerSpeed = 0;
 
+    /**
+     * If any class votes it should not acquire, it will not
+     */
     public final static Concensus shouldAcquire = new Concensus(ConcensusMode.All);
+    /**
+     * If any class votes it should extend, it will
+     */
     public final static Concensus shouldAcquirerExtend = new Concensus(ConcensusMode.Any);
 
     public AcquisitionSubsystem() {
@@ -32,33 +38,35 @@ public class AcquisitionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //if other classes want it to run, it will use its speed, otherwise it'll stop
         m_acquisitionMotor.set(shouldAcquire.getConcensus() ? acquirerSpeed : 0);
+
+        //if other classes want it to extend it will
         m_acquirerExtender.set(shouldAcquirerExtend.getConcensus());
     }
     /**
-     * Deploys the acquirer by setting the solenoid to true
+     * Deploys the acquirer
      */
     public Command cmdDeployAcquirer() {
         return new MethodCommand(() -> shouldAcquirerExtend.vote(true));
     }
     /**
-     * Retracts the acquirer by setting the solenoid to false
+     * Retracts the acquirer unless other classes have told it to stay extended
      */
     public Command cmdRetractAcquirer() {
         return new MethodCommand(() -> shouldAcquirerExtend.vote(false));
     }
     /**
-     * Starts the acquirer motor
-     * 
-     * @param shouldWait determines if we should wait before starting the motor,
-     * this should be only be true when the method is used for restarting the motor in the periodic of
-     * the acquistion subsystem.
+     * turns on the acquirer, pulling balls in, unless disabled
      */
     public Command cmdAcquireForwards() {
         return new MethodCommand(() -> acquirerSpeed = Constants.ACQUIRER_MOTOR_SPEED)
         .runOnEnd(() -> acquirerSpeed = 0)
         .perpetually();
     }
+    /**
+     * turns on the acquirer, pushing balls out, unless disabled
+     */
     public Command cmdAcquireBackwards() {
         return new MethodCommand(() -> acquirerSpeed = -Constants.ACQUIRER_MOTOR_SPEED)
         .runOnEnd(() -> acquirerSpeed = 0)

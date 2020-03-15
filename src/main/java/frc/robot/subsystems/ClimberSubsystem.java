@@ -36,6 +36,7 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
 
         brake.set(false);
 
+        //Sets up interrupts to immediately stop the elevator when it reaches a flag 
         bottomFlag.requestInterrupts(new InterruptHandlerFunction<Object>() {
             @Override
             public void interruptFired(int interruptAssertedMask, Object param) {
@@ -54,6 +55,10 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
         topFlag.setUpSourceEdge(false, true);
         topFlag.enableInterrupts();
     }
+    /**
+     * Deploys the elevator and limits the shooter and acquisition subsystems
+     * while also telling the drivebase to slow
+     */
     public Command cmdDeployElevator() {
         return new MethodCommand(() -> {
             deploy.set(true);
@@ -63,6 +68,10 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
             AcquisitionSubsystem.shouldAcquire.vote(false);
         });
     }
+    /**
+     * Retracts the elevator and unlimits other subsystems
+     * while resuming the drivebase to normal speed
+     */
     public Command cmdRetractElevator() {
         return new MethodCommand(() -> {
             deploy.set(false);
@@ -72,6 +81,10 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
             AcquisitionSubsystem.shouldAcquire.vote(true);
         });
     }
+    /**
+     * Raises the elevator when active, unless it hits a limit switch
+     * <p>If the elevator is not deployed, it will deploy it</p>
+     */
     public Command cmdRaiseElevator() {
         return cmdDeployElevator()
         .andThen(
@@ -83,6 +96,9 @@ public class ClimberSubsystem extends ConfigurableSubsystem {
             .perpetually()
         );
     }
+    /**
+     * Lowers the elevator when active, unless it hits a limit switch
+     */
     public Command cmdLowerElevator() {
         return new MethodCommand(() -> {
             brake.set(false);
