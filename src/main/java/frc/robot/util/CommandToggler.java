@@ -72,6 +72,25 @@ public class CommandToggler {
         return this;
     }
     /**
+     * Adds the specified command onto the toggling list with the specified CommandState
+     * but when this command finishes, it will automatically jump to the next command and run it
+     * @param command
+     * @param state
+     */
+    public CommandToggler addJumpCommand(Command command, CommandState state) {
+        addCommand(command.andThen(() -> runIndex(currentIndex + 1)), state);
+        return this;
+    }
+    /**
+     * Adds the specified command onto the toggling list with the default CommandState
+     * but when this command finishes, it will automatically jump to the next command and run it
+     * @param command
+     */
+    public CommandToggler addJumpCommand(Command command) {
+        addJumpCommand(command, defaultCmdState);
+        return this;
+    }
+    /**
      * Adds the specified command onto the toggling list with the default CommandState
      * @param command
      */
@@ -83,6 +102,7 @@ public class CommandToggler {
      * @param state
      * @return
      */
+    @SuppressWarnings("all")
     public CommandToggler setDefaultState(CommandState state) {
         commandStates = new ArrayList<CommandState>();
         for(Command c : commands) {
@@ -95,6 +115,7 @@ public class CommandToggler {
      */
     public CommandToggler startOnEnable() {
         new Button(RobotState::isEnabled).whenActive(() -> {
+            System.out.println("enabled");
             runIndex(0);
         });
         return this;
@@ -106,7 +127,10 @@ public class CommandToggler {
      * @param condition the condition that must be fulfilled
      */
     public CommandToggler jumpTo(int index, BooleanSupplier condition) {
-        new Trigger(condition).whenActive(() -> runIndex(index));
+        new Trigger(condition).whenActive(() -> {
+            runIndex(index);
+            System.out.println("GAMMER");
+        });
         return this;
     }
     /**
@@ -127,10 +151,15 @@ public class CommandToggler {
     public CommandToggler setToggleButton(BooleanSupplier pressed) {
         return setToggleButton(new Button(pressed));
     }
+
     private void runIndex(int index) {
-        if(index > commands.size() - 1) index = cycle ? 0 : currentIndex;
-        else if(index < 0) index = cycle ? commands.size() - 1 : currentIndex;
-        else {
+        if (index > commands.size() - 1) {
+            index = cycle ? 0 : currentIndex;
+        }
+        else if (index < 0) {
+            index = cycle ? commands.size() - 1 : currentIndex;
+        }
+        if(currentIndex != index) {
             if(currentIndex != -1) {
                 CommandState state = commandStates.get(currentIndex);
                 if(state == CommandState.Precedented && !commands.get(currentIndex).isFinished()) {
@@ -151,6 +180,7 @@ public class CommandToggler {
      * @param button = a Button object
      */
     public CommandToggler setToggleButton(Button button) {
+        
         if(upButton == null) {
             upButton = button;
             upButton.whenPressed(() -> {

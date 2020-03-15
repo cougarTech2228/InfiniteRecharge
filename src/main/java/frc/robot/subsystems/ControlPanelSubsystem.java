@@ -1,42 +1,26 @@
 package frc.robot.subsystems;
 
-//import frc.robot.Constants;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.OI;
-import frc.robot.RobotContainer;
-
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.InterruptHandlerFunction;
-
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.util.Color;
-
-import com.revrobotics.ColorSensorV3;
-import com.revrobotics.ColorMatchResult;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
+import com.revrobotics.ColorSensorV3;
 
-import frc.robot.subsystems.ControlPanelSubsystem;
-import frc.robot.motors.*;
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import java.util.logging.Logger;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 
-/**
- *
- */
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
+import frc.robot.commands.ContinuousCommand;
+import frc.robot.commands.MethodCommand;
+
 public class ControlPanelSubsystem extends SubsystemBase {
 
-    private TalonSRXMotor m_wheelTalonSRX;
     private WPI_TalonSRX m_newWheelTalonSRX;
-    private final static DigitalInput m_digitalInterrupt = new DigitalInput(Constants.DIGITAL_IO_0);
-    private boolean hasFiredRotate;
-    private boolean hasFiredPosition;
-
     private String gameData;
 
     private final I2C.Port m_i2cPort = I2C.Port.kOnboard;
@@ -48,12 +32,8 @@ public class ControlPanelSubsystem extends SubsystemBase {
     private final Color m_kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
     private final Color m_kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
-    private final Logger m_logger = Logger.getLogger(this.getClass().getName());
-
     public ControlPanelSubsystem() {
-        System.out.println("controlpanelsubsystem");
 
-        m_wheelTalonSRX = new TalonSRXMotor(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
         m_newWheelTalonSRX = new WPI_TalonSRX(Constants.CONTROL_PANEL_MOTOR_CAN_ID);
 
         m_colorMatcher.addColorMatch(m_kBlueTarget);
@@ -61,68 +41,47 @@ public class ControlPanelSubsystem extends SubsystemBase {
         m_colorMatcher.addColorMatch(m_kRedTarget);
         m_colorMatcher.addColorMatch(m_kYellowTarget);
 
-        //System.out.println("controlpanelsubsystem");
-        // You need to register the subsystem to get it's periodic
-        // method to be called by the Scheduler
-        CommandScheduler.getInstance().registerSubsystem(this);
-        hasFiredRotate = false;
-        hasFiredPosition = false;
-        // ----------------------------------RotateControlPanelInterrupt----------------------------------
-        m_digitalInterrupt.requestInterrupts(new InterruptHandlerFunction<Object>() {
-
-            @Override
-            public void interruptFired(int interruptAssertedMask, Object param) {
-
-                if (!hasFiredRotate) {
-                    hasFiredRotate = true;
-                    m_digitalInterrupt.disableInterrupts();
-                    System.out.println("interruptFired");
-                    m_logger.info("ControlPanel Digital Interrupt fired");
-                    CommandScheduler.getInstance().schedule(RobotContainer.getRotateControlPanelCommand());
-                }
-            }
-        });
-
-        m_digitalInterrupt.setUpSourceEdge(false, true);
-
-        // Enable digital interrupt pin
-        m_digitalInterrupt.enableInterrupts();
+        register();
     }
 
     @Override
     public void periodic() {
-        // Put code here to be run every loop
-
-    // --------------------------------------PositionControlPanelButton-------------------------------
-    //     if (OI.getXboxBButton() && !hasFiredPosition) {
-    //         hasFiredPosition = true;
-    //         System.out.println("B Button pressed");
-    //         CommandScheduler.getInstance().schedule(RobotContainer.getPositionControlPanelCommand());
-    // }
-
-        // Put methods for controlling this subsystem
-        // here. Call these from Commands.
-        relatchInterrupt();
+        SmartDashboard.putString("FMS color", parseGameData());
     }
 
-    public TalonSRXMotor getTalonSRX() {
-        return m_wheelTalonSRX;
+    public Command cmdSpinToColor(double speed) {
+        return new MethodCommand(() -> gameData = parseGameData()).andThen(
+            new ContinuousCommand(c -> c
+                .when(
+                    gameData.equals(getCurrentColor()) && getConfidence() > .97,
+                    () -> m_newWheelTalonSRX.set(0)
+                )
+                .endAfterward()
+            )
+        );
     }
-
-    public WPI_TalonSRX getNewTalonSRX() {
-        return m_newWheelTalonSRX;
+    private String spinStartColor;
+    public Command cmdSpin4Times() {
+        return new ContinuousCommand(c -> c
+            .when(c.getIteration() == 0, () -> m_newWheelTalonSRX.set(0.5))
+            .when(c.getIteration() == 4, () -> m_newWheelTalonSRX.set(0.2))
+            .run(
+                new WaitCommand(1).andThen(
+                    new ContinuousCommand(c2 -> c2
+                        .endWhen(spinStartColor.equals(getCurrentColor()) && getConfidence() > .97)
+                    )
+                )
+            )
+            .endAfter(4)
+        )
+        .runOnEnd(() -> m_newWheelTalonSRX.set(0))
+        .beforeStarting(() -> spinStartColor = getCurrentColor());
     }
-
-    public void relatchInterrupt() {
-        if (OI.getXboxAButton()) 
-        {
-            hasFiredPosition = false;
-            hasFiredRotate = false;
-            //System.out.println("Reseting interrupt");
-            m_digitalInterrupt.enableInterrupts();
-        }
+    public Command cmdSpinWhileActive() {
+        return new MethodCommand(() -> m_newWheelTalonSRX.set(0.5))
+            .runOnEnd(() -> m_newWheelTalonSRX.set(0))
+            .perpetually();
     }
-
     public String getCurrentColor() 
     {
         Color detectedColor = m_colorSensor.getColor();
@@ -139,6 +98,11 @@ public class ControlPanelSubsystem extends SubsystemBase {
         } else {
             return "UnknownColor";
         }
+    }
+    public double getConfidence() {
+        Color detectedColor = m_colorSensor.getColor();
+        ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
+        return match.confidence;
     }
 
     public String parseGameData()
@@ -159,12 +123,10 @@ public class ControlPanelSubsystem extends SubsystemBase {
                 return "Yellow";
             default:
                 return "bork";
-                //This is borked data
             }
         } 
         else 
         {
-            //Code for no data received yet
             return "No Data Received yet";
         }
     }

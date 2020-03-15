@@ -1,21 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
-import frc.robot.commands.*;
-import frc.robot.subsystems.*;
+import frc.robot.commands.MinAutoCommand;
+import frc.robot.subsystems.AcquisitionSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.ControlPanelSubsystem;
+import frc.robot.subsystems.DrivebaseSubsystem;
+import frc.robot.subsystems.DrumSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.CommandToggler;
 import frc.robot.util.CommandToggler.CommandState;
 
@@ -26,119 +20,69 @@ import frc.robot.util.CommandToggler.CommandState;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
-  private final static OI m_oi = new OI();
-
-  // Robot Subsystems
-  //private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
   private final static ControlPanelSubsystem m_controlPanelSubsystem = new ControlPanelSubsystem();
   private final static DrivebaseSubsystem m_drivebaseSubsystem = new DrivebaseSubsystem();
-  private final static DumperSubsystem m_dumperSubsystem = new DumperSubsystem();
   private final static AcquisitionSubsystem m_acquisitionSubsystem = new AcquisitionSubsystem();
   private final static DrumSubsystem m_storageSubsystem = new DrumSubsystem();
-  private final static ShooterSubsystem m_shooterSubsytem = new ShooterSubsystem();
+  private final static ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+  private final static ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
-  // Robot Commands
-  //private final static SampleCommand m_sampleCommand = new SampleCommand(/*m_subSystem*/);
+  private final static SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
   public RobotContainer() {
-    // Configure the button bindings
+    m_autoChooser.setDefaultOption("Minimum Auto", new MinAutoCommand(m_storageSubsystem, m_shooterSubsystem, m_drivebaseSubsystem));
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by instantiating a {@link GenericHID} or one of its subclasses
-   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
-   * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   private void configureButtonBindings() {
-    //Bind driveState Toggler to left bumper
-    new CommandToggler(
-      m_drivebaseSubsystem.cmdUseArcadeDrive(),
-      m_drivebaseSubsystem.cmdUseStraightDrive()
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxLeftJoystickPress)
-    .setCycle(true)
-    .startOnEnable();
+      new Button(OI::getXboxRightTriggerPressed).whenHeld(m_acquisitionSubsystem.cmdAcquireForwards());
 
-    new Button(OI::getXboxRightJoystickPress)
-      .whenPressed(m_drivebaseSubsystem.cmdSetMaxSpeed(0.3))
-      .whenReleased(m_drivebaseSubsystem.cmdSetMaxSpeed(1));
-    //Bind raise/lowering the dumper to right bumper
-    /*
-    new CommandToggler(
-      m_dumperSubsystem.cmdSetPosition(DumperState.raised),
-      m_dumperSubsystem.cmdSetPosition(DumperState.lowered)
-    )
-    .setToggleButton(OI::getXboxRightBumper)
-    .setCycle(true);
-    */
-    //Bind enabling/disabling the aquirer closed loop to the right trigger
-    new CommandToggler(
-      m_acquisitionSubsystem.cmdSetClosedLoop(),
-      null
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxXButton)
-    .setCycle(true);
+      new Button(OI::getXboxLeftTriggerPressed).whenHeld(m_acquisitionSubsystem.cmdAcquireBackwards());
 
-    new Button(() -> OI.getXboxYButton()).whenPressed(m_storageSubsystem.cmdShootAll());
+      new CommandToggler( // Acquirer Motor Toggle - Right Bumper
+          m_acquisitionSubsystem.cmdDeployAcquirer(),
+          m_acquisitionSubsystem.cmdRetractAcquirer()
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxRightBumper)
+      .setCycle(true);
 
-    new Button(OI::getXboxRightTriggerPressed).whenHeld(m_storageSubsystem.cmdShoot());
-    
-    new CommandToggler(
-      m_shooterSubsytem.cmdEnableShooter(),
-      null
-    )
-    .setDefaultState(CommandState.Interruptible)
-    .setToggleButton(OI::getXboxRightBumper)
-    .setCycle(true);
+      //--------------------------------------Shooter Buttons--------------------------------------------------------
 
-    //new Button(OI::getXboxAButton).whenPressed(m_storageSubsytem.cmdRotateDrumOnce());
-  }
+      new CommandToggler( // Shooter Motor Toggle - Left Bumper
+        m_shooterSubsystem.cmdStartShooter(),
+        m_shooterSubsystem.cmdStopShooter()
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxLeftBumper)
+      .setCycle(true);
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new InstantCommand();
-  }
+      new CommandToggler() // Shoot Entire Drum Toggle - A Button
+      .setDefaultState(CommandState.Interruptible)
+      .addJumpCommand(
+        m_storageSubsystem.cmdShootAll(),
+        CommandState.Interruptible
+      )
+      .addCommand(null)
+      .setToggleButton(OI::getXboxAButton)
+      .setCycle(true);
 
-  // Command Getters
-  public static RotateControlPanelCommand getRotateControlPanelCommand() {
-    return new RotateControlPanelCommand(m_controlPanelSubsystem);
-  }
+      //--------------------------------------Elevator Buttons-------------------------------------------------------
+      
+      new CommandToggler( // Deploy/Retract Elevator toggle - start button
+        m_climberSubsystem.cmdDeployElevator(),
+        m_climberSubsystem.cmdRetractElevator()
+      )
+      .setDefaultState(CommandState.Interruptible)
+      .setToggleButton(OI::getXboxStartButton)
+      .setCycle(true);
 
-  public static PositionControlPanelCommand getPositionControlPanelCommand() {
-    return new PositionControlPanelCommand(m_controlPanelSubsystem);
-   }
+      new Button(OI::getXboxDpadUp).whenHeld(m_climberSubsystem.cmdRaiseElevator());
+      new Button(OI::getXboxDpadDown).whenHeld(m_climberSubsystem.cmdLowerElevator());
 
-  public static RumbleCommand getRumbleCommand() {
-    return new RumbleCommand(m_controlPanelSubsystem);
-  }
+      //--------------------------------------Dial Buttons-----------------------------------------------------------
 
-    public static StartStopAcquisitionMotorCommand getStartAcquisitionMotorCommand() {
-      return new StartStopAcquisitionMotorCommand(m_acquisitionSubsystem);
-    }
+      new Button(OI::getXboxXButton).whenHeld(m_controlPanelSubsystem.cmdSpinWhileActive());
 
-  // Subsystem Getters
-  // public static DrivebaseSubsystem getDrivebaseSubsystem() {
-  //   return m_drivebaseSubsystem;
-  // }
-
-  public static ControlPanelSubsystem getControlPanel() {
-    return m_controlPanelSubsystem;
-  }
-
-  public static AcquisitionSubsystem getAcquisitionSubsystem(){
-    return m_acquisitionSubsystem;
   }
 }

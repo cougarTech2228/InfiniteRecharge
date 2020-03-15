@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.Constants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -13,11 +14,16 @@ import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OI;
+import frc.robot.commands.ContinuousCommand;
 import frc.robot.commands.MethodCommand;
+import frc.robot.util.Concensus;
 import frc.robot.util.ShuffleboardAdapter;
+import frc.robot.util.Concensus.ConcensusMode;
 /**
  *
  */
@@ -137,7 +143,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		* true means talon's local output is PID0 - PID1, and other side Talon is PID0 + PID1
 		*/
 		m_rightMaster.configAuxPIDPolarity(false, Constants.kTimeoutMs);
-
+		/*
 		new ShuffleboardAdapter("Drive Base")
 			.addDoubleText("Right kP", 0, value -> {m_rightMaster.config_kP(0, value); })
 			.addDoubleText("Right kI", 0, value -> {m_rightMaster.config_kF(0, value); })
@@ -159,52 +165,40 @@ public class DrivebaseSubsystem extends SubsystemBase {
 			.addDouble("Left Velocity Error", 0, () -> m_leftMaster.getClosedLoopError())
 			.addDouble("Left Velocity", 0, () -> m_leftMaster.getSelectedSensorVelocity())
 			.addDouble("Left Current", 0, () -> m_leftMaster.getSupplyCurrent())
-			.addDoubleText("Left Percent Power", 0, value -> leftPercentOutput = value);
+			.addDoubleText("Left Percent Power", 0, value -> leftPercentOutput = value);*/
 	}
-	private double rightTargetVelocity = 0;
-	private double leftTargetVelocity = 0;
-	private double rightPercentOutput = 0;
-	private double leftPercentOutput = 0;
+	public static final Concensus shouldLowerSpeed = new Concensus(ConcensusMode.Any);
 
     @Override
     public void periodic() {
-		/*
-		if(rightPercentOutput != 0) {
-			m_rightMaster.set(ControlMode.PercentOutput, rightPercentOutput);
-			System.out.println("Set speed to: " + rightPercentOutput);
+		maxSpeed = shouldLowerSpeed.getConcensus() ? 0.5 : 1;
+		if(RobotState.isOperatorControl()) {
+			arcadeDrive();
 		}
-		else if(rightTargetVelocity != 0) {
-			m_rightMaster.set(ControlMode.Velocity, rightTargetVelocity);
-			System.out.println("Set velocity to: " + rightTargetVelocity);
-		}
-		else {
-			m_rightMaster.set(ControlMode.PercentOutput, 0);
-		}
-
-		if(leftPercentOutput != 0) {
-			m_leftMaster.set(ControlMode.PercentOutput, leftPercentOutput);
-		}
-		else if(leftTargetVelocity != 0) {
-			m_leftMaster.set(ControlMode.Velocity, leftTargetVelocity);
-		}
-		else {
-			m_leftMaster.set(ControlMode.PercentOutput, 0);
-		}*/
     }
 	public Command cmdSetMaxSpeed(double percentOfMax) {
 		return new MethodCommand(() -> maxSpeed = percentOfMax);
 	}
+	public Command cmdSetArcadeDrive(double throttle, double turn, double time) {
+		return new WaitCommand(time).beforeStarting(() -> {
+			m_leftMaster.set(ControlMode.PercentOutput, throttle, DemandType.ArbitraryFeedForward, +turn);
+			m_rightMaster.set(ControlMode.PercentOutput, throttle, DemandType.ArbitraryFeedForward, -turn);
+		}).andThen(() -> {
+			m_leftMaster.set(ControlMode.PercentOutput, 0);
+			m_rightMaster.set(ControlMode.PercentOutput, 0);
+		});
+	}
     public Command cmdUseArcadeDrive() {
         return new SequentialCommandGroup(
             new MethodCommand(this::arcadeInit),
-            new MethodCommand(this::arcadeDrive, true)
+            new MethodCommand(this::arcadeDrive).perpetually()
         );
     }
 
     public Command cmdUseStraightDrive() {
         return new SequentialCommandGroup(
             new MethodCommand(this::straightInit),
-            new MethodCommand(this::straightDrive, true)
+            new MethodCommand(this::straightDrive).perpetually()
         );
     }
 
@@ -214,6 +208,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private void arcadeDrive() {
 		double forward = -OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
+		System.out.println("zoom zoom");
 		forward = Deadband(forward) * maxSpeed;
 		turn = Deadband(turn) * 0.5 * maxSpeed;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
