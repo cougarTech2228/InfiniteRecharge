@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ControlPanelSubsystem;
 import frc.robot.Constants;
@@ -89,10 +90,9 @@ public class RotateControlPanelCommand extends CommandBase {
         }
 
         // -------------------------------------SmartDashboardWrites--------------------------------------
-        //SmartDashboard.putString("startColor", m_redColor);
-        // SmartDashboard.putString("colorString", m_colorStringRotate);
-        // SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
-        // SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
+        SmartDashboard.putString("colorString", m_colorStringRotate);
+        SmartDashboard.putBoolean("hasChangedColor", m_hasChangedColor);
+        SmartDashboard.putNumber("rotationsOfStartColor", m_rotationsOfStartColor);
       }
   
       // Returns true when the command should end.

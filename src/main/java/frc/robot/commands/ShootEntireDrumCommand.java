@@ -18,23 +18,25 @@ public class ShootEntireDrumCommand extends SequentialCommandGroup {
     public ShootEntireDrumCommand(ShooterSubsystem shooterSubsystem) {
         //System.out.println("ShootEntireDrumCommand");
         addCommands(
-            new PrintCommand("Shoot entire drum0"),
+            new PrintCommand("Shoot entire drum")
+            .andThen(() -> RobotContainer.getDrivebaseSubsystem().setShouldHalfSpeed(true)),
             RobotContainer.getRotateDrumOneSectionCommand(),
             new PrintCommand("Shoot 1"),
             RobotContainer.getTryToShootCommand(),
-            new WaitCommand(Constants.timeBetweenShots),
+            new WaitCommand(Constants.TIME_BETWEEN_SHOTS),
             new PrintCommand("Shoot 2"),
             RobotContainer.getTryToShootCommand(),
-            new WaitCommand(Constants.timeBetweenShots),
+            new WaitCommand(Constants.TIME_BETWEEN_SHOTS),
             new PrintCommand("Shoot 3"),
             RobotContainer.getTryToShootCommand(),
-            new WaitCommand(Constants.timeBetweenShots),  
+            new WaitCommand(Constants.TIME_BETWEEN_SHOTS),  
             new PrintCommand("Shoot 4"),
             RobotContainer.getTryToShootCommand(),
-            new WaitCommand(Constants.timeBetweenShots),
+            new WaitCommand(Constants.TIME_BETWEEN_SHOTS),
             new PrintCommand("Shoot 5"),
             RobotContainer.getTryToShootCommand()
             .andThen(() -> shooterSubsystem.setIsShooting(false))
+            .andThen(() -> RobotContainer.getDrivebaseSubsystem().setShouldHalfSpeed(false))
         );
         // Use addRequirements() here to declare subsystem dependencies.
         //addRequirements();

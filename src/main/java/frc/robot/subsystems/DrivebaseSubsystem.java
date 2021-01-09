@@ -9,16 +9,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import frc.robot.RobotContainer;
 
 /**
  * DrivebaseSubsystem
@@ -30,7 +27,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private WPI_TalonSRX m_leftMaster = new WPI_TalonSRX(Constants.LEFT_FRONT_MOTOR_CAN_ID);
 	private WPI_TalonSRX m_leftFollower = new WPI_TalonSRX(Constants.LEFT_REAR_MOTOR_CAN_ID);
 
-	private DifferentialDrive m_differentialDrive;
+	//private DifferentialDrive m_differentialDrive;
 	private boolean m_encodersAreAvailable;
 	private DifferentialDriveOdometry m_odometry;
 	private RamseteController m_ramseteController;
@@ -38,6 +35,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	private Pose2d m_savedPose;
 
 	private boolean m_isAutonomous = true;
+	private boolean m_shouldHalfSpeed;
 
 	public DrivebaseSubsystem() {
 
@@ -86,7 +84,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_rightFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_rightMaster.enableCurrentLimit(true);
 		m_rightFollower.enableCurrentLimit(true);
-		// TODO can we set these back to true?
 
 		m_leftMaster.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
 		m_leftFollower.configPeakCurrentLimit(Constants.DRIVE_CURRENT_LIMIT);
@@ -96,7 +93,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		m_leftFollower.configContinuousCurrentLimit(Constants.DRIVE_CONTINUOUS_CURRENT_LIMIT);
 		m_leftMaster.enableCurrentLimit(true);
 		m_leftFollower.enableCurrentLimit(true);
-		// TODO can we set these back to true?
 
 		// m_differentialDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
 		// m_differentialDrive.setRightSideInverted(true);
@@ -110,6 +106,8 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		// resetOdometry();
 
 		// m_ramseteController = new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA);
+
+		m_shouldHalfSpeed = false;
 	}
 
 	/* Zero all sensors used */
@@ -159,10 +157,23 @@ public class DrivebaseSubsystem extends SubsystemBase {
 		double forward = OI.getXboxLeftJoystickY();
 		double turn = OI.getXboxRightJoystickX();
 
+		if(m_shouldHalfSpeed) {
+			forward *= Constants.ELEVATOR_DEPLOY_SPEED_LOWER;
+			turn *= Constants.ELEVATOR_DEPLOY_SPEED_LOWER;
+		} 
+
 		forward = deadband(forward);
 		turn = deadband(turn) * 0.65;
 		m_leftMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, -turn); 
 		m_rightMaster.set(ControlMode.PercentOutput, forward, DemandType.ArbitraryFeedForward, +turn);
+	}
+
+	public double getCurrentMoveSpeedAverage() {
+		return (m_leftMaster.get() + m_rightMaster.get()) / 2;
+	}
+
+	public void setShouldHalfSpeed(boolean shouldHalfSpeed) {
+		m_shouldHalfSpeed = shouldHalfSpeed;
 	}
 
 	@Override
@@ -219,7 +230,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
 	public void resetOdometry() {
 		zeroSensors();
 		m_savedPose = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
-		m_odometry.resetPosition(m_savedPose, RobotContainer.getNavigationSubsystem().getHeading());
+		//m_odometry.resetPosition(m_savedPose, RobotContainer.getNavigationSubsystem().getHeading());
 	}
 
 	/**

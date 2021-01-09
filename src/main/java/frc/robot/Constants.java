@@ -104,22 +104,21 @@ public final class Constants {
 	public static final int SHOOTER_CAN_ID = 41;
 	public static final int DRUM_SPARK_PWM_ID = 0;
 
-	public static final int LOOPS_TO_WAIT = 5;
+	public static final int LOOPS_TO_WAIT = 10;
 	public static final double SHOOTER_MOTOR_SPEED = 120000.0;
 	public static final int MIN_SHOOTING_DISTANCE = 61;
 	public static final int MAX_SHOOTING_DISTANCE = 0;
 
-	public static final double autoTurnSpeed = 0.6;
-	public static final double timeBetweenShots = 0.5;
-	public static final double bopperWaitTime = 0.25;
+	public static final double TIME_BETWEEN_SHOTS = 0.5; // 1.0
+	public static final double BOPPER_WAIT_TIME = 0.1;
 
 	public static final int DRIVE_CURRENT_LIMIT = 60;
 	public static final int DRIVE_CURRENT_DURATION = 100;
 	public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
 
-	public static final int ACQUIRE_CURRENT_LIMIT = 40;
+	public static final int ACQUIRE_CURRENT_LIMIT = 30;
 	public static final int ACQUIRE_CURRENT_DURATION = 100;
-	public static final int ACQUIRE_CONTINUOUS_CURRENT_LIMIT = 35;
+	public static final int ACQUIRE_CONTINUOUS_CURRENT_LIMIT = 18;
 
 	public static final int SHOOTER_CURRENT_LIMIT = 40;
 	public static final int SHOOTER_CURRENT_DURATION = 100;
@@ -127,6 +126,8 @@ public final class Constants {
 
 	public static final int ACQUIRER_CURRENT_THRESHOLD = 2;
 	
+	public static final double ELEVATOR_DEPLOY_SPEED_LOWER = 0.5;
+
 	/**
 	 * Number of joystick buttons to poll. 10 means buttons[1,9] are polled, which
 	 * is actually 9 buttons.
@@ -256,6 +257,6 @@ public final class Constants {
 
 	public static final double DIFFERENTIAL_DRIVE_CONSTRAINT_MAX_VOLTAGE = 10.0;
 
-	public static final double ACQUIRER_MOTOR_SPEED = 0.45;
+	public static final double ACQUIRER_MOTOR_SPEED = 0.70;
 
 }

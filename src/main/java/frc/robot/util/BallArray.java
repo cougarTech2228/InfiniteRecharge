@@ -33,6 +33,10 @@ public class BallArray implements Sendable {
         return data > 30;
     }
 
+    public boolean isEmpty() {
+        return data == 0;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("DrumWidget");

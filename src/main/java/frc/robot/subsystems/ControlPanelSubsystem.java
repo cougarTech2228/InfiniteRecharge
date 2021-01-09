@@ -6,6 +6,7 @@ import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.InterruptHandlerFunction;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -33,7 +34,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
 
     private String m_gameData;
 
-    private final I2C.Port m_i2cPort = I2C.Port.kOnboard;
+    private final I2C.Port m_i2cPort = I2C.Port.kMXP;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(m_i2cPort);
     private final ColorMatch m_colorMatcher = new ColorMatch();
 
@@ -99,6 +100,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
         // Put methods for controlling this subsystem
         // here. Call these from Commands.
         //SmartDashboard.putString("Current color", getCurrentColor());
+        SmartDashboard.putString("FMS color", parseGameData());
     }
 
     // Put methods for controlling this subsystem
@@ -119,6 +121,14 @@ public class ControlPanelSubsystem extends SubsystemBase {
      */
     public WPI_TalonSRX getWheelMotor() {
         return m_wheelMotor;
+    }
+
+    public void startMotor() {
+        m_wheelMotor.set(Constants.CONTROL_PANEL_MOTOR_VELOCITY_FAST);
+    }
+
+    public void stopMotor() {
+        m_wheelMotor.set(0);
     }
 
     /** 
